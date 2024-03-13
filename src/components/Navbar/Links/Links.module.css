@@ -1,0 +1,18 @@
+.links {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.link {
+  min-width: 100px;
+  padding: 10px;
+  border-radius: 10px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.active {
+  background-color: black;
+  color: white;
+}
