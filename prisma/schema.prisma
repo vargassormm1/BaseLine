@@ -33,6 +33,8 @@ model Matches {
   matchId    Int       @id @default(autoincrement())
   playerOne  Int
   playerTwo  Int
+  playerOneUsername  String?
+  playerTwoUsername  String?
   matchType  Int       // Ensure application logic enforces correct values (1, 3, 5)
   winnerId   Int?
   playedAt   DateTime  @default(now())
