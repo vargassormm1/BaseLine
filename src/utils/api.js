@@ -40,3 +40,16 @@ export const createNewMatchDetails = async (content) => {
     return data.data;
   }
 };
+
+export const getAllMatches = async () => {
+  const res = await fetch(
+    new Request(createUrl(`/api/matchDetails`), {
+      method: "GET",
+    })
+  );
+
+  if (res.ok) {
+    const data = await res.json();
+    return data.data;
+  }
+};

@@ -1,14 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Button, Form, DatePicker, Modal, Select, InputNumber } from "antd";
-import BestOfOneScores from "./BestOfOneScores/BestOfOneScores";
-import BestOfThreeScores from "./BestOfThreeScores/BestOfThreeScores";
-import BestOfFiveScores from "./BestOfFiveScores/BestOfFiveScores";
 import { getAllUsers } from "@/utils/api";
 import Scores from "./Scores/Scores";
 import { createNewMatch, createNewMatchDetails } from "@/utils/api";
+import { revalidatePath } from "next/cache";
 
-const NewMatchForm = ({ currentUser }) => {
+const NewMatchForm = ({ currentUser, refetchMatches }) => {
   const [form] = Form.useForm();
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [bestOf, setBestOf] = useState(null);
@@ -55,6 +53,7 @@ const NewMatchForm = ({ currentUser }) => {
       await createNewMatchDetails(scoresBySet[prop]);
     }
 
+    await refetchMatches();
     form.resetFields();
     setOpen(false);
     setBestOf(null);

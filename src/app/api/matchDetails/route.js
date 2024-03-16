@@ -20,3 +20,13 @@ export const POST = async (request) => {
 
   return NextResponse.json({ data: newMatchDetail });
 };
+
+export const GET = async () => {
+  const matchesWithScores = await prisma.matches.findMany({
+    include: {
+      matchDetails: true,
+    },
+  });
+
+  return NextResponse.json({ data: matchesWithScores });
+};
