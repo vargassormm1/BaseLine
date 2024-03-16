@@ -74,12 +74,7 @@ const Match = ({ matchData }) => {
           ? matchData.playerOneUsername
           : matchData.playerTwoUsername}
       </div>
-      <Table
-        columns={columns}
-        dataSource={dataSource}
-        pagination={false}
-        align
-      />
+      <Table columns={columns} dataSource={dataSource} pagination={false} />
     </div>
   );
 };

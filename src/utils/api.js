@@ -15,6 +15,19 @@ export const getAllUsers = async () => {
   }
 };
 
+export const getRankings = async () => {
+  const res = await fetch(
+    new Request(createUrl(`/api/users/rankings`), {
+      method: "GET",
+    })
+  );
+
+  if (res.ok) {
+    const data = await res.json();
+    return data.data;
+  }
+};
+
 export const createNewMatch = async (content) => {
   const res = await fetch(
     new Request(createUrl(`/api/match`), {

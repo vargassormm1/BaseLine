@@ -10,8 +10,8 @@ const NavbarLinks = [
     path: "/home",
   },
   {
-    name: "Profile",
-    path: "/profile",
+    name: "Rankings",
+    path: "/rankings",
   },
 ];
 

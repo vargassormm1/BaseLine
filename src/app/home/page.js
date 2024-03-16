@@ -16,7 +16,6 @@ const Home = async () => {
 
   return (
     <div className={styles.container}>
-      <h1>Games Played</h1>
       <HomeContent currentUser={currentUser} />
     </div>
   );
