@@ -37,6 +37,7 @@ model Matches {
   playerTwoUsername  String?
   matchType  Int       // Ensure application logic enforces correct values (1, 3, 5)
   winnerId   Int?
+  loserId   Int?
   playedAt   DateTime  @default(now())
   playerOneUser User @relation("PlayerOneMatches", fields: [playerOne], references: [userId])
   playerTwoUser User @relation("PlayerTwoMatches", fields: [playerTwo], references: [userId])
