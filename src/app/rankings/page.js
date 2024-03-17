@@ -63,7 +63,7 @@ const Rankings = () => {
       setRankings(ranks);
     };
     getData();
-  });
+  }, []);
 
   return (
     <div className={styles.container}>
