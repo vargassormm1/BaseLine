@@ -5,6 +5,7 @@ import { Table } from "antd";
 import Image from "next/image";
 import { getRankings } from "@/utils/api";
 import styles from "./Rankings.module.css";
+export const revalidate = 0;
 
 const Rankings = () => {
   const [rankings, setRankings] = useState([]);
@@ -56,8 +57,6 @@ const Rankings = () => {
       render: (text) => <b>{text}</b>,
     },
   ];
-
-  console.log(rankings);
 
   useEffect(() => {
     const getData = async () => {
