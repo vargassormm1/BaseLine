@@ -1,7 +1,28 @@
 .container {
   text-align: center;
+  margin-top: 2rem;
+}
+
+.title {
+  margin-bottom: 20px;
 }
 
 .profilepic {
   border-radius: 50%;
+}
+
+@media (max-width: 480px) {
+  .container {
+    min-width: 320px;
+  }
+  .rankingTable td,
+  .rankingTable th {
+    padding: 5px !important;
+    background-color: white !important;
+  }
+
+  .profilepic {
+    width: 30px;
+    height: 30px;
+  }
 }

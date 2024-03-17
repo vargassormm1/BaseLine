@@ -18,7 +18,7 @@ const HomeContent = ({ currentUser }) => {
   }, []);
 
   return (
-    <div>
+    <div className={styles.container}>
       <NewMatchForm currentUser={currentUser} refetchMatches={fetchMatches} />
       {matches.map((match) => {
         return <Match key={match.matchId} matchData={match} />;

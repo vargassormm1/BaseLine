@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Button, Form, DatePicker, Modal, Select, InputNumber } from "antd";
+import { Button, Form, Modal, Select, InputNumber } from "antd";
 import { getAllUsers } from "@/utils/api";
 import Scores from "./Scores/Scores";
 import { createNewMatch, createNewMatchDetails } from "@/utils/api";
-import { revalidatePath } from "next/cache";
+import styles from "./NewmatchForm.module.css";
+import { PlusCircleOutlined } from "@ant-design/icons";
 
 const NewMatchForm = ({ currentUser, refetchMatches }) => {
   const [form] = Form.useForm();
@@ -88,7 +89,12 @@ const NewMatchForm = ({ currentUser, refetchMatches }) => {
 
   return (
     <>
-      <Button type="primary" onClick={showModal}>
+      <Button
+        onClick={showModal}
+        size="large"
+        className={styles.newGame}
+        icon={<PlusCircleOutlined />}
+      >
         New Match
       </Button>
       <Modal

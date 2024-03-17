@@ -5,7 +5,7 @@
 }
 
 body {
-  background-color: rgb(131, 131, 131);
+  background-color: rgb(61, 99, 67);
   color: white;
 }
 
@@ -15,7 +15,7 @@ a {
 }
 
 .container {
-  max-width: 1366px;
+  max-width: 1536px;
   margin: auto;
   padding-left: 50px;
   padding-right: 50px;
@@ -23,4 +23,47 @@ a {
   display: flex;
   flex-direction: column;
   width: 100%;
+}
+
+@media (max-width: 1536px) {
+  .container {
+    width: 1366px;
+  }
+}
+
+@media (max-width: 1366px) {
+  .container {
+    width: 1280px;
+  }
+}
+
+@media (max-width: 1280px) {
+  .container {
+    width: 1024px;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .container {
+    width: 768px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    width: 640px;
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    width: 475px;
+  }
+}
+@media (max-width: 475px) {
+  .container {
+    width: 380px;
+  }
 }

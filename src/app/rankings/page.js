@@ -67,8 +67,13 @@ const Rankings = () => {
 
   return (
     <div className={styles.container}>
-      <h2>World Rankings</h2>
-      <Table columns={columns} dataSource={rankings} pagination={false} />
+      <h2 className={styles.title}>World Rankings</h2>
+      <Table
+        columns={columns}
+        dataSource={rankings}
+        pagination={false}
+        className={styles.rankingTable}
+      />
     </div>
   );
 };

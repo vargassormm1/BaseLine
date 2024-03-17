@@ -1,0 +1,33 @@
+.match {
+  min-width: 600px;
+  background-color: white;
+  padding: 1rem 3rem;
+  color: black;
+  border-radius: 10px;
+  margin-top: 3rem;
+}
+
+.date {
+  text-align: end;
+  font-size: small;
+  margin-bottom: 20px;
+}
+.boldRow {
+  font-weight: bold;
+}
+
+@media (max-width: 475px) {
+  .match {
+    min-width: 320px;
+    padding: 5px 0;
+  }
+  .date {
+    font-size: x-small;
+    margin: 10px;
+  }
+  .matchTable th,
+  .matchTable td {
+    padding: 10px !important;
+    background-color: white !important;
+  }
+}
