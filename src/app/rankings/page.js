@@ -57,6 +57,8 @@ const Rankings = () => {
     },
   ];
 
+  console.log(rankings);
+
   useEffect(() => {
     const getData = async () => {
       const ranks = await getRankings();

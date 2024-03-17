@@ -24,7 +24,7 @@
 
 @media (max-width: 475px) {
   .dropdown {
-    display: block;
+    display: flex;
   }
   .links {
     display: none;

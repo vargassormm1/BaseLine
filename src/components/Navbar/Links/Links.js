@@ -94,7 +94,7 @@ const Links = ({ userId }) => {
         className={styles.dropdown}
       >
         <a onClick={(e) => e.preventDefault()}>
-          <Space>
+          <Space className={styles.dropLinks}>
             <UserButton afterSignOutUrl="/" />
             <MenuOutlined />
           </Space>

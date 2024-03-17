@@ -34,8 +34,6 @@ export const POST = async (request) => {
       console.log("Invalid match type for points increment.");
   }
 
-  console.log(pointsToAdd);
-
   await prisma.user.update({
     where: { userId: data.winner },
     data: {
