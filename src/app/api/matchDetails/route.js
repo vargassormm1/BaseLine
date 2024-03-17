@@ -26,6 +26,9 @@ export const GET = async () => {
     include: {
       matchDetails: true,
     },
+    orderBy: {
+      playedAt: "desc",
+    },
   });
 
   return NextResponse.json({ data: matchesWithScores });
