@@ -20,5 +20,9 @@ export const GET = async () => {
     ...user,
   }));
 
-  return NextResponse.json({ data: rankedTable });
+  const response = NextResponse.json({ data: rankedTable });
+
+  response.headers.set("Cache-Control", "no-store, max-age=0");
+
+  return response;
 };
