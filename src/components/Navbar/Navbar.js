@@ -1,6 +1,7 @@
 import Links from "./Links/Links";
 import styles from "./Navbar.module.css";
 import { auth } from "@clerk/nextjs";
+
 const Navbar = () => {
   const { userId } = auth();
   return (
