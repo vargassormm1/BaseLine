@@ -34,34 +34,46 @@ const Scores = ({ bestOf, playerOne, playerTwo }) => {
               Tiebreaker
             </Checkbox>
             <div className={styles.scores}>
-              <div>
+              <Form.Item
+                layout="horizontal"
+                name={`playerOneSet${setNumber}Score`}
+                label={`Player 1 (${playerOne})`}
+                rules={[
+                  { required: true, message: "Please input player 1 score" },
+                ]}
+              >
+                <InputNumber min={0} />
+              </Form.Item>
+              {tieBreakers[tieBreakerKey] ? (
                 <Form.Item
-                  name={`playerOneSet${setNumber}Score`}
-                  label={`Player 1 (${playerOne})`}
-                  rules={[
-                    { required: true, message: "Please input player 1 score" },
-                  ]}
+                  label={`Tiebreaker (${playerOne})`}
+                  name={`playerOneSet${setNumber}TieBreakerScore`}
                 >
-                  <InputNumber />
+                  <InputNumber disabled={!tieBreakers[tieBreakerKey]} min={0} />
                 </Form.Item>
+              ) : (
+                <></>
+              )}
+
+              <Form.Item
+                name={`playerTwoSet${setNumber}Score`}
+                label={`Player 2 (${playerTwo})`}
+                rules={[
+                  { required: true, message: "Please input player 2 score" },
+                ]}
+              >
+                <InputNumber min={0} />
+              </Form.Item>
+              {tieBreakers[tieBreakerKey] ? (
                 <Form.Item
-                  name={`playerTwoSet${setNumber}Score`}
-                  label={`Player 2 (${playerTwo})`}
-                  rules={[
-                    { required: true, message: "Please input player 2 score" },
-                  ]}
+                  label={`Tiebreaker (${playerTwo})`}
+                  name={`playerTwoSet${setNumber}TieBreakerScore`}
                 >
-                  <InputNumber />
+                  <InputNumber disabled={!tieBreakers[tieBreakerKey]} min={0} />
                 </Form.Item>
-              </div>
-              <div>
-                <Form.Item name={`playerOneSet${setNumber}TieBreakerScore`}>
-                  <InputNumber disabled={!tieBreakers[tieBreakerKey]} />
-                </Form.Item>
-                <Form.Item name={`playerTwoSet${setNumber}TieBreakerScore`}>
-                  <InputNumber disabled={!tieBreakers[tieBreakerKey]} />
-                </Form.Item>
-              </div>
+              ) : (
+                <></>
+              )}
             </div>
           </div>
         );

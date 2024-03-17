@@ -104,6 +104,7 @@ const NewMatchForm = ({ currentUser, refetchMatches }) => {
         onCancel={handleCancel}
       >
         <Form
+          layout="vertical"
           onFinish={handleSubmit}
           form={form}
           initialValues={{ playerOne: currentUser.username }}
