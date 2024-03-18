@@ -1,7 +1,3 @@
-export const fetchCache = "force-no-store";
-export const revalidate = 0; // seconds
-export const dynamic = "force-dynamic";
-
 const createUrl = (path) => {
   return window.location.origin + path;
 };
@@ -21,9 +17,8 @@ export const getAllUsers = async () => {
 
 export const getRankings = async () => {
   const res = await fetch(createUrl(`/api/users/rankings`), {
-    next: { revalidate: 0 },
+    method: "GET",
   });
-
   if (res.ok) {
     const data = await res.json();
     return data.data;

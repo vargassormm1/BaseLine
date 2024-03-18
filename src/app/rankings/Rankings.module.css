@@ -16,11 +16,6 @@
     min-width: 400px;
     margin: 2rem 0 0 0;
   }
-  .rankingTable td,
-  .rankingTable th {
-    padding: 5px !important;
-    background-color: white !important;
-  }
 
   .profilepic {
     width: 30px;
@@ -30,11 +25,6 @@
 @media (max-width: 480px) {
   .container {
     min-width: 320px;
-  }
-  .rankingTable td,
-  .rankingTable th {
-    padding: 5px !important;
-    background-color: white !important;
   }
 
   .profilepic {

@@ -1,0 +1,14 @@
+@media (max-width: 800px) {
+  .rankingTable td,
+  .rankingTable th {
+    padding: 5px !important;
+    background-color: white !important;
+  }
+}
+@media (max-width: 480px) {
+  .rankingTable td,
+  .rankingTable th {
+    padding: 5px !important;
+    background-color: white !important;
+  }
+}

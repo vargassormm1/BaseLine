@@ -1,82 +1,34 @@
-"use client";
-import { useEffect, useState } from "react";
-import prisma from "@/utils/db";
-import { Table } from "antd";
-import Image from "next/image";
-import { getRankings } from "@/utils/api";
 import styles from "./Rankings.module.css";
-export const fetchCache = "force-no-store";
-export const revalidate = 0; // seconds
-export const dynamic = "force-dynamic";
+import RankingsTable from "@/components/RankingsTable/RankingsTable";
+import prisma from "@/utils/db";
 
-const Rankings = () => {
-  const [rankings, setRankings] = useState([]);
-  const columns = [
-    {
-      title: "Rank",
-      dataIndex: "rank",
-      key: "rank",
-      align: "center",
+const getRankings = async () => {
+  const rankingTable = await prisma.user.findMany({
+    select: {
+      username: true,
+      totalWins: true,
+      totalLosses: true,
+      totalPoints: true,
+      imageUrl: true,
     },
-    {
-      title: "",
-      dataIndex: "imageUrl",
-      key: "imageUrl",
-      align: "center",
-      render: (text) => (
-        <Image
-          className={styles.profilepic}
-          src={text}
-          width={50}
-          height={50}
-          alt="Picture of the user"
-        />
-      ),
+    orderBy: {
+      totalPoints: "desc",
     },
-    {
-      title: "User",
-      dataIndex: "username",
-      key: "username",
-      align: "center",
-    },
-    {
-      title: "Losses",
-      dataIndex: "totalLosses",
-      key: "totalLosses",
-      align: "center",
-    },
-    {
-      title: "Wins",
-      key: "totalWins",
-      align: "center",
-      dataIndex: "totalWins",
-    },
-    {
-      title: "Points",
-      dataIndex: "totalPoints",
-      key: "totalPoints",
-      align: "center",
-      render: (text) => <b>{text}</b>,
-    },
-  ];
-
-  useEffect(() => {
-    const getData = async () => {
-      const ranks = await getRankings();
-      setRankings(ranks);
-    };
-    getData();
-  }, []);
-
+  });
+  const rankedTable = rankingTable.map((user, index) => ({
+    rank: index + 1,
+    key: user.username,
+    ...user,
+  }));
+  return rankedTable;
+};
+const Rankings = async () => {
+  const rankings = await getRankings();
+  console.log(rankings);
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>World Rankings</h2>
-      <Table
-        columns={columns}
-        dataSource={rankings}
-        pagination={false}
-        className={styles.rankingTable}
-      />
+      <RankingsTable rankings={rankings} />
     </div>
   );
 };
