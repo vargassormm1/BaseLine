@@ -17,7 +17,7 @@ export const getAllUsers = async () => {
 
 export const getRankings = async () => {
   const res = await fetch(
-    new Request(createUrl(`/api/users/rankings`, { cache: "no-store" }), {
+    new Request(createUrl(`/api/users/rankings`), {
       method: "GET",
     })
   );

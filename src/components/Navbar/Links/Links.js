@@ -105,6 +105,7 @@ const Links = ({ userId }) => {
           <>
             {NavbarLinks.map((link) => (
               <Link
+                prefetch={true}
                 href={link.path}
                 key={link.name}
                 className={`${styles.link} ${
