@@ -17,11 +17,7 @@ export const getAllUsers = async () => {
 
 export const getRankings = async () => {
   const res = await fetch(createUrl(`/api/users/rankings`), {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    cache: "no-store", // This line opts out of caching for this request
+    next: { revalidate: 0 },
   });
 
   if (res.ok) {
