@@ -17,16 +17,10 @@ export const getAllUsers = async () => {
 
 export const getRankings = async () => {
   const res = await fetch(
-    new Request(
-      createUrl(`/api/users/rankings`, {
-        next: {
-          revalidate: 0,
-        },
-      }),
-      {
-        method: "GET",
-      }
-    )
+    new Request(createUrl(`/api/users/rankings`), {
+      method: "GET",
+      cache: "no-store",
+    })
   );
 
   if (res.ok) {
