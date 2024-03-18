@@ -1,3 +1,6 @@
+export const fetchCache = "force-no-store";
+export const revalidate = 0; // seconds
+
 const createUrl = (path) => {
   return window.location.origin + path;
 };
