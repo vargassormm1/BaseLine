@@ -5,7 +5,8 @@ import { Table } from "antd";
 import Image from "next/image";
 import { getRankings } from "@/utils/api";
 import styles from "./Rankings.module.css";
-export const revalidate = 0;
+export const fetchCache = "force-no-store";
+export const revalidate = 0; // seconds
 
 const Rankings = () => {
   const [rankings, setRankings] = useState([]);
