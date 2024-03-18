@@ -7,28 +7,14 @@
   margin-bottom: 20px;
 }
 
-.profilepic {
-  border-radius: 50%;
-}
-
 @media (max-width: 800px) {
   .container {
     min-width: 400px;
     margin: 2rem 0 0 0;
   }
-
-  .profilepic {
-    width: 30px;
-    height: 30px;
-  }
 }
 @media (max-width: 480px) {
   .container {
     min-width: 320px;
-  }
-
-  .profilepic {
-    width: 30px;
-    height: 30px;
   }
 }

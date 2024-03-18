@@ -17,14 +17,23 @@
   color: white;
 }
 
+.drop {
+  display: none;
+}
+
 .dropdown {
   display: none;
   cursor: pointer;
 }
 
 @media (max-width: 475px) {
+  .drop {
+    display: flex;
+  }
+
   .dropdown {
     display: flex;
+    margin-right: 10px;
   }
   .links {
     display: none;

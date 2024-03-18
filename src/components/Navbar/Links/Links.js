@@ -87,19 +87,21 @@ const Links = ({ userId }) => {
   };
   return (
     <>
-      <Dropdown
-        menu={{
-          items,
-        }}
-        className={styles.dropdown}
-      >
-        <a onClick={(e) => e.preventDefault()}>
-          <Space className={styles.dropLinks}>
-            <UserButton afterSignOutUrl="/" />
-            <MenuOutlined />
-          </Space>
-        </a>
-      </Dropdown>
+      <div className={styles.drop}>
+        <Dropdown
+          menu={{
+            items,
+          }}
+          className={styles.dropdown}
+        >
+          <a onClick={(e) => e.preventDefault()}>
+            <Space className={styles.dropLinks}>
+              <MenuOutlined />
+            </Space>
+          </a>
+        </Dropdown>
+        <UserButton afterSignOutUrl="/" />
+      </div>
       <ul className={styles.links}>
         {userId ? (
           <>

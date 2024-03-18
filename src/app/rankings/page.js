@@ -24,7 +24,6 @@ const getRankings = async () => {
 };
 const Rankings = async () => {
   const rankings = await getRankings();
-  console.log(rankings);
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>World Rankings</h2>

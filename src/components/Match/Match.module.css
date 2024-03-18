@@ -43,7 +43,7 @@
   }
   .matchTable th,
   .matchTable td {
-    padding: 10px !important;
+    padding: 3px !important;
     background-color: white !important;
   }
 }

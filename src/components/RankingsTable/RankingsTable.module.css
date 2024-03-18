@@ -1,14 +1,26 @@
+.profilepic {
+  border-radius: 50%;
+}
+
 @media (max-width: 800px) {
   .rankingTable td,
   .rankingTable th {
-    padding: 5px !important;
+    padding: 3px !important;
     background-color: white !important;
+  }
+  .profilepic {
+    width: 30px;
+    height: 30px;
   }
 }
 @media (max-width: 480px) {
   .rankingTable td,
   .rankingTable th {
-    padding: 5px !important;
+    padding: 3px !important;
     background-color: white !important;
+  }
+  .profilepic {
+    width: 25px;
+    height: 25px;
   }
 }
