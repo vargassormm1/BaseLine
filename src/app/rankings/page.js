@@ -7,6 +7,7 @@ import { getRankings } from "@/utils/api";
 import styles from "./Rankings.module.css";
 export const fetchCache = "force-no-store";
 export const revalidate = 0; // seconds
+export const dynamic = "force-dynamic";
 
 const Rankings = () => {
   const [rankings, setRankings] = useState([]);

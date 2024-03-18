@@ -1,5 +1,6 @@
 export const fetchCache = "force-no-store";
 export const revalidate = 0; // seconds
+export const dynamic = "force-dynamic";
 
 const createUrl = (path) => {
   return window.location.origin + path;
