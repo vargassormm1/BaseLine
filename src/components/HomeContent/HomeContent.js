@@ -5,7 +5,7 @@ import NewMatchForm from "@/components/NewMatchForm/NewMatchForm";
 import Match from "../Match/Match";
 import { getAllMatches } from "@/utils/api";
 
-const HomeContent = ({ currentUser }) => {
+const HomeContent = ({ currentUser, users }) => {
   const [matches, setMatches] = useState([]);
 
   const fetchMatches = async () => {
@@ -19,7 +19,11 @@ const HomeContent = ({ currentUser }) => {
 
   return (
     <div className={styles.container}>
-      <NewMatchForm currentUser={currentUser} refetchMatches={fetchMatches} />
+      <NewMatchForm
+        currentUser={currentUser}
+        refetchMatches={fetchMatches}
+        users={users}
+      />
       {matches.map((match) => {
         return <Match key={match.matchId} matchData={match} />;
       })}

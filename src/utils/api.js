@@ -2,19 +2,6 @@ const createUrl = (path) => {
   return window.location.origin + path;
 };
 
-export const getAllUsers = async () => {
-  const res = await fetch(
-    new Request(createUrl(`/api/users`), {
-      method: "GET",
-    })
-  );
-
-  if (res.ok) {
-    const data = await res.json();
-    return data.data;
-  }
-};
-
 export const getRankings = async () => {
   const res = await fetch(createUrl(`/api/users/rankings`), {
     method: "GET",

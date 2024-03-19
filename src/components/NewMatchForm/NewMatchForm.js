@@ -1,18 +1,15 @@
-"use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button, Form, Modal, Select, InputNumber } from "antd";
-import { getAllUsers } from "@/utils/api";
 import Scores from "./Scores/Scores";
 import { createNewMatch, createNewMatchDetails } from "@/utils/api";
 import styles from "./NewmatchForm.module.css";
 import { PlusCircleOutlined } from "@ant-design/icons";
 
-const NewMatchForm = ({ currentUser, refetchMatches }) => {
+const NewMatchForm = ({ currentUser, refetchMatches, users }) => {
   const [form] = Form.useForm();
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [bestOf, setBestOf] = useState(null);
   const [sets, setSets] = useState(null);
-  const [users, setUsers] = useState([]);
   const [open, setOpen] = useState(false);
   const [playerTwo, setPlayerTwo] = useState(null);
 
@@ -35,7 +32,6 @@ const NewMatchForm = ({ currentUser, refetchMatches }) => {
     const newMatch = await createNewMatch(values);
     const scoresBySet = {};
     Object.keys(values).forEach((key) => {
-      // Extract set number and field type from the key
       const match = key.match(
         /(playerOne|playerTwo)(Set\d+)(Score|TieBreakerScore)/
       );
@@ -70,22 +66,6 @@ const NewMatchForm = ({ currentUser, refetchMatches }) => {
     (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
 
   const player2 = users.find((el) => playerTwo === el.userId);
-
-  useEffect(() => {
-    const getUsers = async () => {
-      const users = await getAllUsers();
-      users.map((el) => {
-        el.value = el.userId;
-        el.label = el.username;
-      });
-      const finalData = users.filter(
-        (el) => el.username !== currentUser.username
-      );
-      setUsers(finalData);
-    };
-
-    getUsers();
-  }, [currentUser.username]);
 
   return (
     <>

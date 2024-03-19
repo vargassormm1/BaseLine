@@ -2,6 +2,7 @@ import styles from "./home.module.css";
 import prisma from "@/utils/db";
 import { auth } from "@clerk/nextjs";
 import HomeContent from "@/components/HomeContent/HomeContent";
+
 const getCurrentUser = async (clerkId) => {
   const user = await prisma.user.findUnique({
     where: { clerkId },
@@ -10,13 +11,30 @@ const getCurrentUser = async (clerkId) => {
   return user;
 };
 
+const getAllUsers = async (userId) => {
+  const users = await prisma.user.findMany({
+    select: {
+      userId: true,
+      username: true,
+    },
+  });
+  users.map((el) => {
+    el.value = el.userId;
+    el.label = el.username;
+  });
+  const finalData = users.filter((el) => el.userId !== userId);
+  return finalData;
+};
+
 const Home = async () => {
   const { userId } = await auth();
+  const users = await getAllUsers(userId);
+
   const currentUser = await getCurrentUser(userId);
 
   return (
     <div className={styles.container}>
-      <HomeContent currentUser={currentUser} />
+      <HomeContent currentUser={currentUser} users={users} />
     </div>
   );
 };
