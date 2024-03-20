@@ -11,10 +11,11 @@ const getCurrentUser = async (clerkId) => {
   return user;
 };
 
-const getAllUsers = async (userId) => {
+const getAllUsers = async (clerkId) => {
   const users = await prisma.user.findMany({
     select: {
       userId: true,
+      clerkId: true,
       username: true,
     },
   });
@@ -22,7 +23,7 @@ const getAllUsers = async (userId) => {
     el.value = el.userId;
     el.label = el.username;
   });
-  const finalData = users.filter((el) => el.userId !== userId);
+  const finalData = users.filter((el) => el.clerkId !== clerkId);
   return finalData;
 };
 
