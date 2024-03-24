@@ -55,6 +55,20 @@ const Links = ({ userId }) => {
           ),
           key: "1",
         },
+        {
+          label: (
+            <Link
+              href="/h2h"
+              key="h2h"
+              className={`${styles.link} ${
+                pathName === "/h2h" ? styles.active : styles.link
+              }`}
+            >
+              Rankings
+            </Link>
+          ),
+          key: "1",
+        },
       ]
     : [
         {
