@@ -88,6 +88,7 @@ const NewMatchForm = ({ currentUser, refetchMatches, users }) => {
           onFinish={handleSubmit}
           form={form}
           initialValues={{ playerOne: currentUser.username }}
+          className={styles.newMatchForm}
         >
           <h2>New Match</h2>
 
@@ -191,12 +192,7 @@ const NewMatchForm = ({ currentUser, refetchMatches, users }) => {
           </Form.Item>
 
           {/* Submit */}
-          <Form.Item
-            wrapperCol={{
-              offset: 8,
-              span: 16,
-            }}
-          >
+          <Form.Item className={styles.submit}>
             <Button type="primary" htmlType="submit">
               Submit
             </Button>

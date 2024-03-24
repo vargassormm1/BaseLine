@@ -4,3 +4,28 @@
   border-color: #3f8600 !important;
   color: white !important;
 }
+
+.newMatchForm {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.submit {
+  align-self: center;
+}
+
+@media (max-width: 1536px) {
+}
+@media (max-width: 1366px) {
+}
+@media (max-width: 1280px) {
+}
+@media (max-width: 1024px) {
+}
+@media (max-width: 768px) {
+}
+@media (max-width: 640px) {
+}
+@media (max-width: 475px) {
+}

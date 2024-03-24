@@ -26,6 +26,19 @@
   cursor: pointer;
 }
 
+@media (max-width: 640px) {
+  .drop {
+    display: flex;
+  }
+
+  .dropdown {
+    display: flex;
+    margin-right: 10px;
+  }
+  .links {
+    display: none;
+  }
+}
 @media (max-width: 475px) {
   .drop {
     display: flex;
