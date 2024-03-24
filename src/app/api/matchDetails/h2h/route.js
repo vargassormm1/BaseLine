@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import prisma from "@/utils/db";
+import prisma from "../../../../utils/db";
 
 export const GET = async (req) => {
   const userId1 = req.nextUrl.searchParams.get("user1");
