@@ -50,3 +50,19 @@ export const getAllMatches = async () => {
     return data.data;
   }
 };
+
+export const getH2hMatches = async (user1, user2) => {
+  const res = await fetch(
+    new Request(
+      createUrl(`/api/matchDetails/h2h?user1=${user1}&user2=${user2}`),
+      {
+        method: "GET",
+      }
+    )
+  );
+
+  if (res.ok) {
+    const data = await res.json();
+    return data.data;
+  }
+};
