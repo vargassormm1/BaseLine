@@ -64,7 +64,7 @@ const Links = ({ userId }) => {
                 pathName === "/h2h" ? styles.active : styles.link
               }`}
             >
-              Rankings
+              H2H
             </Link>
           ),
           key: "1",
