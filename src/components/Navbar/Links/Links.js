@@ -16,6 +16,10 @@ const NavbarLinks = [
     name: "Rankings",
     path: "/rankings",
   },
+  {
+    name: "H2H",
+    path: "/h2h",
+  },
 ];
 
 const Links = ({ userId }) => {
