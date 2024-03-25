@@ -4,11 +4,14 @@
   border-color: #3f8600 !important;
   color: white !important;
 }
-
 .newMatchForm {
   display: flex;
   flex-direction: column;
   justify-content: center;
+}
+
+.newMatchForm h2 {
+  align-self: center;
 }
 
 .submit {

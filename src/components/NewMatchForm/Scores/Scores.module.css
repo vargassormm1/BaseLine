@@ -1,3 +1,6 @@
 .scores {
   display: flex;
 }
+.scoreInput {
+  width: 100%;
+}
