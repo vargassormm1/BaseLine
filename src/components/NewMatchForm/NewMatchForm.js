@@ -90,7 +90,7 @@ const NewMatchForm = ({ currentUser, refetchMatches, users }) => {
           initialValues={{ playerOne: currentUser.username }}
           className={styles.newMatchForm}
         >
-          <h2>New Match</h2>
+          <h2 className={styles.scores}>New Match</h2>
 
           {/* Player 1 */}
           <Form.Item label="Player 1" name="playerOne">
