@@ -1,6 +1,5 @@
 import styles from "./page.module.css";
 import Link from "next/link";
-import { Button } from "antd";
 import { auth } from "@clerk/nextjs";
 
 const Home = async () => {
@@ -13,7 +12,7 @@ const Home = async () => {
       <p>–</p>
       <p>Track, Compete, Excel.</p>
       <Link href={href}>
-        <Button className={styles.getStarted}>Get Started</Button>
+        <button className={styles.getStarted}>Get Started</button>
       </Link>
     </main>
   );

@@ -1,5 +1,5 @@
 "use client";
-import { Table, Button } from "antd";
+import { Table } from "antd";
 import styles from "./Match.module.css";
 const Match = ({ matchData }) => {
   // Dynamically generate columns from the matchDetails, with the first being player names

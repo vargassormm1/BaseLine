@@ -34,16 +34,16 @@ const RankingsTable = ({ rankings }) => {
       align: "center",
     },
     {
-      title: "Losses",
-      dataIndex: "totalLosses",
-      key: "totalLosses",
-      align: "center",
-    },
-    {
       title: "Wins",
       key: "totalWins",
       align: "center",
       dataIndex: "totalWins",
+    },
+    {
+      title: "Losses",
+      dataIndex: "totalLosses",
+      key: "totalLosses",
+      align: "center",
     },
     {
       title: "Points",
