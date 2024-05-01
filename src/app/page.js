@@ -1,10 +1,10 @@
 import styles from "./page.module.css";
 import Link from "next/link";
 import { Button } from "antd";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 
 const Home = async () => {
-  const { userId } = await auth();
+  const { userId } = auth();
   let href = userId ? "/home" : "/new-user";
   return (
     <main className={styles.container}>

@@ -1,10 +1,10 @@
+import styles from "./signin.module.css";
 import { SignIn } from "@clerk/nextjs";
-import styles from "./sign-in.module.css";
 
 export default function Page() {
   return (
     <div className={styles.container}>
-      <SignIn />
+      <SignIn path="/sign-in" />
     </div>
   );
 }
