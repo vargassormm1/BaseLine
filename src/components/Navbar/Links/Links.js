@@ -1,9 +1,8 @@
 "use client";
-import { useState } from "react";
 import Link from "next/link";
 import styles from "./Links.module.css";
 import { usePathname } from "next/navigation";
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
 import { MenuOutlined } from "@ant-design/icons";
 import { Dropdown, Space } from "antd";
 
@@ -23,7 +22,6 @@ const NavbarLinks = [
 ];
 
 const Links = ({ userId }) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathName = usePathname();
   const items = userId
     ? [
@@ -74,10 +72,10 @@ const Links = ({ userId }) => {
         {
           label: (
             <Link
-              href="/login"
+              href="/sign-in"
               key="login"
               className={`${styles.link} ${
-                pathName === "/login" ? styles.active : styles.link
+                pathName === "/sign-in" ? styles.active : styles.link
               }`}
             >
               Login
@@ -88,10 +86,10 @@ const Links = ({ userId }) => {
         {
           label: (
             <Link
-              href="/register"
+              href="/sign-up"
               key="register"
               className={`${styles.link} ${
-                pathName === "/register" ? styles.active : styles.link
+                pathName === "/sign-up" ? styles.active : styles.link
               }`}
             >
               Register
@@ -100,9 +98,7 @@ const Links = ({ userId }) => {
           key: "2",
         },
       ];
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+
   return (
     <>
       <div className={styles.drop}>
@@ -121,7 +117,25 @@ const Links = ({ userId }) => {
         <UserButton afterSignOutUrl="/" />
       </div>
       <ul className={styles.links}>
-        {userId ? (
+        <SignedOut>
+          <Link
+            href={"/sign-in"}
+            className={`${styles.link} ${
+              pathName === "/sign-in" ? styles.active : styles.link
+            }`}
+          >
+            Login
+          </Link>
+          <Link
+            href={"/sign-up"}
+            className={`${styles.link} ${
+              pathName === "/sign-up" ? styles.active : styles.link
+            }`}
+          >
+            Sign Up
+          </Link>
+        </SignedOut>
+        <SignedIn>
           <>
             {NavbarLinks.map((link) => (
               <Link
@@ -137,26 +151,7 @@ const Links = ({ userId }) => {
             ))}
             <UserButton afterSignOutUrl="/" />
           </>
-        ) : (
-          <>
-            <Link
-              href={"/login"}
-              className={`${styles.link} ${
-                pathName === "/login" ? styles.active : styles.link
-              }`}
-            >
-              Login
-            </Link>
-            <Link
-              href={"/register"}
-              className={`${styles.link} ${
-                pathName === "/register" ? styles.active : styles.link
-              }`}
-            >
-              Sign Up
-            </Link>
-          </>
-        )}
+        </SignedIn>
       </ul>
     </>
   );
