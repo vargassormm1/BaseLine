@@ -1,8 +1,15 @@
 .newGame {
   width: 200px;
-  background-color: #4b940b !important;
-  border-color: #3f8600 !important;
-  color: white !important;
+  border-radius: 5px;
+  background-color: #4b940b;
+  border-color: #3f8600;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  font-size: 16px;
+}
+.newGame:hover {
+  cursor: pointer;
 }
 .newMatchForm {
   display: flex;
