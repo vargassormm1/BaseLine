@@ -1,8 +1,7 @@
 "use client";
-import { Table, Button } from "antd";
 import styles from "./Match.module.css";
+
 const Match = ({ matchData }) => {
-  // Dynamically generate columns from the matchDetails, with the first being player names
   const uniqueSets = [
     ...new Set(matchData.matchDetails.map((detail) => detail.setNumber)),
   ];
@@ -19,16 +18,9 @@ const Match = ({ matchData }) => {
       dataIndex: `set${setNumber}`,
       key: `set${setNumber}`,
       align: "center",
-      render: (score, record) => (
-        <>
-          {score.main}
-          {score.tieBreaker && <sup>{score.tieBreaker}</sup>}
-        </>
-      ),
     })),
   ];
 
-  // Transforming dataSource to fit the new columns setup
   const dataSource = [
     {
       key: "playerOne",
@@ -71,18 +63,38 @@ const Match = ({ matchData }) => {
       <p className={styles.date}>
         {new Date(matchData.playedAt).toLocaleDateString("en-US", {
           year: "numeric",
-          month: "2-digit",
+          month: "long",
           day: "2-digit",
         })}
       </p>
-      <Table
-        columns={columns}
-        dataSource={dataSource}
-        pagination={false}
-        rowClassName={getRowClassName}
-        className={styles.matchTable}
-      />
+      <table className={styles.matchTable}>
+        <thead>
+          <tr>
+            {columns.map((column) => (
+              <th key={column.key} style={{ textAlign: column.align }}>
+                {column.title}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {dataSource.map((record) => (
+            <tr key={record.key} className={getRowClassName(record)}>
+              <td style={{ textAlign: "center" }}>{record.playerName}</td>
+              {uniqueSets.map((setNumber) => (
+                <td key={setNumber} style={{ textAlign: "center" }}>
+                  {record[`set${setNumber}`].main}
+                  {record[`set${setNumber}`].tieBreaker && (
+                    <sup>{record[`set${setNumber}`].tieBreaker}</sup>
+                  )}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
+
 export default Match;

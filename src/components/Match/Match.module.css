@@ -1,17 +1,39 @@
 .match {
-  min-width: 600px;
-  background-color: white;
-  padding: 1rem 3rem;
   color: black;
-  border-radius: 10px;
-  margin-top: 3rem;
+  min-width: 600px;
+  margin: 20px;
+  padding: 20px;
+  border-radius: 8px;
+}
+.date {
+  font-size: 12px;
+  margin-bottom: 10px;
+  text-align: left;
+  color: white;
+}
+.matchTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.matchTable th,
+.matchTable td {
+  border: 0.5px solid lightgrey;
+  padding: 20px 10px;
+  text-align: center;
 }
 
-.date {
-  text-align: end;
-  font-size: small;
-  margin-bottom: 20px;
+.matchTable th {
+  background-color: rgb(241, 241, 241);
+  font-weight: 500;
 }
+
+.matchTable td {
+  background-color: white;
+}
+
 .boldRow {
   font-weight: bold;
 }
@@ -29,30 +51,20 @@
 @media (max-width: 640px) {
   .match {
     min-width: 400px;
-    padding: 5px 0;
-  }
-  .date {
-    font-size: smaller;
+    padding: 5px;
     margin: 10px;
+  }
+
+  .date {
+    font-size: 12px;
   }
   .matchTable th,
   .matchTable td {
-    padding: 10px !important;
-    background-color: white !important;
+    padding: 15px 5px;
   }
 }
 @media (max-width: 475px) {
   .match {
     min-width: 320px;
-    padding: 5px 0;
-  }
-  .date {
-    font-size: x-small;
-    margin: 10px;
-  }
-  .matchTable th,
-  .matchTable td {
-    padding: 3px !important;
-    background-color: white !important;
   }
 }
