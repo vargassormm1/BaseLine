@@ -8,12 +8,12 @@ const Home = async () => {
   let href = userId ? "/home" : "/new-user";
   return (
     <main className={styles.container}>
-      <h1 className={styles.title}>Baseline</h1>
+      <h1>Baseline</h1>
       <p>The Court is Calling</p>
       <p>–</p>
       <p>Track, Compete, Excel.</p>
       <Link href={href}>
-        <Button className={styles.getStarted}>Get Started</Button>
+        <button className={styles.getStarted}>Get Started</button>
       </Link>
     </main>
   );

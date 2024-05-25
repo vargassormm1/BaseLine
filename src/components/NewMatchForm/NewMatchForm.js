@@ -69,14 +69,9 @@ const NewMatchForm = ({ currentUser, refetchMatches, users }) => {
 
   return (
     <>
-      <Button
-        onClick={showModal}
-        size="large"
-        className={styles.newGame}
-        icon={<PlusCircleOutlined />}
-      >
-        New Match
-      </Button>
+      <button onClick={showModal} className={styles.newGame}>
+        <PlusCircleOutlined /> New Match
+      </button>
       <Modal
         open={open}
         confirmLoading={confirmLoading}
