@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Form, Modal, Select, InputNumber } from "antd";
+import { Form, Modal, Select, InputNumber } from "antd";
 import Scores from "./Scores/Scores";
 import { createNewMatch, createNewMatchDetails } from "@/utils/api";
 import styles from "./NewmatchForm.module.css";
@@ -13,10 +13,10 @@ const NewMatchForm = ({ currentUser, refetchMatches, users }) => {
   const [open, setOpen] = useState(false);
   const [playerTwo, setPlayerTwo] = useState(null);
 
-  // Modal
   const showModal = () => {
     setOpen(true);
   };
+
   const handleCancel = () => {
     form.resetFields();
     setOpen(false);
@@ -25,12 +25,38 @@ const NewMatchForm = ({ currentUser, refetchMatches, users }) => {
     setPlayerTwo(null);
   };
 
+  const calculateWinner = (scores, playerTwoId) => {
+    let playerOneWins = 0;
+    let playerTwoWins = 0;
+
+    scores.forEach((set) => {
+      if (set.playeronescore > set.playertwoscore) {
+        playerOneWins++;
+      } else {
+        playerTwoWins++;
+      }
+    });
+
+    if (bestOf === 1) {
+      return playerOneWins > playerTwoWins ? currentUser.userId : playerTwoId;
+    }
+
+    const requiredWins = Math.ceil(bestOf / 2);
+
+    return playerOneWins >= requiredWins ? currentUser.userId : playerTwoId;
+  };
+
   const handleSubmit = async (values) => {
     values.playerOne = currentUser.userId;
     values.playerOneUsername = currentUser.username;
     values.playerTwoUsername = player2?.username;
-    const newMatch = await createNewMatch(values);
+
+    const playerTwoId = users.find(
+      (user) => user.username === player2?.username
+    )?.userId;
     const scoresBySet = {};
+    const scoresArray = [];
+
     Object.keys(values).forEach((key) => {
       const match = key.match(
         /(playerOne|playerTwo)(Set\d+)(Score|TieBreakerScore)/
@@ -40,14 +66,29 @@ const NewMatchForm = ({ currentUser, refetchMatches, users }) => {
         if (!scoresBySet[set])
           scoresBySet[set] = {
             set: parseInt(set.replace("Set", "")),
-            matchId: newMatch.matchId,
           };
         scoresBySet[set][`${player.toLowerCase()}${scoreType}`] = values[key];
+
+        if (scoreType === "Score") {
+          scoresArray.push({
+            playeronescore: values[`playerOne${set}Score`],
+            playertwoscore: values[`playerTwo${set}Score`],
+          });
+        }
       }
     });
 
+    const winner = calculateWinner(scoresArray, playerTwoId);
+    const newMatch = await createNewMatch({
+      ...values,
+      winner,
+    });
+
     for (let prop in scoresBySet) {
-      await createNewMatchDetails(scoresBySet[prop]);
+      await createNewMatchDetails({
+        ...scoresBySet[prop],
+        matchId: newMatch.matchId,
+      });
     }
 
     await refetchMatches();
@@ -58,11 +99,7 @@ const NewMatchForm = ({ currentUser, refetchMatches, users }) => {
     setPlayerTwo(null);
   };
 
-  // Select options
   const filterOpponents = (input, option) =>
-    (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
-
-  const filterWinner = (input, option) =>
     (option?.label ?? "").toLowerCase().includes(input.toLowerCase());
 
   const player2 = users.find((el) => playerTwo === el.userId);
@@ -163,35 +200,8 @@ const NewMatchForm = ({ currentUser, refetchMatches, users }) => {
             playerTwo={player2?.username}
           />
 
-          {/* Winner */}
-          <Form.Item
-            label="Winner"
-            name="winner"
-            rules={[
-              {
-                required: true,
-                message: "Please select the winner of the match",
-              },
-            ]}
-          >
-            <Select
-              showSearch
-              placeholder="Select Winner"
-              optionFilterProp="children"
-              filterOption={filterWinner}
-              options={[
-                ...users,
-                { value: currentUser.userId, label: currentUser.username },
-              ]}
-            />
-          </Form.Item>
-
           {/* Submit */}
-          <Form.Item className={styles.submit}>
-            <Button type="primary" htmlType="submit">
-              Submit
-            </Button>
-          </Form.Item>
+          <button htmlType="submit">Submit</button>
         </Form>
       </Modal>
     </>

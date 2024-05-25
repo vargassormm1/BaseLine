@@ -16,13 +16,20 @@
   flex-direction: column;
   justify-content: center;
 }
-
 .newMatchForm h2 {
   align-self: center;
 }
-
-.submit {
-  align-self: center;
+.newMatchForm button {
+  background-color: #4b940b;
+  border-color: #3f8600;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  margin-top: 2rem;
+}
+.newMatchForm button:hover {
+  cursor: pointer;
 }
 
 @media (max-width: 1536px) {
