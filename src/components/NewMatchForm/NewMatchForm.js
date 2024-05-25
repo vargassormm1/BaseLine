@@ -136,18 +136,22 @@ const NewMatchForm = ({ currentUser, refetchMatches, users }) => {
             rules={[
               {
                 required: true,
-                message: "Please select your oppents username",
+                message: "Please select your opponent's username",
               },
             ]}
           >
             <Select
-              showSearch
               placeholder="Select Opponent"
-              optionFilterProp="children"
-              filterOption={filterOpponents}
-              options={users}
               onChange={(value) => setPlayerTwo(value)}
-            />
+            >
+              {users.map((user, id) => {
+                return (
+                  <Select.Option key={id} value={user.userId}>
+                    {user.username}
+                  </Select.Option>
+                );
+              })}
+            </Select>
           </Form.Item>
 
           {/* Match Type */}
