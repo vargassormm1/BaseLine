@@ -1,65 +1,46 @@
 "use client";
 
-import { Table } from "antd";
 import Image from "next/image";
 import styles from "./RankingsTable.module.css";
 
 const RankingsTable = ({ rankings }) => {
-  const columns = [
-    {
-      title: "Rank",
-      dataIndex: "rank",
-      key: "rank",
-      align: "center",
-    },
-    {
-      title: "",
-      dataIndex: "imageUrl",
-      key: "imageUrl",
-      align: "center",
-      render: (text) => (
-        <Image
-          className={styles.profilepic}
-          src={text}
-          width={50}
-          height={50}
-          alt="Picture of the user"
-        />
-      ),
-    },
-    {
-      title: "User",
-      dataIndex: "username",
-      key: "username",
-      align: "center",
-    },
-    {
-      title: "Wins",
-      key: "totalWins",
-      align: "center",
-      dataIndex: "totalWins",
-    },
-    {
-      title: "Losses",
-      dataIndex: "totalLosses",
-      key: "totalLosses",
-      align: "center",
-    },
-    {
-      title: "Points",
-      dataIndex: "totalPoints",
-      key: "totalPoints",
-      align: "center",
-      render: (text) => <b>{text}</b>,
-    },
-  ];
   return (
-    <Table
-      columns={columns}
-      dataSource={rankings}
-      pagination={false}
-      className={styles.rankingTable}
-    />
+    <div className={styles.rankingTable}>
+      <table>
+        <thead>
+          <tr>
+            <th style={{ textAlign: "center" }}>Rank</th>
+            <th style={{ textAlign: "center" }}></th>
+            <th style={{ textAlign: "center" }}>User</th>
+            <th style={{ textAlign: "center" }}>Wins</th>
+            <th style={{ textAlign: "center" }}>Losses</th>
+            <th style={{ textAlign: "center" }}>Points</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rankings.map((ranking) => (
+            <tr key={ranking.rank}>
+              <td style={{ textAlign: "center" }}>{ranking.rank}</td>
+              <td style={{ textAlign: "center" }}>
+                <Image
+                  className={styles.profilepic}
+                  src={ranking.imageUrl}
+                  width={50}
+                  height={50}
+                  alt="Picture of the user"
+                />
+              </td>
+              <td style={{ textAlign: "center" }}>{ranking.username}</td>
+              <td style={{ textAlign: "center" }}>{ranking.totalWins}</td>
+              <td style={{ textAlign: "center" }}>{ranking.totalLosses}</td>
+              <td style={{ textAlign: "center" }}>
+                <b>{ranking.totalPoints}</b>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 };
 
