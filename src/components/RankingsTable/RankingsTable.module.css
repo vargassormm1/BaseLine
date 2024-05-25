@@ -1,24 +1,69 @@
-.profilepic {
+.rankingTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  color: black;
+}
+
+.rankingTable table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.rankingTable th,
+.rankingTable td {
+  border: 0.5px solid lightgrey;
+  padding: 20px 10px;
+  text-align: center;
+}
+
+.rankingTable th {
+  background-color: rgb(241, 241, 241);
+  font-weight: 500;
+}
+
+.rankingTable td {
+  background-color: white;
+}
+
+.rankingTable td img {
   border-radius: 50%;
 }
 
-@media (max-width: 800px) {
-  .rankingTable td,
-  .rankingTable th {
-    padding: 3px !important;
-    background-color: white !important;
+/* Remove left and right borders from specific columns */
+.rankingTable td:nth-child(1),
+.rankingTable td:nth-child(2),
+.rankingTable td:nth-child(3) {
+  border-left: none;
+  border-right: none;
+}
+
+@media (max-width: 1536px) {
+}
+@media (max-width: 1366px) {
+}
+@media (max-width: 1280px) {
+}
+@media (max-width: 1024px) {
+}
+@media (max-width: 768px) {
+}
+@media (max-width: 640px) {
+  .rankingTable {
+    font-size: 14px;
+  }
+  .rankingTable th,
+  .rankingTable td {
+    padding: 15px 5px;
   }
   .profilepic {
     width: 30px;
     height: 30px;
   }
 }
-@media (max-width: 480px) {
-  .rankingTable td,
-  .rankingTable th {
-    padding: 3px !important;
-    background-color: white !important;
-  }
+@media (max-width: 475px) {
   .profilepic {
     width: 25px;
     height: 25px;
