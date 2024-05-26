@@ -3,7 +3,7 @@ import styles from "./H2Hmatches.module.css";
 
 const H2HMatches = ({ matches }) => {
   return (
-    <div>
+    <div className={styles.container}>
       {matches?.length !== 0 ? (
         matches?.map((match) => {
           return <Match key={match.matchId} matchData={match} />;
