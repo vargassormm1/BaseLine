@@ -1,28 +1,42 @@
 .container {
-  width: 100%;
-  text-align: center;
   margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  width: 100%;
 }
 .players {
   display: flex;
-  justify-content: space-between;
-  padding: 0 200px;
+  justify-content: space-around;
+  width: 100%;
+  text-align: center;
 }
-
 .player {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
-
-.image {
-  min-height: 400px;
-}
-
 .select {
   width: 300px;
-  margin-bottom: 3rem;
+  padding: 5px;
+  margin: 2rem 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  color: black;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.image {
+  min-height: 400px;
+  margin-top: 20px;
+  text-align: center;
+}
+.profileImage {
+  border-radius: 50%;
 }
 
 @media (max-width: 1536px) {
@@ -30,14 +44,8 @@
 @media (max-width: 1366px) {
 }
 @media (max-width: 1280px) {
-  .players {
-    padding: 0 100px;
-  }
 }
 @media (max-width: 1024px) {
-  .players {
-    padding: 0 50px;
-  }
 }
 @media (max-width: 768px) {
   .players {

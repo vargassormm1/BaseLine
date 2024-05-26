@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Select } from "antd";
 import Image from "next/image";
 import H2HMatches from "../H2HMatches/H2Hmatches";
 import { getH2hMatches } from "@/utils/api";
@@ -13,12 +12,15 @@ const UserSelect = ({ users }) => {
   const [user2Wins, setUser2Wins] = useState(0);
   const [matches, setMatches] = useState([]);
 
-  const handleSelectUser1Change = (userId) => {
+  const handleSelectUser1Change = (event) => {
+    const userId = parseInt(event.target.value);
+    console.log(typeof userId);
     const user = users.find((user) => user?.userId === userId);
     setUser1(user);
   };
 
-  const handleSelectUser2Change = (userId) => {
+  const handleSelectUser2Change = (event) => {
+    const userId = parseInt(event.target.value);
     const user = users.find((user) => user?.userId === userId);
     setUser2(user);
   };
@@ -49,11 +51,14 @@ const UserSelect = ({ users }) => {
       <div className={styles.players}>
         <div className={styles.player}>
           <h3>Player 1</h3>
-          <Select
-            className={styles.select}
-            options={users}
-            onChange={(userId) => handleSelectUser1Change(userId)}
-          />
+          <select className={styles.select} onChange={handleSelectUser1Change}>
+            <option value="">Select Player 1</option>
+            {users.map((user) => (
+              <option key={user.userId} value={user.userId}>
+                {user.username}
+              </option>
+            ))}
+          </select>
           <div className={styles.image}>
             {user1 ? (
               <>
@@ -67,18 +72,21 @@ const UserSelect = ({ users }) => {
                 <h3>Wins: {user1Wins}</h3>
               </>
             ) : (
-              <></>
+              <p>No player selected</p>
             )}
           </div>
         </div>
 
         <div className={styles.player}>
           <h3>Player 2</h3>
-          <Select
-            className={styles.select}
-            options={users}
-            onChange={(userId) => handleSelectUser2Change(userId)}
-          />
+          <select className={styles.select} onChange={handleSelectUser2Change}>
+            <option value="">Select Player 2</option>
+            {users.map((user) => (
+              <option key={user.userId} value={user.userId}>
+                {user.username}
+              </option>
+            ))}
+          </select>
           <div className={styles.image}>
             {user2 ? (
               <>
@@ -92,13 +100,13 @@ const UserSelect = ({ users }) => {
                 <h3>Wins: {user2Wins}</h3>
               </>
             ) : (
-              <></>
+              <p>No player selected</p>
             )}
           </div>
         </div>
       </div>
 
-      <H2HMatches matches={matches} />
+      {user1 && user2 ? <H2HMatches matches={matches} /> : <></>}
     </div>
   );
 };
