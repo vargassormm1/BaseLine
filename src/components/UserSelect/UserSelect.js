@@ -72,7 +72,7 @@ const UserSelect = ({ users }) => {
                 <h3>Wins: {user1Wins}</h3>
               </>
             ) : (
-              <></>
+              <p>No player selected</p>
             )}
           </div>
         </div>
@@ -100,13 +100,13 @@ const UserSelect = ({ users }) => {
                 <h3>Wins: {user2Wins}</h3>
               </>
             ) : (
-              <></>
+              <p>No player selected</p>
             )}
           </div>
         </div>
       </div>
 
-      <H2HMatches matches={matches} />
+      {user1 && user2 ? <H2HMatches matches={matches} /> : <></>}
     </div>
   );
 };

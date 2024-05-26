@@ -23,13 +23,17 @@
   width: 300px;
   padding: 5px;
   margin: 2rem 0;
-  border: 1px solid #ccc;
+  border: 1px solid black;
   border-radius: 4px;
   font-size: 16px;
+  color: black;
+  appearance: none;
+  -webkit-appearance: none;
 }
 .image {
   min-height: 400px;
   margin-top: 20px;
+  text-align: center;
 }
 .profileImage {
   border-radius: 50%;
