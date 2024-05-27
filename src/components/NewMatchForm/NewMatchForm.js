@@ -192,6 +192,7 @@ const NewMatchForm = ({ currentUser, refetchMatches, users }) => {
               ]}
             >
               <InputNumber
+                // style={{ fontSize: "16px" }}
                 min={bestOf === 3 ? 2 : 3}
                 max={bestOf === 3 ? 3 : 5}
                 onChange={(value) => setSets(value)}
