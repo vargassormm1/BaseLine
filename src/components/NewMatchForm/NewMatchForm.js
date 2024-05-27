@@ -68,14 +68,14 @@ const NewMatchForm = ({ currentUser, refetchMatches, users }) => {
             set: parseInt(set.replace("Set", "")),
           };
         scoresBySet[set][`${player.toLowerCase()}${scoreType}`] = values[key];
-
-        if (scoreType === "Score") {
-          scoresArray.push({
-            playeronescore: values[`playerOne${set}Score`],
-            playertwoscore: values[`playerTwo${set}Score`],
-          });
-        }
       }
+    });
+
+    Object.keys(scoresBySet).forEach((set) => {
+      scoresArray.push({
+        playeronescore: scoresBySet[set].playeroneScore,
+        playertwoscore: scoresBySet[set].playertwoScore,
+      });
     });
 
     const winner = calculateWinner(scoresArray, playerTwoId);
@@ -171,6 +171,7 @@ const NewMatchForm = ({ currentUser, refetchMatches, users }) => {
                   setSets(1);
                 } else {
                   setBestOf(parseInt(value));
+                  setSets(null);
                 }
               }}
             >
@@ -198,11 +199,15 @@ const NewMatchForm = ({ currentUser, refetchMatches, users }) => {
             </Form.Item>
           ) : null}
 
-          <Scores
-            bestOf={bestOf === 1 ? 1 : sets}
-            playerOne={currentUser.username}
-            playerTwo={player2?.username}
-          />
+          {player2 && matchType ? (
+            <Scores
+              bestOf={bestOf === 1 ? 1 : sets}
+              playerOne={currentUser.username}
+              playerTwo={player2?.username}
+            />
+          ) : (
+            <></>
+          )}
 
           {/* Submit */}
           <button htmlType="submit">Submit</button>
