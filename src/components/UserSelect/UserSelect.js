@@ -51,14 +51,16 @@ const UserSelect = ({ users }) => {
       <div className={styles.players}>
         <div className={styles.player}>
           <h3>Player 1</h3>
-          <select className={styles.select} onChange={handleSelectUser1Change}>
-            <option value="">Select Player 1</option>
-            {users.map((user) => (
-              <option key={user.userId} value={user.userId}>
-                {user.username}
-              </option>
-            ))}
-          </select>
+          <div className={styles.customSelect}>
+            <select onChange={handleSelectUser1Change}>
+              <option value="">Select Player 1</option>
+              {users.map((user) => (
+                <option key={user.userId} value={user.userId}>
+                  {user.username}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className={styles.image}>
             {user1 ? (
               <>
@@ -79,14 +81,19 @@ const UserSelect = ({ users }) => {
 
         <div className={styles.player}>
           <h3>Player 2</h3>
-          <select className={styles.select} onChange={handleSelectUser2Change}>
-            <option value="">Select Player 2</option>
-            {users.map((user) => (
-              <option key={user.userId} value={user.userId}>
-                {user.username}
-              </option>
-            ))}
-          </select>
+          <div className={styles.customSelect}>
+            <select
+              className={styles.select}
+              onChange={handleSelectUser2Change}
+            >
+              <option value="">Select Player 2</option>
+              {users.map((user) => (
+                <option key={user.userId} value={user.userId}>
+                  {user.username}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className={styles.image}>
             {user2 ? (
               <>
