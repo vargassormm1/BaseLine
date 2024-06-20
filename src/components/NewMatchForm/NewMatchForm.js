@@ -82,6 +82,7 @@ const NewMatchForm = ({ currentUser, refetchMatches, users }) => {
     const newMatch = await createNewMatch({
       ...values,
       winner,
+      playerOneConfirmed: true,
     });
 
     for (let prop in scoresBySet) {
@@ -211,7 +212,7 @@ const NewMatchForm = ({ currentUser, refetchMatches, users }) => {
           )}
 
           {/* Submit */}
-          <button htmlType="submit">Submit</button>
+          <button htmltype="submit">Submit</button>
         </Form>
       </Modal>
     </>

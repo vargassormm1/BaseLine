@@ -14,7 +14,6 @@ const UserSelect = ({ users }) => {
 
   const handleSelectUser1Change = (event) => {
     const userId = parseInt(event.target.value);
-    console.log(typeof userId);
     const user = users.find((user) => user?.userId === userId);
     setUser1(user);
   };
