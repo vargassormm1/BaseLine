@@ -39,6 +39,9 @@ model Matches {
   winnerId   Int?
   loserId   Int?
   playedAt   DateTime  @default(now())
+  playerOneConfirmed    Boolean   @default(false)
+  playerTwoConfirmed    Boolean   @default(false)
+  scoreVisible          Boolean   @default(false)
   playerOneUser User @relation("PlayerOneMatches", fields: [playerOne], references: [userId])
   playerTwoUser User @relation("PlayerTwoMatches", fields: [playerTwo], references: [userId])
   winnerUser    User? @relation("WonMatches", fields: [winnerId], references: [userId])
