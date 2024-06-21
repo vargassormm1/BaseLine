@@ -120,7 +120,7 @@ const NewMatchForm = ({ currentUser, refetchMatches, users }) => {
           layout="vertical"
           onFinish={handleSubmit}
           form={form}
-          initialValues={{ playerOne: currentUser.username }}
+          initialValues={{ playerOne: currentUser?.username }}
           className={styles.newMatchForm}
         >
           <h2 className={styles.scores}>New Match</h2>
