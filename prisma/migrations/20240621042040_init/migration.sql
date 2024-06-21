@@ -6,7 +6,7 @@ CREATE TABLE "User" (
     "lname" TEXT NOT NULL,
     "username" TEXT NOT NULL,
     "email" TEXT NOT NULL,
-    "password" TEXT NOT NULL,
+    "imageUrl" TEXT,
     "totalWins" INTEGER NOT NULL DEFAULT 0,
     "totalLosses" INTEGER NOT NULL DEFAULT 0,
     "totalPoints" INTEGER NOT NULL DEFAULT 0,
@@ -19,8 +19,11 @@ CREATE TABLE "Matches" (
     "matchId" SERIAL NOT NULL,
     "playerOne" INTEGER NOT NULL,
     "playerTwo" INTEGER NOT NULL,
+    "playerOneUsername" TEXT,
+    "playerTwoUsername" TEXT,
     "matchType" INTEGER NOT NULL,
     "winnerId" INTEGER,
+    "loserId" INTEGER,
     "playedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Matches_pkey" PRIMARY KEY ("matchId")
