@@ -19,6 +19,10 @@ const NavbarLinks = [
     name: "H2H",
     path: "/h2h",
   },
+  {
+    name: "Pending",
+    path: "/pending",
+  },
 ];
 
 const Links = ({ userId }) => {
@@ -65,7 +69,21 @@ const Links = ({ userId }) => {
               H2H
             </Link>
           ),
-          key: "1",
+          key: "2",
+        },
+        {
+          label: (
+            <Link
+              href="/pending"
+              key="pending"
+              className={`${styles.link} ${
+                pathName === "/pending" ? styles.active : styles.link
+              }`}
+            >
+              Pending
+            </Link>
+          ),
+          key: "3",
         },
       ]
     : [
