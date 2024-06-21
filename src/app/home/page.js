@@ -2,7 +2,6 @@ import styles from "./home.module.css";
 import prisma from "@/utils/db";
 import { auth } from "@clerk/nextjs/server";
 import HomeContent from "@/components/HomeContent/HomeContent";
-import { redirect } from "next/navigation";
 
 const getCurrentUser = async (clerkId) => {
   const user = await prisma.user.findUnique({

@@ -4,7 +4,7 @@ import { SignIn } from "@clerk/nextjs";
 export default function Page() {
   return (
     <div className={styles.container}>
-      <SignIn path="/sign-in" />
+      <SignIn routing="hash" />
     </div>
   );
 }
