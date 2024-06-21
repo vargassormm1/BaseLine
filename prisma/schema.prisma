@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,46 +8,47 @@ datasource db {
 }
 
 model User {
-  userId    Int      @id @default(autoincrement())
-  clerkId    String   @unique
-  fname     String
-  lname     String
-  username  String   @unique
-  email     String   @unique
-  imageUrl  String?
-  totalWins Int  @default(0)
-  totalLosses Int @default(0)
-  totalPoints Int @default(0)
+  userId             Int       @id @default(autoincrement())
+  clerkId            String    @unique
+  fname              String
+  lname              String
+  username           String    @unique
+  email              String    @unique
+  imageUrl           String?
+  totalWins          Int       @default(0)
+  totalLosses        Int       @default(0)
+  totalPoints        Int       @default(0)
   matchesAsPlayerOne Matches[] @relation("PlayerOneMatches")
   matchesAsPlayerTwo Matches[] @relation("PlayerTwoMatches")
   wonMatches         Matches[] @relation("WonMatches")
 }
 
 model Matches {
-  matchId    Int       @id @default(autoincrement())
-  playerOne  Int
-  playerTwo  Int
-  playerOneUsername  String?
-  playerTwoUsername  String?
-  matchType  Int       // Ensure application logic enforces correct values (1, 3, 5)
-  winnerId   Int?
-  loserId   Int?
-  playedAt   DateTime  @default(now())
-  playerOneUser User @relation("PlayerOneMatches", fields: [playerOne], references: [userId])
-  playerTwoUser User @relation("PlayerTwoMatches", fields: [playerTwo], references: [userId])
-  winnerUser    User? @relation("WonMatches", fields: [winnerId], references: [userId])
-  matchDetails MatchDetails[]
+  matchId           Int            @id @default(autoincrement())
+  playerOne         Int
+  playerTwo         Int
+  playerOneUsername String?
+  playerTwoUsername String?
+  matchType         Int
+  winnerId          Int?
+  loserId           Int?
+  playedAt          DateTime       @default(now())
+  playerOneConfirmed    Boolean   @default(false)
+  playerTwoConfirmed    Boolean   @default(false)
+  scoreVisible          Boolean   @default(false)
+  matchDetails      MatchDetails[]
+  playerOneUser     User           @relation("PlayerOneMatches", fields: [playerOne], references: [userId])
+  playerTwoUser     User           @relation("PlayerTwoMatches", fields: [playerTwo], references: [userId])
+  winnerUser        User?          @relation("WonMatches", fields: [winnerId], references: [userId])
 }
 
 model MatchDetails {
-  detailId                Int     @id @default(autoincrement())
-  matchId                 Int
-  setNumber               Int
-  playerOneScore          Int
-  playerTwoScore          Int
-  playerOneTieBreakerScore Int?    // Optional fields for tiebreaker scores
-  playerTwoTieBreakerScore Int?    // Optional fields for tiebreaker scores
-  match                   Matches @relation(fields: [matchId], references: [matchId])
+  detailId                 Int     @id @default(autoincrement())
+  matchId                  Int
+  setNumber                Int
+  playerOneScore           Int
+  playerTwoScore           Int
+  playerOneTieBreakerScore Int?
+  playerTwoTieBreakerScore Int?
+  match                    Matches @relation(fields: [matchId], references: [matchId])
 }
-
-
