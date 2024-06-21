@@ -23,6 +23,13 @@ export const POST = async (request) => {
 
 export const GET = async () => {
   const matchesWithScores = await prisma.matches.findMany({
+    where: {
+      AND: [
+        { playerOneConfirmed: true },
+        { playerTwoConfirmed: true },
+        { scoreVisible: true },
+      ],
+    },
     include: {
       matchDetails: true,
     },
