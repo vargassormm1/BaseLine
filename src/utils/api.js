@@ -51,6 +51,19 @@ export const getAllMatches = async () => {
   }
 };
 
+export const getPendingMatches = async (userId) => {
+  const res = await fetch(
+    new Request(createUrl(`/api/pending/${userId}`), {
+      method: "GET",
+    })
+  );
+
+  if (res.ok) {
+    const data = await res.json();
+    return data.data;
+  }
+};
+
 export const getH2hMatches = async (user1, user2) => {
   const res = await fetch(
     new Request(
@@ -61,6 +74,33 @@ export const getH2hMatches = async (user1, user2) => {
     )
   );
 
+  if (res.ok) {
+    const data = await res.json();
+    return data.data;
+  }
+};
+
+export const confirmPendingMatch = async (content) => {
+  const res = await fetch(
+    new Request(createUrl(`/api/match/confirm`), {
+      method: "PUT",
+      body: JSON.stringify(content),
+    })
+  );
+  if (res.ok) {
+    const data = await res.json();
+    return data.data;
+  }
+};
+
+export const denyPendingMatch = async (content) => {
+  console.log("api", content);
+  const res = await fetch(
+    new Request(createUrl(`/api/match/deny`), {
+      method: "DELETE",
+      body: JSON.stringify(content),
+    })
+  );
   if (res.ok) {
     const data = await res.json();
     return data.data;
