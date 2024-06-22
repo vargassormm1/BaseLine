@@ -152,7 +152,14 @@ const Links = ({ userId, currentUser }) => {
         >
           <a onClick={(e) => e.preventDefault()}>
             <Space className={styles.dropLinks}>
-              <MenuOutlined />
+              <div className={styles.badge}>
+                <MenuOutlined />
+                {userId && parseInt(pendingMatchCount) !== 0 ? (
+                  <span className={styles.badgeDot}></span>
+                ) : (
+                  <></>
+                )}
+              </div>
             </Space>
           </a>
         </Dropdown>
