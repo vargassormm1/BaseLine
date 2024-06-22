@@ -1,6 +1,8 @@
 "use client";
+import { useContext } from "react";
 import styles from "./PendingMatch.module.css";
 import { confirmPendingMatch, denyPendingMatch } from "@/utils/api";
+import { PendingMatchContext } from "../../../context/PendingMatchContext";
 
 const PendingMatch = ({
   pendingMatchData,
@@ -8,6 +10,8 @@ const PendingMatch = ({
   pendingMatchHandled,
   currentUser,
 }) => {
+  const { setPendingMatchChanged } = useContext(PendingMatchContext);
+
   const uniqueSets = [
     ...new Set(pendingMatchData.matchDetails.map((detail) => detail.setNumber)),
   ];
@@ -70,6 +74,7 @@ const PendingMatch = ({
     try {
       await confirmPendingMatch(pendingMatchData);
       setPendingMatchHandled(!pendingMatchHandled);
+      setPendingMatchChanged((prev) => !prev);
     } catch (error) {
       console.log(error);
     }
@@ -79,6 +84,7 @@ const PendingMatch = ({
     try {
       await denyPendingMatch(pendingMatchData);
       setPendingMatchHandled(!pendingMatchHandled);
+      setPendingMatchChanged((prev) => !prev);
     } catch (error) {
       console.log(error);
     }
