@@ -40,6 +40,22 @@
   cursor: pointer;
 }
 
+.badge {
+  position: relative;
+  display: inline-block;
+}
+
+.badgeDot {
+  content: "";
+  position: absolute;
+  top: -2.5px;
+  right: -2.5px;
+  width: 5px;
+  height: 5px;
+  background-color: red;
+  border-radius: 50%;
+}
+
 @media (max-width: 640px) {
   .drop {
     display: flex;
