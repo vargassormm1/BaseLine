@@ -2,6 +2,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar/Navbar";
+import { PendingMatchProvider } from "../context/PendingMatchContext";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -15,8 +16,10 @@ export default function RootLayout({ children }) {
       <html lang="en">
         <body className={inter.className}>
           <div className="container">
-            <Navbar />
-            {children}
+            <PendingMatchProvider>
+              <Navbar />
+              {children}
+            </PendingMatchProvider>
           </div>
         </body>
       </html>

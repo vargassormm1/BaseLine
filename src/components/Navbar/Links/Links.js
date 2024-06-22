@@ -1,10 +1,13 @@
 "use client";
+import { useContext, useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import styles from "./Links.module.css";
 import { usePathname } from "next/navigation";
 import { UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
 import { MenuOutlined } from "@ant-design/icons";
 import { Dropdown, Space } from "antd";
+import { PendingMatchContext } from "../../../context/PendingMatchContext";
+import { getPendingMatchesCount } from "@/utils/api";
 
 const NavbarLinks = [
   {
@@ -25,7 +28,10 @@ const NavbarLinks = [
   },
 ];
 
-const Links = ({ userId }) => {
+const Links = ({ userId, currentUser }) => {
+  const { pendingMatchChanged } = useContext(PendingMatchContext);
+  const [pendingMatchCount, setPendingMatchCount] = useState(0);
+
   const pathName = usePathname();
   const items = userId
     ? [
@@ -80,7 +86,14 @@ const Links = ({ userId }) => {
                 pathName === "/pending" ? styles.active : styles.link
               }`}
             >
-              Pending
+              Pending{" "}
+              {parseInt(pendingMatchCount) !== 0 ? (
+                <span className={styles.count}>
+                  {String(pendingMatchCount)}
+                </span>
+              ) : (
+                <></>
+              )}
             </Link>
           ),
           key: "3",
@@ -116,6 +129,17 @@ const Links = ({ userId }) => {
           key: "2",
         },
       ];
+
+  const fetchPendingMatchesCount = useCallback(async (userId) => {
+    const data = await getPendingMatchesCount(userId);
+    setPendingMatchCount(String(data));
+  }, []);
+
+  useEffect(() => {
+    if (currentUser) {
+      fetchPendingMatchesCount(currentUser.userId);
+    }
+  }, [currentUser, fetchPendingMatchesCount, pendingMatchChanged]);
 
   return (
     <>
@@ -165,6 +189,12 @@ const Links = ({ userId }) => {
                 }`}
               >
                 {link.name}
+                {link.name === "Pending" &&
+                parseInt(pendingMatchCount) !== 0 ? (
+                  <span className={styles.count}>{pendingMatchCount}</span>
+                ) : (
+                  <></>
+                )}
               </Link>
             ))}
             <UserButton afterSignOutUrl="/" />

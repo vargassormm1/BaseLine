@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Form, Modal, Select, InputNumber } from "antd";
 import Scores from "./Scores/Scores";
 import { createNewMatch, createNewMatchDetails } from "@/utils/api";
 import styles from "./NewmatchForm.module.css";
 import { PlusCircleOutlined } from "@ant-design/icons";
+import { PendingMatchContext } from "@/context/PendingMatchContext";
 
 const NewMatchForm = ({ currentUser, refetchMatches, users }) => {
   const [form] = Form.useForm();
@@ -12,6 +13,7 @@ const NewMatchForm = ({ currentUser, refetchMatches, users }) => {
   const [sets, setSets] = useState(null);
   const [open, setOpen] = useState(false);
   const [playerTwo, setPlayerTwo] = useState(null);
+  const { setPendingMatchChanged } = useContext(PendingMatchContext);
 
   const showModal = () => {
     setOpen(true);
@@ -92,6 +94,7 @@ const NewMatchForm = ({ currentUser, refetchMatches, users }) => {
       });
     }
 
+    setPendingMatchChanged((prev) => !prev);
     await refetchMatches();
     form.resetFields();
     setOpen(false);
