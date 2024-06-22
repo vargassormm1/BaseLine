@@ -64,6 +64,19 @@ export const getPendingMatches = async (userId) => {
   }
 };
 
+export const getPendingMatchesCount = async (userId) => {
+  const res = await fetch(
+    new Request(createUrl(`/api/pending/count/${userId}`), {
+      method: "GET",
+    })
+  );
+
+  if (res.ok) {
+    const data = await res.json();
+    return data.data;
+  }
+};
+
 export const getH2hMatches = async (user1, user2) => {
   const res = await fetch(
     new Request(
