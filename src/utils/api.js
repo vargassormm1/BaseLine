@@ -16,110 +16,121 @@ export const getRankings = async () => {
   }
 };
 
-export const createNewMatch = async (content) => {
-  const res = await fetch(
-    new Request(createUrl(`/api/match`), {
-      method: "POST",
-      body: JSON.stringify(content),
-    })
-  );
-  if (res.ok) {
-    const data = await res.json();
-    return data.data;
-  }
-};
-
-export const createNewMatchDetails = async (content) => {
-  const res = await fetch(
-    new Request(createUrl(`/api/matchDetails`), {
-      method: "POST",
-      body: JSON.stringify(content),
-    })
-  );
-  if (res.ok) {
-    const data = await res.json();
-    return data.data;
-  }
-};
-
 export const getAllMatches = async () => {
-  const res = await fetch(
-    new Request(createUrl(`/api/matchDetails`), {
-      method: "GET",
-    })
-  );
-
-  if (res.ok) {
+  try {
+    const res = await fetch(createUrl(`/api/matchDetails`), { method: "GET" });
+    if (!res.ok) throw new Error("Network response was not ok");
     const data = await res.json();
     return data.data;
+  } catch (error) {
+    console.error("Error in getAllMatches:", error);
+    throw error;
   }
 };
 
 export const getPendingMatches = async (userId) => {
-  const res = await fetch(
-    new Request(createUrl(`/api/pending/${userId}`), {
+  try {
+    const res = await fetch(createUrl(`/api/pending/${userId}`), {
       method: "GET",
-    })
-  );
-
-  if (res.ok) {
+    });
+    if (!res.ok) throw new Error("Network response was not ok");
     const data = await res.json();
     return data.data;
+  } catch (error) {
+    console.error("Error in getPendingMatches:", error);
+    throw error;
   }
 };
 
 export const getPendingMatchesCount = async (userId) => {
-  const res = await fetch(
-    new Request(createUrl(`/api/pending/count/${userId}`), {
+  try {
+    const res = await fetch(createUrl(`/api/pending/count/${userId}`), {
       method: "GET",
-    })
-  );
-
-  if (res.ok) {
+    });
+    if (!res.ok) throw new Error("Network response was not ok");
     const data = await res.json();
     return data.data;
+  } catch (error) {
+    console.error("Error in getPendingMatchesCount:", error);
+    throw error;
   }
 };
 
 export const getH2hMatches = async (user1, user2) => {
-  const res = await fetch(
-    new Request(
+  try {
+    const res = await fetch(
       createUrl(`/api/matchDetails/h2h?user1=${user1}&user2=${user2}`),
-      {
-        method: "GET",
-      }
-    )
-  );
-
-  if (res.ok) {
+      { method: "GET" }
+    );
+    if (!res.ok) throw new Error("Network response was not ok");
     const data = await res.json();
     return data.data;
+  } catch (error) {
+    console.error("Error in getH2hMatches:", error);
+    throw error;
+  }
+};
+
+export const createNewMatch = async (content) => {
+  try {
+    const res = await fetch(createUrl(`/api/match`), {
+      method: "POST",
+      body: JSON.stringify(content),
+      headers: { "Content-Type": "application/json" },
+    });
+    if (!res.ok) throw new Error("Network response was not ok");
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error in createNewMatch:", error);
+    throw error;
+  }
+};
+
+export const createNewMatchDetails = async (content) => {
+  try {
+    const res = await fetch(createUrl(`/api/matchDetails`), {
+      method: "POST",
+      body: JSON.stringify(content),
+      headers: { "Content-Type": "application/json" },
+    });
+    if (!res.ok) throw new Error("Network response was not ok");
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error in createNewMatchDetails:", error);
+    throw error;
   }
 };
 
 export const confirmPendingMatch = async (content) => {
-  const res = await fetch(
-    new Request(createUrl(`/api/match/confirm`), {
+  try {
+    const res = await fetch(createUrl(`/api/match/confirm`), {
       method: "PUT",
       body: JSON.stringify(content),
-    })
-  );
-  if (res.ok) {
+      headers: { "Content-Type": "application/json" },
+    });
+    if (!res.ok) throw new Error("Network response was not ok");
     const data = await res.json();
     return data.data;
+  } catch (error) {
+    console.error("Error in confirmPendingMatch:", error);
+    throw error;
   }
 };
 
 export const denyPendingMatch = async (content) => {
-  console.log("api", content);
-  const res = await fetch(
-    new Request(createUrl(`/api/match/deny`), {
+  try {
+    const res = await fetch(createUrl(`/api/match/deny`), {
       method: "DELETE",
       body: JSON.stringify(content),
-    })
-  );
-  if (res.ok) {
+      headers: { "Content-Type": "application/json" },
+    });
+    if (!res.ok) throw new Error("Network response was not ok");
     const data = await res.json();
     return data.data;
+  } catch (error) {
+    console.error("Error in denyPendingMatch:", error);
+    throw error;
   }
 };

@@ -21,7 +21,7 @@ const Navbar = async () => {
   return (
     <div className={styles.main}>
       <div className={styles.container}>
-        <Link href="/">
+        <Link href={userId ? "/home" : "/"}>
           <h1 className={styles.logo}>Baseline</h1>
         </Link>
         <Links userId={userId} currentUser={currentUser} />

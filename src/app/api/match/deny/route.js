@@ -2,19 +2,30 @@ import { NextResponse } from "next/server";
 import prisma from "@/utils/db";
 
 export const DELETE = async (request) => {
-  const data = await request.json();
+  try {
+    const data = await request.json();
 
-  const deleteMatchDetails = await prisma.matchDetails.deleteMany({
-    where: {
-      matchId: data.matchId,
-    },
-  });
+    if (!data.matchId) {
+      return NextResponse.json(
+        { error: "Invalid matchId. It must be a number." },
+        { status: 400 }
+      );
+    }
 
-  const deleteMatch = await prisma.matches.delete({
-    where: {
-      matchId: data.matchId,
-    },
-  });
+    await prisma.matchDetails.deleteMany({
+      where: { matchId: data.matchId },
+    });
 
-  return NextResponse.json({ data: deleteMatch });
+    const deletedMatch = await prisma.matches.delete({
+      where: { matchId: data.matchId },
+    });
+
+    return NextResponse.json({ data: deletedMatch });
+  } catch (error) {
+    console.error("Error in deny match:", error);
+    return NextResponse.json(
+      { error: "An error occurred while denying the match." },
+      { status: 500 }
+    );
+  }
 };
