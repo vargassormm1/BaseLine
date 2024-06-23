@@ -11,6 +11,8 @@
   "dependencies": {
     "@clerk/nextjs": "^5.0.4",
     "@prisma/client": "^5.11.0",
+    "@upstash/ratelimit": "^1.2.1",
+    "@upstash/redis": "^1.31.6",
     "@vercel/postgres": "^0.7.2",
     "antd": "^5.15.2",
     "next": "14.1.3",
