@@ -4,11 +4,10 @@ import { auth } from "@clerk/nextjs/server";
 import HomeContent from "@/components/HomeContent/HomeContent";
 
 const getCurrentUser = async (clerkId) => {
-  const user = await prisma.user.findUnique({
+  return prisma.user.findUnique({
     where: { clerkId },
     select: { userId: true, username: true },
   });
-  return user;
 };
 
 const getAllUsers = async (clerkId) => {
@@ -20,12 +19,13 @@ const getAllUsers = async (clerkId) => {
     },
   });
 
-  users.map((el) => {
-    el.value = el.userId;
-    el.label = el.username;
-  });
-  const finalData = users.filter((el) => el.clerkId !== clerkId);
-  return finalData;
+  return users
+    .filter((user) => user.clerkId !== clerkId)
+    .map((user) => ({
+      ...user,
+      value: user.userId,
+      label: user.username,
+    }));
 };
 
 const Home = async () => {

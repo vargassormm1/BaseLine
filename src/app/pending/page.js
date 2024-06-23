@@ -2,6 +2,7 @@ import styles from "./pending.module.css";
 import prisma from "@/utils/db";
 import { auth } from "@clerk/nextjs/server";
 import PendingMatches from "@/components/PendingMatches/PendingMatches";
+import { redirect } from "next/navigation";
 
 const getCurrentUser = async (clerkId) => {
   if (!clerkId) {
@@ -16,7 +17,16 @@ const getCurrentUser = async (clerkId) => {
 
 const Pending = async () => {
   const { userId } = auth();
+  if (!userId) {
+    redirect("/sign-in");
+    return null;
+  }
+
   const currentUser = await getCurrentUser(userId);
+  if (!currentUser) {
+    console.error("User not found in the database");
+    return null;
+  }
 
   return (
     <div className={styles.container}>

@@ -4,11 +4,11 @@ import styles from "./h2h.module.css";
 
 const getAllUsers = async () => {
   const users = await prisma.user.findMany({});
-  users.map((el) => {
-    el.value = el.userId;
-    el.label = el.username;
-  });
-  return users;
+  return users.map((user) => ({
+    ...user,
+    value: user.userId,
+    label: user.username,
+  }));
 };
 
 const H2H = async () => {
