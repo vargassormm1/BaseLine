@@ -1,9 +1,24 @@
 "use client";
-
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import styles from "./RankingsTable.module.css";
+import { getRankings } from "../../utils/api";
 
-const RankingsTable = ({ rankings }) => {
+const RankingsTable = () => {
+  const [rankings, setRankings] = useState([]);
+
+  useEffect(() => {
+    const getUserRankings = async () => {
+      try {
+        const response = await getRankings();
+        setRankings(response);
+      } catch (error) {
+        setError("Failed to fetch rankings");
+      }
+    };
+    getUserRankings();
+  }, []);
+
   return (
     <div className={styles.rankingTable}>
       <table>
@@ -18,7 +33,7 @@ const RankingsTable = ({ rankings }) => {
           </tr>
         </thead>
         <tbody>
-          {rankings.map((ranking) => (
+          {rankings?.map((ranking) => (
             <tr key={ranking.rank}>
               <td style={{ textAlign: "center" }}>{ranking.rank}</td>
               <td style={{ textAlign: "center" }}>

@@ -3,12 +3,16 @@ const createUrl = (path) => {
 };
 
 export const getRankings = async () => {
-  const res = await fetch(createUrl(`/api/users/rankings`), {
-    method: "GET",
-  });
-  if (res.ok) {
+  try {
+    const res = await fetch(createUrl(`/api/rankings`), {
+      method: "GET",
+    });
+    if (!res.ok) throw new Error("Network response was not ok");
     const data = await res.json();
     return data.data;
+  } catch (error) {
+    console.error("Error in getRankings:", error);
+    throw error;
   }
 };
 
