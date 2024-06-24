@@ -3,35 +3,35 @@ import prisma from "@/utils/db";
 import { auth } from "@clerk/nextjs/server";
 import HomeContent from "@/components/HomeContent/HomeContent";
 
-const getCurrentUser = async (clerkId) => {
-  return prisma.user.findUnique({
-    where: { clerkId },
-    select: { userId: true, username: true },
-  });
-};
+const getUserData = async (clerkId) => {
+  const [currentUser, allUsers] = await Promise.all([
+    prisma.user.findUnique({
+      where: { clerkId },
+      select: { userId: true, username: true },
+    }),
+    prisma.user.findMany({
+      select: {
+        userId: true,
+        clerkId: true,
+        username: true,
+      },
+    }),
+  ]);
 
-const getAllUsers = async (clerkId) => {
-  const users = await prisma.user.findMany({
-    select: {
-      userId: true,
-      clerkId: true,
-      username: true,
-    },
-  });
-
-  return users
+  const users = allUsers
     .filter((user) => user.clerkId !== clerkId)
     .map((user) => ({
       ...user,
       value: user.userId,
       label: user.username,
     }));
+
+  return { currentUser, users };
 };
 
 const Home = async () => {
   const { userId } = auth();
-  const users = await getAllUsers(userId);
-  const currentUser = await getCurrentUser(userId);
+  const { currentUser, users } = await getUserData(userId);
 
   return (
     <div className={styles.container}>

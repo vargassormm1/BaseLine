@@ -4,6 +4,7 @@ import Image from "next/image";
 import H2HMatches from "../H2HMatches/H2Hmatches";
 import { getH2hMatches } from "@/utils/api";
 import styles from "./UserSelect.module.css";
+import Spinner from "../Spinner/Spinner";
 
 const UserSelect = ({ users }) => {
   const [user1, setUser1] = useState(null);
@@ -11,6 +12,7 @@ const UserSelect = ({ users }) => {
   const [user2, setUser2] = useState(null);
   const [user2Wins, setUser2Wins] = useState(0);
   const [matches, setMatches] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const handleSelectUser1Change = (event) => {
     const userId = parseInt(event.target.value);
@@ -27,19 +29,25 @@ const UserSelect = ({ users }) => {
   useEffect(() => {
     const getMatches = async (user1, user2) => {
       if (user1?.userId && user2?.userId) {
-        const allMatches = await getH2hMatches(user1?.userId, user2?.userId);
-        setMatches(allMatches);
+        setLoading(true);
+        try {
+          const allMatches = await getH2hMatches(user1?.userId, user2?.userId);
+          setMatches(allMatches);
 
-        const user1Wins = allMatches?.filter(
-          (el) => el.winnerId === user1?.userId
-        );
-        setUser1Wins(user1Wins?.length);
-        const user2Wins = allMatches?.filter(
-          (el) => el.winnerId === user2?.userId
-        );
-        setUser2Wins(user2Wins?.length);
-      } else {
-        return;
+          const user1Wins = allMatches?.filter(
+            (el) => el.winnerId === user1?.userId
+          );
+          setUser1Wins(user1Wins?.length);
+
+          const user2Wins = allMatches?.filter(
+            (el) => el.winnerId === user2?.userId
+          );
+          setUser2Wins(user2Wins?.length);
+        } catch (error) {
+          console.log(error);
+        } finally {
+          setLoading(false);
+        }
       }
     };
     getMatches(user1, user2);
@@ -112,7 +120,13 @@ const UserSelect = ({ users }) => {
         </div>
       </div>
 
-      {user1 && user2 ? <H2HMatches matches={matches} /> : <></>}
+      {loading ? (
+        <Spinner />
+      ) : user1 && user2 ? (
+        <H2HMatches matches={matches} />
+      ) : (
+        <></>
+      )}
     </div>
   );
 };
