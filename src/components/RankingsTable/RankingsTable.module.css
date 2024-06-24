@@ -5,39 +5,46 @@
   border-radius: 8px;
   overflow: hidden;
   color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  flex-direction: column;
 }
-
 .rankingTable table {
   width: 100%;
   border-collapse: collapse;
+  border-radius: 8px;
+  overflow: hidden;
 }
-
 .rankingTable th,
 .rankingTable td {
   border: 0.5px solid lightgrey;
   padding: 20px 10px;
   text-align: center;
 }
-
 .rankingTable th {
   background-color: rgb(241, 241, 241);
   font-weight: 500;
 }
-
 .rankingTable td {
   background-color: white;
 }
-
 .rankingTable td img {
   border-radius: 50%;
 }
-
-/* Remove left and right borders from specific columns */
 .rankingTable td:nth-child(1),
 .rankingTable td:nth-child(2),
 .rankingTable td:nth-child(3) {
   border-left: none;
   border-right: none;
+}
+.spinnerContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
 }
 
 @media (max-width: 1536px) {
