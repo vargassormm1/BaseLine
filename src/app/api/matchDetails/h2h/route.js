@@ -24,6 +24,11 @@ export const GET = async (request) => {
 
     const userId1 = request.nextUrl.searchParams.get("user1");
     const userId2 = request.nextUrl.searchParams.get("user2");
+    const page = parseInt(request.nextUrl.searchParams.get("page") || "1", 10);
+    const limit = parseInt(
+      request.nextUrl.searchParams.get("limit") || "5",
+      10
+    );
 
     if (!userId1 || !userId2) {
       return NextResponse.json(
@@ -55,6 +60,8 @@ export const GET = async (request) => {
       orderBy: {
         playedAt: "desc",
       },
+      skip: (page - 1) * limit,
+      take: limit,
     });
 
     return NextResponse.json({ data: matches });

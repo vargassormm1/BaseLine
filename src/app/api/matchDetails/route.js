@@ -69,8 +69,11 @@ export const GET = async (request) => {
       );
     }
 
-    const page = parseInt(request.nextUrl.searchParams.get("page") || "1");
-    const limit = parseInt(request.nextUrl.searchParams.get("limit") || "20");
+    const page = parseInt(request.nextUrl.searchParams.get("page") || "1", 10);
+    const limit = parseInt(
+      request.nextUrl.searchParams.get("limit") || "5",
+      10
+    );
 
     const matchesWithScores = await prisma.matches.findMany({
       skip: (page - 1) * limit,
@@ -88,6 +91,8 @@ export const GET = async (request) => {
       orderBy: {
         playedAt: "desc",
       },
+      skip: (page - 1) * limit,
+      take: limit,
     });
 
     return NextResponse.json({ data: matchesWithScores });

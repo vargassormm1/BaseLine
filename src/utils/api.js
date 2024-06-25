@@ -59,10 +59,12 @@ export const getPendingMatchesCount = async (userId) => {
   }
 };
 
-export const getH2hMatches = async (user1, user2) => {
+export const getH2hMatches = async (user1, user2, page = 1, limit = 5) => {
   try {
     const res = await fetch(
-      createUrl(`/api/matchDetails/h2h?user1=${user1}&user2=${user2}`),
+      createUrl(
+        `/api/matchDetails/h2h?user1=${user1}&user2=${user2}&page=${page}&limit=${limit}`
+      ),
       { method: "GET" }
     );
     if (!res.ok) throw new Error("Network response was not ok");
