@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import H2HMatches from "../H2HMatches/H2Hmatches";
 import { getH2hMatches } from "@/utils/api";
@@ -13,26 +13,58 @@ const UserSelect = ({ users }) => {
   const [user2Wins, setUser2Wins] = useState(0);
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const loader = useRef(null);
+
+  const handleObserver = (entities) => {
+    const target = entities[0];
+    if (target.isIntersecting) {
+      setPage((prev) => prev + 1);
+    }
+  };
 
   const handleSelectUser1Change = (event) => {
     const userId = parseInt(event.target.value);
     const user = users.find((user) => user?.userId === userId);
     setUser1(user);
+    setPage(1);
+    setMatches([]);
   };
 
   const handleSelectUser2Change = (event) => {
     const userId = parseInt(event.target.value);
     const user = users.find((user) => user?.userId === userId);
     setUser2(user);
+    setPage(1);
+    setMatches([]);
   };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(handleObserver, {
+      root: null,
+      rootMargin: "20px",
+      threshold: 1.0,
+    });
+    if (loader.current) {
+      observer.observe(loader.current);
+    }
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     const getMatches = async (user1, user2) => {
       if (user1?.userId && user2?.userId) {
         setLoading(true);
         try {
-          const allMatches = await getH2hMatches(user1?.userId, user2?.userId);
-          setMatches(allMatches);
+          const allMatches = await getH2hMatches(
+            user1?.userId,
+            user2?.userId,
+            page
+          );
+          setMatches((prev) => [...prev, ...allMatches]);
 
           const user1Wins = allMatches?.filter(
             (el) => el.winnerId === user1?.userId
@@ -51,7 +83,7 @@ const UserSelect = ({ users }) => {
       }
     };
     getMatches(user1, user2);
-  }, [user1, user2]);
+  }, [page, user1, user2]);
 
   return (
     <div className={styles.container}>
@@ -127,6 +159,7 @@ const UserSelect = ({ users }) => {
       ) : (
         <></>
       )}
+      <div ref={loader} />
     </div>
   );
 };
