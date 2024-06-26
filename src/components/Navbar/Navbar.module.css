@@ -1,6 +1,10 @@
 .main {
   display: flex;
   flex-direction: column;
+  position: sticky;
+  top: 0;
+  background-color: rgb(61, 99, 67);
+  z-index: 1000;
 }
 .container {
   display: flex;
