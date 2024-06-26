@@ -16,12 +16,9 @@ export const getRankings = async () => {
   }
 };
 
-export const getAllMatches = async (page = 1, limit = 5) => {
+export const getAllMatches = async () => {
   try {
-    const res = await fetch(
-      createUrl(`/api/matchDetails?page=${page}&limit=${limit}`),
-      { method: "GET" }
-    );
+    const res = await fetch(createUrl(`/api/matchDetails`), { method: "GET" });
     if (!res.ok) throw new Error("Network response was not ok");
     const data = await res.json();
     return data.data;
