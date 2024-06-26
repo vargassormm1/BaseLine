@@ -32,7 +32,7 @@ const Links = ({ userId, currentUser }) => {
     },
     {
       name: "Profile",
-      path: `/profile/${currentUser.userId}`,
+      path: `/profile/${currentUser?.userId}`,
     },
   ];
   const items = userId
@@ -103,7 +103,7 @@ const Links = ({ userId, currentUser }) => {
         {
           label: (
             <Link
-              href={`/profile/${currentUser.userId}`}
+              href={`/profile/${currentUser?.userId}`}
               key="profile"
               className={`${styles.link} ${
                 pathName === "/profile" ? styles.active : styles.link
@@ -153,7 +153,7 @@ const Links = ({ userId, currentUser }) => {
 
   useEffect(() => {
     if (currentUser) {
-      fetchPendingMatchesCount(currentUser.userId);
+      fetchPendingMatchesCount(currentUser?.userId);
     }
   }, [currentUser, fetchPendingMatchesCount, pendingMatchChanged]);
 
