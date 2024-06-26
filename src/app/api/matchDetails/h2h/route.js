@@ -5,7 +5,7 @@ import { Redis } from "@upstash/redis";
 
 const ratelimit = new Ratelimit({
   redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(20, "30 s"),
+  limiter: Ratelimit.slidingWindow(50, "30 s"),
   analytics: true,
   prefix: "@upstash/ratelimit",
 });
@@ -51,6 +51,16 @@ export const GET = async (request) => {
       },
       include: {
         matchDetails: true,
+        playerOneUser: {
+          select: {
+            imageUrl: true,
+          },
+        },
+        playerTwoUser: {
+          select: {
+            imageUrl: true,
+          },
+        },
       },
       orderBy: {
         playedAt: "desc",

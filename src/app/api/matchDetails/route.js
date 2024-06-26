@@ -5,7 +5,7 @@ import { Redis } from "@upstash/redis";
 
 const ratelimit = new Ratelimit({
   redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(20, "30 s"),
+  limiter: Ratelimit.slidingWindow(50, "30 s"),
   analytics: true,
   prefix: "@upstash/ratelimit",
 });
@@ -27,8 +27,8 @@ export const POST = async (request) => {
     if (
       !data.matchId ||
       !data.set ||
-      !data.playeroneScore ||
-      !data.playertwoScore
+      data.playeroneScore === undefined ||
+      data.playertwoScore === undefined
     ) {
       return NextResponse.json(
         { error: "Invalid input data" },
@@ -79,6 +79,16 @@ export const GET = async (request) => {
       },
       include: {
         matchDetails: true,
+        playerOneUser: {
+          select: {
+            imageUrl: true,
+          },
+        },
+        playerTwoUser: {
+          select: {
+            imageUrl: true,
+          },
+        },
       },
       orderBy: {
         playedAt: "desc",
