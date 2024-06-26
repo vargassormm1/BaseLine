@@ -4,6 +4,7 @@ import Image from "next/image";
 import styles from "./RankingsTable.module.css";
 import { getRankings } from "../../utils/api";
 import Spinner from "../Spinner/Spinner";
+import Link from "next/link";
 
 const RankingsTable = () => {
   const [rankings, setRankings] = useState([]);
@@ -46,15 +47,21 @@ const RankingsTable = () => {
               <tr key={ranking.rank}>
                 <td style={{ textAlign: "center" }}>{ranking.rank}</td>
                 <td style={{ textAlign: "center" }}>
-                  <Image
-                    className={styles.profilepic}
-                    src={ranking.imageUrl}
-                    width={50}
-                    height={50}
-                    alt="Picture of the user"
-                  />
+                  <Link href={`/profile/${ranking.userId}`}>
+                    <Image
+                      className={styles.profilepic}
+                      src={ranking.imageUrl}
+                      width={50}
+                      height={50}
+                      alt="Picture of the user"
+                    />
+                  </Link>
                 </td>
-                <td style={{ textAlign: "center" }}>{ranking.username}</td>
+                <td style={{ textAlign: "center" }}>
+                  <Link href={`/profile/${ranking.userId}`}>
+                    {ranking.username}
+                  </Link>
+                </td>
                 <td style={{ textAlign: "center" }}>{ranking.totalWins}</td>
                 <td style={{ textAlign: "center" }}>{ranking.totalLosses}</td>
                 <td style={{ textAlign: "center" }}>

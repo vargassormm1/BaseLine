@@ -111,6 +111,10 @@
   .matchTable td {
     padding: 15px 5px;
   }
+  .profileImage {
+    width: 30px;
+    height: 30px;
+  }
 }
 @media (max-width: 475px) {
   .match {
