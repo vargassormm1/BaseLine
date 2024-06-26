@@ -3,6 +3,7 @@ import { useContext } from "react";
 import styles from "./PendingMatch.module.css";
 import { confirmPendingMatch, denyPendingMatch } from "@/utils/api";
 import { PendingMatchContext } from "../../../context/PendingMatchContext";
+import Image from "next/image";
 
 const PendingMatch = ({
   pendingMatchData,
@@ -35,6 +36,7 @@ const PendingMatch = ({
     {
       key: "playerOne",
       playerName: pendingMatchData.playerOneUsername,
+      playerImage: pendingMatchData.playerOneUser.imageUrl,
       playerUserId: pendingMatchData.playerOne,
       ...uniqueSets.reduce((acc, setNumber) => {
         const setDetails = pendingMatchData.matchDetails.find(
@@ -50,6 +52,7 @@ const PendingMatch = ({
     {
       key: "playerTwo",
       playerName: pendingMatchData.playerTwoUsername,
+      playerImage: pendingMatchData.playerTwoUser.imageUrl,
       playerUserId: pendingMatchData.playerTwo,
       ...uniqueSets.reduce((acc, setNumber) => {
         const setDetails = pendingMatchData.matchDetails.find(
@@ -112,7 +115,16 @@ const PendingMatch = ({
         <tbody>
           {dataSource.map((record) => (
             <tr key={record.key} className={getRowClassName(record)}>
-              <td style={{ textAlign: "center" }}>{record.playerName}</td>
+              <td className={styles.playerInfo} style={{ textAlign: "center" }}>
+                <Image
+                  src={record.playerImage}
+                  width={40}
+                  height={40}
+                  alt="Picture of the user"
+                  className={styles.profileImage}
+                />
+                {record.playerName}
+              </td>
               {uniqueSets.map((setNumber) => (
                 <td key={setNumber} style={{ textAlign: "center" }}>
                   {record[`set${setNumber}`].main}
