@@ -1,0 +1,96 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 100%;
+  margin: 2rem 5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  color: black;
+  background-color: rgb(241, 241, 241);
+}
+
+.userImage {
+  border-radius: 50%;
+  overflow: hidden;
+  width: 100px;
+  height: 100px;
+  margin-bottom: 12px;
+}
+
+.profilepic {
+  object-fit: cover;
+}
+
+.userName {
+  text-align: center;
+}
+
+.userName h3 {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0 0 1rem 0;
+}
+
+.userName p {
+  font-size: 20px;
+  margin: 1rem 0;
+}
+
+.userStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  width: 100%;
+  text-align: center;
+  margin-top: 16px;
+}
+
+.userStats div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.userStats h4 {
+  font-size: 32px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.userStats p {
+  font-size: 16px;
+}
+
+@media (max-width: 1536px) {
+}
+@media (max-width: 1366px) {
+}
+@media (max-width: 1280px) {
+}
+@media (max-width: 1024px) {
+}
+@media (max-width: 768px) {
+}
+@media (max-width: 640px) {
+  .userName h3 {
+    font-size: 22px;
+  }
+
+  .userName p {
+    font-size: 18px;
+  }
+
+  .userStats h4 {
+    font-size: 30px;
+  }
+
+  .userStats p {
+    font-size: 14px;
+  }
+}
+@media (max-width: 475px) {
+}
