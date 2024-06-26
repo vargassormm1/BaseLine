@@ -74,6 +74,18 @@
   color: white;
   margin: 1rem 0;
 }
+.playerInfo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.profileImage {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  margin-right: 10px;
+}
 
 @media (max-width: 1536px) {
 }

@@ -1,5 +1,6 @@
 "use client";
 import styles from "./Match.module.css";
+import Image from "next/image";
 
 const Match = ({ matchData }) => {
   const uniqueSets = [
@@ -25,6 +26,7 @@ const Match = ({ matchData }) => {
     {
       key: "playerOne",
       playerName: matchData.playerOneUsername,
+      playerImage: matchData.playerOneUser.imageUrl,
       playerUserId: matchData.playerOne,
       ...uniqueSets.reduce((acc, setNumber) => {
         const setDetails = matchData.matchDetails.find(
@@ -40,6 +42,7 @@ const Match = ({ matchData }) => {
     {
       key: "playerTwo",
       playerName: matchData.playerTwoUsername,
+      playerImage: matchData.playerTwoUser.imageUrl,
       playerUserId: matchData.playerTwo,
       ...uniqueSets.reduce((acc, setNumber) => {
         const setDetails = matchData.matchDetails.find(
@@ -57,6 +60,8 @@ const Match = ({ matchData }) => {
   const getRowClassName = (record) => {
     return matchData.winnerId === record.playerUserId ? styles.boldRow : "";
   };
+
+  console.log(matchData);
 
   return (
     <div className={styles.match}>
@@ -80,7 +85,16 @@ const Match = ({ matchData }) => {
         <tbody>
           {dataSource.map((record) => (
             <tr key={record.key} className={getRowClassName(record)}>
-              <td style={{ textAlign: "center" }}>{record.playerName}</td>
+              <td className={styles.playerInfo} style={{ textAlign: "center" }}>
+                <Image
+                  src={record.playerImage}
+                  width={40}
+                  height={40}
+                  alt="Picture of the user"
+                  className={styles.profileImage}
+                />
+                {record.playerName}
+              </td>
               {uniqueSets.map((setNumber) => (
                 <td key={setNumber} style={{ textAlign: "center" }}>
                   {record[`set${setNumber}`].main}
