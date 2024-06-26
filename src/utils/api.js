@@ -56,6 +56,20 @@ export const getPendingMatchesCount = async (userId) => {
   }
 };
 
+export const getAllUserMatches = async (userId) => {
+  try {
+    const res = await fetch(createUrl(`/api/matchDetails/${userId}`), {
+      method: "GET",
+    });
+    if (!res.ok) throw new Error("Network response was not ok");
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error in getPendingMatchesCount:", error);
+    throw error;
+  }
+};
+
 export const getH2hMatches = async (user1, user2) => {
   try {
     const res = await fetch(

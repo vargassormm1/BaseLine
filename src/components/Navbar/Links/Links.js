@@ -9,30 +9,32 @@ import { Dropdown, Space } from "antd";
 import { PendingMatchContext } from "../../../context/PendingMatchContext";
 import { getPendingMatchesCount } from "@/utils/api";
 
-const NavbarLinks = [
-  {
-    name: "Home",
-    path: "/home",
-  },
-  {
-    name: "Rankings",
-    path: "/rankings",
-  },
-  {
-    name: "H2H",
-    path: "/h2h",
-  },
-  {
-    name: "Pending",
-    path: "/pending",
-  },
-];
-
 const Links = ({ userId, currentUser }) => {
   const { pendingMatchChanged } = useContext(PendingMatchContext);
   const [pendingMatchCount, setPendingMatchCount] = useState(0);
-
   const pathName = usePathname();
+  const NavbarLinks = [
+    {
+      name: "Home",
+      path: "/home",
+    },
+    {
+      name: "Rankings",
+      path: "/rankings",
+    },
+    {
+      name: "H2H",
+      path: "/h2h",
+    },
+    {
+      name: "Pending",
+      path: "/pending",
+    },
+    {
+      name: "Profile",
+      path: `/profile/${currentUser?.userId}`,
+    },
+  ];
   const items = userId
     ? [
         {
@@ -98,6 +100,20 @@ const Links = ({ userId, currentUser }) => {
           ),
           key: "3",
         },
+        {
+          label: (
+            <Link
+              href={`/profile/${currentUser?.userId}`}
+              key="profile"
+              className={`${styles.link} ${
+                pathName === "/profile" ? styles.active : styles.link
+              }`}
+            >
+              Profile
+            </Link>
+          ),
+          key: "4",
+        },
       ]
     : [
         {
@@ -137,7 +153,7 @@ const Links = ({ userId, currentUser }) => {
 
   useEffect(() => {
     if (currentUser) {
-      fetchPendingMatchesCount(currentUser.userId);
+      fetchPendingMatchesCount(currentUser?.userId);
     }
   }, [currentUser, fetchPendingMatchesCount, pendingMatchChanged]);
 

@@ -15,7 +15,7 @@ const H2H = async () => {
   const users = await getAllUsers();
   return (
     <div className={styles.container}>
-      <h1>H2H</h1>
+      <h2>H2H</h2>
       <UserSelect users={users} />
     </div>
   );

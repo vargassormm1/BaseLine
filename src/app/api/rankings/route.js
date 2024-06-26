@@ -29,6 +29,7 @@ export const GET = async (request) => {
         totalLosses: true,
         totalPoints: true,
         imageUrl: true,
+        userId: true,
       },
     });
 

@@ -4,6 +4,7 @@ import styles from "./PendingMatch.module.css";
 import { confirmPendingMatch, denyPendingMatch } from "@/utils/api";
 import { PendingMatchContext } from "../../../context/PendingMatchContext";
 import Image from "next/image";
+import Link from "next/link";
 
 const PendingMatch = ({
   pendingMatchData,
@@ -116,14 +117,18 @@ const PendingMatch = ({
           {dataSource.map((record) => (
             <tr key={record.key} className={getRowClassName(record)}>
               <td className={styles.playerInfo} style={{ textAlign: "center" }}>
-                <Image
-                  src={record.playerImage}
-                  width={40}
-                  height={40}
-                  alt="Picture of the user"
-                  className={styles.profileImage}
-                />
-                {record.playerName}
+                <Link href={`/profile/${record.playerUserId}`}>
+                  <Image
+                    src={record.playerImage}
+                    width={40}
+                    height={40}
+                    alt="Picture of the user"
+                    className={styles.profileImage}
+                  />
+                </Link>
+                <Link href={`/profile/${record.playerUserId}`}>
+                  {record.playerName}
+                </Link>
               </td>
               {uniqueSets.map((setNumber) => (
                 <td key={setNumber} style={{ textAlign: "center" }}>

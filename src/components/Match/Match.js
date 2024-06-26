@@ -1,6 +1,7 @@
 "use client";
 import styles from "./Match.module.css";
 import Image from "next/image";
+import Link from "next/link";
 
 const Match = ({ matchData }) => {
   const uniqueSets = [
@@ -86,14 +87,18 @@ const Match = ({ matchData }) => {
           {dataSource.map((record) => (
             <tr key={record.key} className={getRowClassName(record)}>
               <td className={styles.playerInfo} style={{ textAlign: "center" }}>
-                <Image
-                  src={record.playerImage}
-                  width={40}
-                  height={40}
-                  alt="Picture of the user"
-                  className={styles.profileImage}
-                />
-                {record.playerName}
+                <Link href={`/profile/${record.playerUserId}`}>
+                  <Image
+                    src={record.playerImage}
+                    width={40}
+                    height={40}
+                    alt="Picture of the user"
+                    className={styles.profileImage}
+                  />
+                </Link>
+                <Link href={`/profile/${record.playerUserId}`}>
+                  {record.playerName}
+                </Link>
               </td>
               {uniqueSets.map((setNumber) => (
                 <td key={setNumber} style={{ textAlign: "center" }}>

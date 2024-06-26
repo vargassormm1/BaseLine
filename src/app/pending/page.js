@@ -19,7 +19,6 @@ const Pending = async () => {
   const { userId } = auth();
   if (!userId) {
     redirect("/sign-in");
-    return null;
   }
 
   const currentUser = await getCurrentUser(userId);

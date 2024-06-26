@@ -1,0 +1,34 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding-bottom: 5rem;
+}
+
+.title {
+  margin-bottom: 20px;
+}
+
+@media (max-width: 1536px) {
+}
+@media (max-width: 1366px) {
+}
+@media (max-width: 1280px) {
+}
+@media (max-width: 1024px) {
+}
+@media (max-width: 768px) {
+  .container {
+    min-width: 400px;
+    margin: 2rem 0 0 0;
+  }
+}
+@media (max-width: 640px) {
+}
+@media (max-width: 475px) {
+  .container {
+    min-width: 320px;
+  }
+}
