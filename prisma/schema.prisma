@@ -21,6 +21,10 @@ model User {
   matchesAsPlayerOne Matches[] @relation("PlayerOneMatches")
   matchesAsPlayerTwo Matches[] @relation("PlayerTwoMatches")
   wonMatches         Matches[] @relation("WonMatches")
+  messageThreads1    MessageThread[] @relation("User1MessageThreads")
+  messageThreads2    MessageThread[] @relation("User2MessageThreads")
+  sentMessages       Message[] @relation("SentMessages")
+  receivedMessages   Message[] @relation("ReceivedMessages")
 }
 
 model Matches {
@@ -51,4 +55,25 @@ model MatchDetails {
   playerOneTieBreakerScore Int?
   playerTwoTieBreakerScore Int?
   match                    Matches @relation(fields: [matchId], references: [matchId])
+}
+
+model MessageThread {
+  threadId       Int       @id @default(autoincrement())
+  participant1   Int
+  participant2   Int
+  messages       Message[]
+  lastUpdated    DateTime  @updatedAt
+  user1          User      @relation("User1MessageThreads", fields: [participant1], references: [userId])
+  user2          User      @relation("User2MessageThreads", fields: [participant2], references: [userId])
+}
+model Message {
+  messageId       Int           @id @default(autoincrement())
+  threadId        Int
+  senderId        Int
+  receiverId      Int
+  content         String
+  timestamp       DateTime      @default(now())
+  thread          MessageThread @relation(fields: [threadId], references: [threadId])
+  sender          User          @relation("SentMessages", fields: [senderId], references: [userId])
+  receiver        User          @relation("ReceivedMessages", fields: [receiverId], references: [userId])
 }
