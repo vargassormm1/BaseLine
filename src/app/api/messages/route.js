@@ -31,16 +31,16 @@ export const POST = async (request) => {
       );
     }
 
-    const thread = await prisma.messageThread.findFirst({
+    let thread = await prisma.messageThread.findFirst({
       where: {
         OR: [
           {
-            participant1: senderId,
-            participant2: receiverId,
+            participant1: data.senderId,
+            participant2: data.receiverId,
           },
           {
-            participant1: receiverId,
-            participant2: senderId,
+            participant1: data.receiverId,
+            participant2: data.senderId,
           },
         ],
       },
@@ -49,8 +49,8 @@ export const POST = async (request) => {
     if (!thread) {
       thread = await prisma.messageThread.create({
         data: {
-          participant1: senderId,
-          participant2: receiverId,
+          participant1: data.senderId,
+          participant2: data.receiverId,
           lastUpdated: new Date(),
         },
       });
@@ -59,9 +59,9 @@ export const POST = async (request) => {
     const newMessage = await prisma.message.create({
       data: {
         threadId: thread.threadId,
-        senderId: senderId,
-        receiverId: receiverId,
-        content: content,
+        senderId: data.senderId,
+        receiverId: data.receiverId,
+        content: data.content,
         timestamp: new Date(),
       },
     });

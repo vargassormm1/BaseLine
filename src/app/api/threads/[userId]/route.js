@@ -35,13 +35,29 @@ export const GET = async (request, { params }) => {
       include: {
         user1: true,
         user2: true,
+        messages: {
+          take: 1,
+          orderBy: { timestamp: "desc" },
+          include: {
+            sender: true,
+            receiver: true,
+          },
+        },
       },
       orderBy: {
         lastUpdated: "desc",
       },
     });
 
-    return NextResponse.json({ data: threads });
+    // Transform threads to include the last message in a simpler structure
+    const threadsWithLastMessage = threads.map((thread) => {
+      const lastMessage = thread.messages[0] || null;
+      return {
+        ...thread,
+        lastMessage,
+      };
+    });
+    return NextResponse.json({ data: threadsWithLastMessage });
   } catch (error) {
     console.error("Error fetching message threads:", error);
     return NextResponse.json(
