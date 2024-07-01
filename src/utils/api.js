@@ -85,6 +85,34 @@ export const getH2hMatches = async (user1, user2) => {
   }
 };
 
+export const getAllThreads = async (userId) => {
+  try {
+    const res = await fetch(createUrl(`/api/threads/${userId}`), {
+      method: "GET",
+    });
+    if (!res.ok) throw new Error("Network response was not ok");
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error in getAllThreads:", error);
+    throw error;
+  }
+};
+
+export const getThreadMessages = async (threadId) => {
+  try {
+    const res = await fetch(createUrl(`/api/messages/${threadId}`), {
+      method: "GET",
+    });
+    if (!res.ok) throw new Error("Network response was not ok");
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error in getThreadMessages:", error);
+    throw error;
+  }
+};
+
 export const createNewMatch = async (content) => {
   try {
     const res = await fetch(createUrl(`/api/match`), {
@@ -113,6 +141,38 @@ export const createNewMatchDetails = async (content) => {
     return data.data;
   } catch (error) {
     console.error("Error in createNewMatchDetails:", error);
+    throw error;
+  }
+};
+
+export const createMessageThread = async (content) => {
+  try {
+    const res = await fetch(createUrl(`/api/threads`), {
+      method: "POST",
+      body: JSON.stringify(content),
+      headers: { "Content-Type": "application/json" },
+    });
+    if (!res.ok) throw new Error("Network response was not ok");
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error in createMessageThread:", error);
+    throw error;
+  }
+};
+
+export const createMessage = async (content) => {
+  try {
+    const res = await fetch(createUrl(`/api/messages`), {
+      method: "POST",
+      body: JSON.stringify(content),
+      headers: { "Content-Type": "application/json" },
+    });
+    if (!res.ok) throw new Error("Network response was not ok");
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error in createMessage:", error);
     throw error;
   }
 };
