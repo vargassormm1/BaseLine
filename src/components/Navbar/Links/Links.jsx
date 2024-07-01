@@ -8,6 +8,7 @@ import { MenuOutlined } from "@ant-design/icons";
 import { Dropdown, Space } from "antd";
 import { PendingMatchContext } from "../../../context/PendingMatchContext";
 import { getPendingMatchesCount } from "@/utils/api";
+import { MessageOutlined } from "@ant-design/icons";
 
 const Links = ({ userId, currentUser }) => {
   const { pendingMatchChanged } = useContext(PendingMatchContext);
@@ -33,6 +34,10 @@ const Links = ({ userId, currentUser }) => {
     {
       name: "Profile",
       path: `/profile/${currentUser?.userId}`,
+    },
+    {
+      name: "Messages",
+      path: `/messages`,
     },
   ];
   const items = userId
@@ -113,6 +118,20 @@ const Links = ({ userId, currentUser }) => {
             </Link>
           ),
           key: "4",
+        },
+        {
+          label: (
+            <Link
+              href={`/messages`}
+              key="messages"
+              className={`${styles.link} ${
+                pathName === "/messages" ? styles.active : styles.link
+              }`}
+            >
+              <MessageOutlined />
+            </Link>
+          ),
+          key: "5",
         },
       ]
     : [
@@ -211,7 +230,7 @@ const Links = ({ userId, currentUser }) => {
                   pathName === link.path ? styles.active : styles.link
                 }`}
               >
-                {link.name}
+                {link.name === "Messages" ? <MessageOutlined /> : link.name}
                 {link.name === "Pending" &&
                 parseInt(pendingMatchCount) !== 0 ? (
                   <span className={styles.count}>{pendingMatchCount}</span>

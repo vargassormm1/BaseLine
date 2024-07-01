@@ -40,17 +40,17 @@ const NewMatchForm = ({ currentUser, refetchMatches, users }) => {
     });
 
     if (bestOf === 1) {
-      return playerOneWins > playerTwoWins ? currentUser.userId : playerTwoId;
+      return playerOneWins > playerTwoWins ? currentUser?.userId : playerTwoId;
     }
 
     const requiredWins = Math.ceil(bestOf / 2);
 
-    return playerOneWins >= requiredWins ? currentUser.userId : playerTwoId;
+    return playerOneWins >= requiredWins ? currentUser?.userId : playerTwoId;
   };
 
   const handleSubmit = async (values) => {
-    values.playerOne = currentUser.userId;
-    values.playerOneUsername = currentUser.username;
+    values.playerOne = currentUser?.userId;
+    values.playerOneUsername = currentUser?.username;
     values.playerTwoUsername = player2?.username;
 
     const playerTwoId = users.find(
@@ -207,7 +207,7 @@ const NewMatchForm = ({ currentUser, refetchMatches, users }) => {
           {player2 && matchType ? (
             <Scores
               bestOf={bestOf === 1 ? 1 : sets}
-              playerOne={currentUser.username}
+              playerOne={currentUser?.username}
               playerTwo={player2?.username}
             />
           ) : (

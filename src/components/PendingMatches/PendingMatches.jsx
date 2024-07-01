@@ -23,7 +23,7 @@ const PendingMatches = ({ currentUser }) => {
 
   useEffect(() => {
     if (currentUser) {
-      fetchPendingMatches(currentUser.userId);
+      fetchPendingMatches(currentUser?.userId);
     }
   }, [currentUser, pendingMatchHandled]);
 

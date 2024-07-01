@@ -15,8 +15,10 @@ const ProfileMatchHistory = ({ currentUser }) => {
       setMatches(data);
       setLoading(false);
     };
-    getData(currentUser.userId);
-  }, [currentUser.userId]);
+    if (currentUser?.userId) {
+      getData(currentUser?.userId);
+    }
+  }, [currentUser?.userId]);
 
   return (
     <div className={styles.container}>
