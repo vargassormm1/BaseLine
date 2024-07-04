@@ -1,25 +1,29 @@
 "use client";
-import { useEffect } from "react";
+import { useContext } from "react";
 import styles from "./MessageHistory.module.css";
 import MessageHistoryCard from "./MessageHistoryCard/MessageHistoryCard";
-import { getAllThreads } from "@/utils/api";
+import { viewThread, getUnreadMessagesCount } from "@/utils/api";
+import { PendingMatchContext } from "../../context/PendingMatchContext";
 
 const MessageHistory = ({
   currentUser,
   currentThread,
   setCurrentThread,
   threads,
-  setThreads,
 }) => {
-  useEffect(() => {
-    const getData = async (userId) => {
-      const data = await getAllThreads(userId);
-      setThreads(data);
-    };
-    if (currentUser?.userId) {
-      getData(currentUser?.userId);
+  const { setUnreadMessageCount } = useContext(PendingMatchContext);
+  const readMeassages = async (threadId, userId) => {
+    try {
+      await viewThread({
+        threadId,
+        userId,
+      });
+      const unreadCount = await getUnreadMessagesCount(userId);
+      setUnreadMessageCount(unreadCount);
+    } catch (error) {
+      console.error("Error marking messages as read:", error);
     }
-  }, [currentUser?.userId, setThreads]);
+  };
 
   return (
     <div className={styles.container}>
@@ -32,6 +36,7 @@ const MessageHistory = ({
             isSelected={thread.threadId === currentThread?.threadId}
             onClick={() => {
               setCurrentThread(thread);
+              readMeassages(thread.threadId, currentUser?.userId);
             }}
           />
         );
