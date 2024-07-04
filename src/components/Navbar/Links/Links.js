@@ -7,11 +7,13 @@ import { UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
 import { MenuOutlined } from "@ant-design/icons";
 import { Dropdown, Space } from "antd";
 import { PendingMatchContext } from "../../../context/PendingMatchContext";
-import { getPendingMatchesCount } from "@/utils/api";
+import { getPendingMatchesCount, getUnreadMessagesCount } from "@/utils/api";
 import { MessageOutlined } from "@ant-design/icons";
+import { socket } from "@/utils/socket";
 
 const Links = ({ userId, currentUser }) => {
-  const { pendingMatchChanged } = useContext(PendingMatchContext);
+  const { pendingMatchChanged, unreadMessageCount, setUnreadMessageCount } =
+    useContext(PendingMatchContext);
   const [pendingMatchCount, setPendingMatchCount] = useState(0);
   const pathName = usePathname();
   const NavbarLinks = [
@@ -93,14 +95,16 @@ const Links = ({ userId, currentUser }) => {
                 pathName === "/pending" ? styles.active : styles.link
               }`}
             >
-              Pending{" "}
-              {parseInt(pendingMatchCount) !== 0 ? (
-                <span className={styles.count}>
-                  {String(pendingMatchCount)}
-                </span>
-              ) : (
-                <></>
-              )}
+              <div className={styles.iconWithBadge}>
+                Pending
+                {parseInt(pendingMatchCount) !== 0 ? (
+                  <span className={styles.countBadge}>
+                    {String(pendingMatchCount)}
+                  </span>
+                ) : (
+                  <></>
+                )}
+              </div>
             </Link>
           ),
           key: "3",
@@ -128,7 +132,14 @@ const Links = ({ userId, currentUser }) => {
                 pathName === "/messages" ? styles.active : styles.link
               }`}
             >
-              <MessageOutlined />
+              <div className={styles.iconWithBadge}>
+                <MessageOutlined />
+                {unreadMessageCount > 0 && (
+                  <span className={styles.countBadge}>
+                    {unreadMessageCount}
+                  </span>
+                )}
+              </div>
             </Link>
           ),
           key: "5",
@@ -170,11 +181,45 @@ const Links = ({ userId, currentUser }) => {
     setPendingMatchCount(String(data));
   }, []);
 
+  const fetchUnreadMessagesCount = useCallback(
+    async (userId) => {
+      const data = await getUnreadMessagesCount(userId);
+      setUnreadMessageCount(data);
+    },
+    [setUnreadMessageCount]
+  );
+
   useEffect(() => {
     if (currentUser) {
       fetchPendingMatchesCount(currentUser?.userId);
+      fetchUnreadMessagesCount(currentUser?.userId);
     }
-  }, [currentUser, fetchPendingMatchesCount, pendingMatchChanged]);
+  }, [
+    currentUser,
+    fetchPendingMatchesCount,
+    fetchUnreadMessagesCount,
+    pendingMatchChanged,
+  ]);
+
+  useEffect(() => {
+    const handleNewMessage = () => {
+      if (currentUser) {
+        fetchUnreadMessagesCount(currentUser.userId);
+      }
+    };
+    const handleNewPendingMatchAction = () => {
+      if (currentUser) {
+        fetchPendingMatchesCount(currentUser?.userId);
+      }
+    };
+
+    socket.on("new message", handleNewMessage);
+    socket.on("update pending match", handleNewPendingMatchAction);
+
+    return () => {
+      socket.off("new message", handleNewMessage);
+    };
+  }, [currentUser, fetchPendingMatchesCount, fetchUnreadMessagesCount]);
 
   return (
     <>
@@ -189,11 +234,11 @@ const Links = ({ userId, currentUser }) => {
             <Space className={styles.dropLinks}>
               <div className={styles.badge}>
                 <MenuOutlined />
-                {userId && parseInt(pendingMatchCount) !== 0 ? (
+                {userId &&
+                (parseInt(pendingMatchCount) !== 0 ||
+                  parseInt(unreadMessageCount) !== 0) ? (
                   <span className={styles.badgeDot}></span>
-                ) : (
-                  <></>
-                )}
+                ) : null}
               </div>
             </Space>
           </a>
@@ -230,12 +275,26 @@ const Links = ({ userId, currentUser }) => {
                   pathName === link.path ? styles.active : styles.link
                 }`}
               >
-                {link.name === "Messages" ? <MessageOutlined /> : link.name}
-                {link.name === "Pending" &&
-                parseInt(pendingMatchCount) !== 0 ? (
-                  <span className={styles.count}>{pendingMatchCount}</span>
+                {link.name === "Messages" ? (
+                  <div className={styles.iconWithBadge}>
+                    <MessageOutlined />
+                    {unreadMessageCount > 0 && (
+                      <span className={styles.countBadge}>
+                        {unreadMessageCount}
+                      </span>
+                    )}
+                  </div>
+                ) : link.name === "Pending" ? (
+                  <div className={styles.iconWithBadge}>
+                    {link.name}
+                    {parseInt(pendingMatchCount) !== 0 && (
+                      <span className={styles.countBadge}>
+                        {pendingMatchCount}
+                      </span>
+                    )}
+                  </div>
                 ) : (
-                  <></>
+                  link.name
                 )}
               </Link>
             ))}
