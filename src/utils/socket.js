@@ -2,4 +2,6 @@
 
 import { io } from "socket.io-client";
 
-export const socket = io("http://localhost:3005");
+export const socket = io("http://localhost:3005", {
+  transports: ["websocket", "polling"],
+});
