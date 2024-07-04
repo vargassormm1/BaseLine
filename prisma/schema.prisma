@@ -8,23 +8,23 @@ datasource db {
 }
 
 model User {
-  userId                                         Int             @id @default(autoincrement())
-  clerkId                                        String          @unique
-  fname                                          String
-  lname                                          String
-  username                                       String          @unique
-  email                                          String          @unique
-  imageUrl                                       String?
-  totalWins                                      Int             @default(0)
-  totalLosses                                    Int             @default(0)
-  totalPoints                                    Int             @default(0)
-  matchesAsPlayerOne                             Matches[]       @relation("PlayerOneMatches")
-  matchesAsPlayerTwo                             Matches[]       @relation("PlayerTwoMatches")
-  wonMatches                                     Matches[]       @relation("WonMatches")
-  Message_Message_receiverIdToUser               Message[]       @relation("Message_receiverIdToUser")
-  Message_Message_senderIdToUser                 Message[]       @relation("Message_senderIdToUser")
-  MessageThread_MessageThread_participant1ToUser MessageThread[] @relation("MessageThread_participant1ToUser")
-  MessageThread_MessageThread_participant2ToUser MessageThread[] @relation("MessageThread_participant2ToUser")
+  userId             Int             @id @default(autoincrement())
+  clerkId            String          @unique
+  fname              String
+  lname              String
+  username           String          @unique
+  email              String          @unique
+  imageUrl           String?
+  totalWins          Int             @default(0)
+  totalLosses        Int             @default(0)
+  totalPoints        Int             @default(0)
+  matchesAsPlayerOne Matches[]       @relation("PlayerOneMatches")
+  matchesAsPlayerTwo Matches[]       @relation("PlayerTwoMatches")
+  wonMatches         Matches[]       @relation("WonMatches")
+  receivedMessages   Message[]       @relation("ReceivedMessages")
+  sentMessages       Message[]       @relation("SentMessages")
+  messageThreads1    MessageThread[] @relation("User1MessageThreads")
+  messageThreads2    MessageThread[] @relation("User2MessageThreads")
 }
 
 model Matches {
@@ -57,24 +57,25 @@ model MatchDetails {
   match                    Matches @relation(fields: [matchId], references: [matchId])
 }
 
-model Message {
-  messageId                     Int           @id @default(autoincrement())
-  threadId                      Int
-  senderId                      Int
-  receiverId                    Int
-  content                       String
-  timestamp                     DateTime      @default(now())
-  User_Message_receiverIdToUser User          @relation("Message_receiverIdToUser", fields: [receiverId], references: [userId])
-  User_Message_senderIdToUser   User          @relation("Message_senderIdToUser", fields: [senderId], references: [userId])
-  MessageThread                 MessageThread @relation(fields: [threadId], references: [threadId])
+model MessageThread {
+  threadId     Int       @id @default(autoincrement())
+  participant1 Int
+  participant2 Int
+  lastUpdated  DateTime  @updatedAt
+  messages     Message[]
+  user1        User      @relation("User1MessageThreads", fields: [participant1], references: [userId])
+  user2        User      @relation("User2MessageThreads", fields: [participant2], references: [userId])
 }
 
-model MessageThread {
-  threadId                              Int       @id @default(autoincrement())
-  participant1                          Int
-  participant2                          Int
-  lastUpdated                           DateTime
-  Message                               Message[]
-  User_MessageThread_participant1ToUser User      @relation("MessageThread_participant1ToUser", fields: [participant1], references: [userId])
-  User_MessageThread_participant2ToUser User      @relation("MessageThread_participant2ToUser", fields: [participant2], references: [userId])
+model Message {
+  messageId  Int           @id @default(autoincrement())
+  threadId   Int
+  senderId   Int
+  receiverId Int
+  content    String
+  timestamp  DateTime      @default(now())
+  read       Boolean       @default(false)
+  receiver   User          @relation("ReceivedMessages", fields: [receiverId], references: [userId])
+  sender     User          @relation("SentMessages", fields: [senderId], references: [userId])
+  thread     MessageThread @relation(fields: [threadId], references: [threadId])
 }
