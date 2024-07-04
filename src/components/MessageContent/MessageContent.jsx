@@ -1,23 +1,43 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import styles from "./MessageContent.module.css";
 import { getAllThreads } from "@/utils/api";
 import Chat from "../Chat/Chat";
 import MessageHistory from "../MessageHistory/MessageHistory";
+import { socket } from "@/utils/socket";
 
 const MessageContent = ({ currentUser }) => {
   const [threads, setThreads] = useState([]);
   const [currentThread, setCurrentThread] = useState(null);
 
-  useEffect(() => {
-    const getData = async (userId) => {
+  const fetchThreads = useCallback(async (userId) => {
+    try {
       const data = await getAllThreads(userId);
       setThreads(data);
-    };
-    if (currentUser?.userId) {
-      getData(currentUser?.userId);
+    } catch (error) {
+      console.error("Error fetching threads:", error);
     }
-  }, [currentUser?.userId]);
+  }, []);
+
+  useEffect(() => {
+    if (currentUser?.userId) {
+      fetchThreads(currentUser?.userId);
+    }
+  }, [currentUser?.userId, fetchThreads]);
+
+  useEffect(() => {
+    const handleNewMessage = () => {
+      if (currentUser?.userId) {
+        fetchThreads(currentUser?.userId);
+      }
+    };
+
+    socket.on("new message", handleNewMessage);
+
+    return () => {
+      socket.off("new message", handleNewMessage);
+    };
+  }, [currentUser?.userId, fetchThreads]);
 
   return (
     <div className={styles.container}>
