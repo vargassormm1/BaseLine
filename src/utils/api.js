@@ -113,6 +113,20 @@ export const getThreadMessages = async (threadId) => {
   }
 };
 
+export const getUnreadMessagesCount = async (userId) => {
+  try {
+    const res = await fetch(createUrl(`/api/messages/unread/${userId}`), {
+      method: "GET",
+    });
+    if (!res.ok) throw new Error("Network response was not ok");
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error in getThreadMessages:", error);
+    throw error;
+  }
+};
+
 export const createNewMatch = async (content) => {
   try {
     const res = await fetch(createUrl(`/api/match`), {
@@ -189,6 +203,22 @@ export const confirmPendingMatch = async (content) => {
     return data.data;
   } catch (error) {
     console.error("Error in confirmPendingMatch:", error);
+    throw error;
+  }
+};
+
+export const viewThread = async (content) => {
+  try {
+    const res = await fetch(createUrl(`/api/messages/read`), {
+      method: "PUT",
+      body: JSON.stringify(content),
+      headers: { "Content-Type": "application/json" },
+    });
+    if (!res.ok) throw new Error("Network response was not ok");
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error in viewThread:", error);
     throw error;
   }
 };
