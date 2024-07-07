@@ -10,8 +10,10 @@ import { PendingMatchContext } from "../../../context/PendingMatchContext";
 import { getPendingMatchesCount, getUnreadMessagesCount } from "@/utils/api";
 import { MessageOutlined } from "@ant-design/icons";
 import { socket } from "@/utils/socket";
+import { useClerk } from "@clerk/nextjs";
 
 const Links = ({ userId, currentUser }) => {
+  const { signOut } = useClerk();
   const { pendingMatchChanged, unreadMessageCount, setUnreadMessageCount } =
     useContext(PendingMatchContext);
   const [pendingMatchCount, setPendingMatchCount] = useState(0);
@@ -115,7 +117,9 @@ const Links = ({ userId, currentUser }) => {
               href={`/profile/${currentUser?.userId}`}
               key="profile"
               className={`${styles.link} ${
-                pathName === "/profile" ? styles.active : styles.link
+                pathName === `/profile/${currentUser?.userId}`
+                  ? styles.active
+                  : styles.link
               }`}
             >
               Profile
@@ -125,22 +129,12 @@ const Links = ({ userId, currentUser }) => {
         },
         {
           label: (
-            <Link
-              href={`/messages`}
-              key="messages"
-              className={`${styles.link} ${
-                pathName === "/messages" ? styles.active : styles.link
-              }`}
+            <button
+              className={styles.signout}
+              onClick={() => signOut({ redirectUrl: "/" })}
             >
-              <div className={styles.iconWithBadge}>
-                <MessageOutlined />
-                {unreadMessageCount > 0 && (
-                  <span className={styles.countBadge}>
-                    {unreadMessageCount}
-                  </span>
-                )}
-              </div>
-            </Link>
+              Sign Out
+            </button>
           ),
           key: "5",
         },
@@ -224,6 +218,21 @@ const Links = ({ userId, currentUser }) => {
   return (
     <>
       <div className={styles.drop}>
+        <SignedIn>
+          <Link
+            href={`/messages`}
+            key="messages"
+            className={`${styles.messageLink}`}
+          >
+            <div className={styles.iconWithBadge}>
+              <MessageOutlined />
+              {unreadMessageCount > 0 && (
+                <span className={styles.countBadge}>{unreadMessageCount}</span>
+              )}
+            </div>
+          </Link>
+          <UserButton afterSignOutUrl="/" />
+        </SignedIn>
         <Dropdown
           menu={{
             items,
@@ -234,16 +243,13 @@ const Links = ({ userId, currentUser }) => {
             <Space className={styles.dropLinks}>
               <div className={styles.badge}>
                 <MenuOutlined />
-                {userId &&
-                (parseInt(pendingMatchCount) !== 0 ||
-                  parseInt(unreadMessageCount) !== 0) ? (
+                {userId && parseInt(pendingMatchCount) !== 0 ? (
                   <span className={styles.badgeDot}></span>
                 ) : null}
               </div>
             </Space>
           </a>
         </Dropdown>
-        <UserButton afterSignOutUrl="/" />
       </div>
       <ul className={styles.links}>
         <SignedOut>
@@ -271,9 +277,9 @@ const Links = ({ userId, currentUser }) => {
                 prefetch={true}
                 href={link.path}
                 key={link.name}
-                className={`${styles.link} ${
-                  pathName === link.path ? styles.active : styles.link
-                }`}
+                className={`${
+                  link.path === "/messages" ? styles.messageLink : styles.link
+                } ${pathName === link.path ? styles.active : styles.link}`}
               >
                 {link.name === "Messages" ? (
                   <div className={styles.iconWithBadge}>
