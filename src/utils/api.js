@@ -87,7 +87,7 @@ export const getH2hMatches = async (user1, user2) => {
 
 export const getAllThreads = async (userId) => {
   try {
-    const res = await fetch(createUrl(`/api/threads/${userId}`), {
+    const res = await fetch(createUrl(`/api/threads/user/${userId}`), {
       method: "GET",
     });
     if (!res.ok) throw new Error("Network response was not ok");
@@ -123,6 +123,20 @@ export const getUnreadMessagesCount = async (userId) => {
     return data.data;
   } catch (error) {
     console.error("Error in getThreadMessages:", error);
+    throw error;
+  }
+};
+
+export const getThreadById = async (threadId) => {
+  try {
+    const res = await fetch(createUrl(`/api/threads/${threadId}`), {
+      method: "GET",
+    });
+    if (!res.ok) throw new Error("Network response was not ok");
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error in getThreadById:", error);
     throw error;
   }
 };

@@ -36,12 +36,12 @@ export const POST = async (request) => {
       where: {
         OR: [
           {
-            participant1: userId1,
-            participant2: userId2,
+            participant1: data.participant1,
+            participant2: data.participant2,
           },
           {
-            participant1: userId2,
-            participant2: userId1,
+            participant1: data.participant2,
+            participant2: data.participant1,
           },
         ],
       },
@@ -51,8 +51,8 @@ export const POST = async (request) => {
     if (!thread) {
       thread = await prisma.messageThread.create({
         data: {
-          participant1: userId1,
-          participant2: userId2,
+          participant1: data.participant1,
+          participant2: data.participant2,
           lastUpdated: new Date(),
         },
       });
