@@ -7,6 +7,15 @@
   margin-top: 2rem;
 }
 
+.message {
+  background-color: rgb(241, 241, 241);
+  color: black;
+  padding: 2rem;
+  margin-top: 10%;
+  border-radius: 5px;
+  text-align: center;
+}
+
 @media (max-width: 1536px) {
 }
 @media (max-width: 1366px) {
