@@ -1,7 +1,26 @@
+"use client";
 import styles from "./ProfileCard.module.css";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { createMessageThread } from "@/utils/api";
 
-const ProfileCard = ({ currentUser }) => {
+const ProfileCard = ({ currentUser, loggedInUser }) => {
+  const router = useRouter();
+
+  const handleMessageClick = async () => {
+    try {
+      const newThread = await createMessageThread({
+        participant1: currentUser?.userId,
+        participant2: loggedInUser?.userId,
+      });
+      if (newThread) {
+        router.push(`/messages?threadId=${newThread.threadId}`);
+      }
+    } catch (error) {
+      console.error("Error creating message thread:", error);
+    }
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.userImage}>
@@ -33,6 +52,11 @@ const ProfileCard = ({ currentUser }) => {
           <p>Points</p>
         </div>
       </div>
+      {loggedInUser?.userId === currentUser?.userId ? null : (
+        <button className={styles.messageButton} onClick={handleMessageClick}>
+          Message
+        </button>
+      )}
     </div>
   );
 };
