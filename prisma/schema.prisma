@@ -8,38 +8,42 @@ datasource db {
 }
 
 model User {
-  userId             Int       @id @default(autoincrement())
-  clerkId            String    @unique
+  userId             Int             @id @default(autoincrement())
+  clerkId            String          @unique
   fname              String
   lname              String
-  username           String    @unique
-  email              String    @unique
+  username           String          @unique
+  email              String          @unique
   imageUrl           String?
-  totalWins          Int       @default(0)
-  totalLosses        Int       @default(0)
-  totalPoints        Int       @default(0)
-  matchesAsPlayerOne Matches[] @relation("PlayerOneMatches")
-  matchesAsPlayerTwo Matches[] @relation("PlayerTwoMatches")
-  wonMatches         Matches[] @relation("WonMatches")
+  totalWins          Int             @default(0)
+  totalLosses        Int             @default(0)
+  totalPoints        Int             @default(0)
+  matchesAsPlayerOne Matches[]       @relation("PlayerOneMatches")
+  matchesAsPlayerTwo Matches[]       @relation("PlayerTwoMatches")
+  wonMatches         Matches[]       @relation("WonMatches")
+  receivedMessages   Message[]       @relation("ReceivedMessages")
+  sentMessages       Message[]       @relation("SentMessages")
+  messageThreads1    MessageThread[] @relation("User1MessageThreads")
+  messageThreads2    MessageThread[] @relation("User2MessageThreads")
 }
 
 model Matches {
-  matchId           Int            @id @default(autoincrement())
-  playerOne         Int
-  playerTwo         Int
-  playerOneUsername String?
-  playerTwoUsername String?
-  matchType         Int
-  winnerId          Int?
-  loserId           Int?
-  playedAt          DateTime       @default(now())
-  playerOneConfirmed    Boolean   @default(false)
-  playerTwoConfirmed    Boolean   @default(false)
-  scoreVisible          Boolean   @default(false)
-  matchDetails      MatchDetails[]
-  playerOneUser     User           @relation("PlayerOneMatches", fields: [playerOne], references: [userId])
-  playerTwoUser     User           @relation("PlayerTwoMatches", fields: [playerTwo], references: [userId])
-  winnerUser        User?          @relation("WonMatches", fields: [winnerId], references: [userId])
+  matchId            Int            @id @default(autoincrement())
+  playerOne          Int
+  playerTwo          Int
+  playerOneUsername  String?
+  playerTwoUsername  String?
+  matchType          Int
+  winnerId           Int?
+  loserId            Int?
+  playedAt           DateTime       @default(now())
+  playerOneConfirmed Boolean        @default(false)
+  playerTwoConfirmed Boolean        @default(false)
+  scoreVisible       Boolean        @default(false)
+  matchDetails       MatchDetails[]
+  playerOneUser      User           @relation("PlayerOneMatches", fields: [playerOne], references: [userId])
+  playerTwoUser      User           @relation("PlayerTwoMatches", fields: [playerTwo], references: [userId])
+  winnerUser         User?          @relation("WonMatches", fields: [winnerId], references: [userId])
 }
 
 model MatchDetails {
@@ -51,4 +55,27 @@ model MatchDetails {
   playerOneTieBreakerScore Int?
   playerTwoTieBreakerScore Int?
   match                    Matches @relation(fields: [matchId], references: [matchId])
+}
+
+model MessageThread {
+  threadId     Int       @id @default(autoincrement())
+  participant1 Int
+  participant2 Int
+  lastUpdated  DateTime  @updatedAt
+  messages     Message[]
+  user1        User      @relation("User1MessageThreads", fields: [participant1], references: [userId])
+  user2        User      @relation("User2MessageThreads", fields: [participant2], references: [userId])
+}
+
+model Message {
+  messageId  Int           @id @default(autoincrement())
+  threadId   Int
+  senderId   Int
+  receiverId Int
+  content    String
+  timestamp  DateTime      @default(now())
+  read       Boolean       @default(false)
+  receiver   User          @relation("ReceivedMessages", fields: [receiverId], references: [userId])
+  sender     User          @relation("SentMessages", fields: [senderId], references: [userId])
+  thread     MessageThread @relation(fields: [threadId], references: [threadId])
 }

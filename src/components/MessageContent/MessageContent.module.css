@@ -1,0 +1,28 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+.notice {
+  width: 70%;
+  text-align: center;
+}
+
+@media (max-width: 1536px) {
+}
+@media (max-width: 1366px) {
+}
+@media (max-width: 1280px) {
+}
+@media (max-width: 1024px) {
+}
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+}
+@media (max-width: 640px) {
+}
+@media (max-width: 475px) {
+}
