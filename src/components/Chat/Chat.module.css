@@ -36,7 +36,7 @@
   align-items: flex-start;
   gap: 1em;
   padding: 1em;
-  height: 550px;
+  height: 400px;
   overflow-y: auto;
   background-color: white;
   color: black;
@@ -126,7 +126,9 @@
 @media (max-width: 769px) {
   .container {
     width: 100%;
-    height: 50%;
+    height: 600px;
+    margin-top: 4rem;
+    overflow: hidden;
   }
   .backButton {
     display: block;
