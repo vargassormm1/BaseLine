@@ -126,7 +126,7 @@
 @media (max-width: 769px) {
   .container {
     width: 100%;
-    height: 500px;
+    height: 400px;
     overflow: hidden;
   }
   .backButton {
