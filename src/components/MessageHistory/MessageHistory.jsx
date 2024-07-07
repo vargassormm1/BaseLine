@@ -27,20 +27,26 @@ const MessageHistory = ({
 
   return (
     <div className={styles.container}>
-      {threads.map((thread) => {
-        return (
-          <MessageHistoryCard
-            key={thread.threadId}
-            messageInfo={thread}
-            currentUser={currentUser}
-            isSelected={thread.threadId === currentThread?.threadId}
-            onClick={() => {
-              setCurrentThread(thread);
-              readMeassages(thread.threadId, currentUser?.userId);
-            }}
-          />
-        );
-      })}
+      {threads.length > 0 ? (
+        threads.map((thread) => {
+          return (
+            <MessageHistoryCard
+              key={thread.threadId}
+              messageInfo={thread}
+              currentUser={currentUser}
+              isSelected={thread.threadId === currentThread?.threadId}
+              onClick={() => {
+                setCurrentThread(thread);
+                readMeassages(thread.threadId, currentUser?.userId);
+              }}
+            />
+          );
+        })
+      ) : (
+        <div className={styles.notice}>
+          <p>No messages yet</p>
+        </div>
+      )}
     </div>
   );
 };

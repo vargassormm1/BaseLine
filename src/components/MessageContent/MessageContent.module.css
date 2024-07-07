@@ -18,6 +18,9 @@
 @media (max-width: 1024px) {
 }
 @media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
 }
 @media (max-width: 640px) {
 }

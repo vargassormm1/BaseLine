@@ -41,7 +41,9 @@ const MessageHistoryCard = ({
             })}
           </p>
         </div>
-        <div className={styles.message}>{messageInfo.lastMessage?.content}</div>
+        <div className={styles.message}>
+          <p>{messageInfo.lastMessage?.content}</p>
+        </div>
       </div>
     </div>
   );
