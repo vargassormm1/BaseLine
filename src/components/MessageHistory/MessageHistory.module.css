@@ -1,5 +1,5 @@
 .container {
-  width: 30%;
+  width: 100%;
   text-align: center;
   background-color: white;
   min-height: 700px;
@@ -26,6 +26,10 @@
 }
 @media (max-width: 768px) {
   .container {
+    width: 100%;
+    min-height: 500px;
+  }
+  .notice {
     width: 100%;
     min-height: 500px;
   }

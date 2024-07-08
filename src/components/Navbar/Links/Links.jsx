@@ -28,6 +28,10 @@ const Links = ({ userId, currentUser }) => {
       path: "/rankings",
     },
     {
+      name: "Players",
+      path: `/players`,
+    },
+    {
       name: "H2H",
       path: "/h2h",
     },
@@ -77,6 +81,20 @@ const Links = ({ userId, currentUser }) => {
         {
           label: (
             <Link
+              href="/players"
+              key="players"
+              className={`${styles.link} ${
+                pathName === "/players" ? styles.active : styles.link
+              }`}
+            >
+              Players
+            </Link>
+          ),
+          key: "2",
+        },
+        {
+          label: (
+            <Link
               href="/h2h"
               key="h2h"
               className={`${styles.link} ${
@@ -86,7 +104,7 @@ const Links = ({ userId, currentUser }) => {
               H2H
             </Link>
           ),
-          key: "2",
+          key: "3",
         },
         {
           label: (
@@ -109,7 +127,7 @@ const Links = ({ userId, currentUser }) => {
               </div>
             </Link>
           ),
-          key: "3",
+          key: "4",
         },
         {
           label: (
@@ -125,7 +143,7 @@ const Links = ({ userId, currentUser }) => {
               Profile
             </Link>
           ),
-          key: "4",
+          key: "5",
         },
         {
           label: (
@@ -136,7 +154,7 @@ const Links = ({ userId, currentUser }) => {
               Sign Out
             </button>
           ),
-          key: "5",
+          key: "6",
         },
       ]
     : [

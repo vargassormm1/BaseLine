@@ -1,0 +1,156 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  border-radius: 10px;
+  width: 100%;
+  height: 100%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  color: black;
+  background-color: rgb(241, 241, 241);
+}
+
+.userImage {
+  border-radius: 50%;
+  overflow: hidden;
+  width: 60px;
+  height: 60px;
+  margin-bottom: 12px;
+}
+
+.profilepic {
+  object-fit: cover;
+}
+
+.userName {
+  text-align: center;
+}
+
+.userName h3 {
+  font-size: 20px;
+  font-weight: bold;
+  margin: 0 0 1rem 0;
+}
+
+.userName p {
+  font-size: 18px;
+  margin: 1rem 0;
+  width: 100%;
+}
+.userName p:hover {
+  color: #4b940b;
+}
+
+.userStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  width: 100%;
+  text-align: center;
+  margin-top: 16px;
+}
+
+.userStats div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.userStats h4 {
+  font-size: 30px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.userStats p {
+  font-size: 16px;
+}
+
+.messageButton {
+  background-color: #4b940b;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-top: 2rem;
+}
+
+.messageButton:hover {
+  background-color: #3a7308;
+}
+
+@media (max-width: 1536px) {
+}
+@media (max-width: 1366px) {
+}
+@media (max-width: 1280px) {
+}
+@media (max-width: 1024px) {
+}
+@media (max-width: 768px) {
+}
+@media (max-width: 640px) {
+  .userName h3 {
+    font-size: 22px;
+  }
+
+  .userName p {
+    font-size: 18px;
+  }
+
+  .userStats h4 {
+    font-size: 30px;
+  }
+
+  .userStats p {
+    font-size: 14px;
+  }
+  .messageButton {
+    margin-top: 0.5rem;
+  }
+  .userStats {
+    margin-top: 14px;
+  }
+  .userName p {
+    margin: 0.5rem 0;
+  }
+  .userName h3 {
+    margin: 0 0 0.5rem 0;
+  }
+}
+@media (max-width: 475px) {
+  .userName h3 {
+    font-size: 20px;
+  }
+
+  .userName p {
+    font-size: 16px;
+  }
+
+  .userStats h4 {
+    font-size: 26px;
+  }
+
+  .userStats p {
+    font-size: 12px;
+  }
+  .userStats {
+    gap: 14px;
+  }
+  .messageButton {
+    margin-top: 0.5rem;
+  }
+  .userStats {
+    margin-top: 12px;
+  }
+  .userName p {
+    margin: 0.25rem 0;
+  }
+  .userName h3 {
+    margin: 0 0 0.25rem 0;
+  }
+}

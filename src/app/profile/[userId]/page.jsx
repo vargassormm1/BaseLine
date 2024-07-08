@@ -3,6 +3,7 @@ import prisma from "@/utils/db";
 import ProfileCard from "@/components/ProfileCard/ProfileCard";
 import ProfileMatchHistory from "@/components/ProfileMatchHistory/ProfileMatchHistory";
 import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
 const getCurrentUser = async (userId) => {
   if (!userId) {
