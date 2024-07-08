@@ -7,6 +7,8 @@ import MessageHistory from "../MessageHistory/MessageHistory";
 import { socket } from "@/utils/socket";
 import { useMediaQuery } from "react-responsive";
 import { useSearchParams } from "next/navigation";
+import { SearchOutlined } from "@ant-design/icons";
+import Link from "next/link";
 
 const MessageContent = ({ currentUser }) => {
   const searchParams = useSearchParams();
@@ -87,21 +89,36 @@ const MessageContent = ({ currentUser }) => {
             onBack={handleBackClick}
           />
         ) : (
-          <MessageHistory
-            currentUser={currentUser}
-            currentThread={currentThread}
-            setCurrentThread={handleThreadClick}
-            threads={threads}
-          />
+          <div className={styles.history}>
+            <Link href="/players">
+              <button className={styles.find}>
+                <SearchOutlined /> Find Players
+              </button>
+            </Link>
+            <MessageHistory
+              currentUser={currentUser}
+              currentThread={currentThread}
+              setCurrentThread={handleThreadClick}
+              threads={threads}
+            />
+          </div>
         )
       ) : (
         <>
-          <MessageHistory
-            currentUser={currentUser}
-            currentThread={currentThread}
-            setCurrentThread={setCurrentThread}
-            threads={threads}
-          />
+          <div className={styles.history}>
+            <Link href="/players">
+              <button className={styles.find}>
+                <SearchOutlined /> Find Players
+              </button>
+            </Link>
+            <MessageHistory
+              currentUser={currentUser}
+              currentThread={currentThread}
+              setCurrentThread={setCurrentThread}
+              threads={threads}
+            />
+          </div>
+
           {currentThread ? (
             <Chat currentUser={currentUser} currentThread={currentThread} />
           ) : (
