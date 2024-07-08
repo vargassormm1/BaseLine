@@ -45,6 +45,6 @@
 }
 @media (max-width: 475px) {
   .players {
-    gap: 5px;
+    row-gap: 30px;
   }
 }

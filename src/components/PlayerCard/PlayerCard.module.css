@@ -109,6 +109,18 @@
   .userStats p {
     font-size: 14px;
   }
+  .messageButton {
+    margin-top: 0.5rem;
+  }
+  .userStats {
+    margin-top: 14px;
+  }
+  .userName p {
+    margin: 0.5rem 0;
+  }
+  .userName h3 {
+    margin: 0 0 0.5rem 0;
+  }
 }
 @media (max-width: 475px) {
   .userName h3 {
@@ -120,7 +132,7 @@
   }
 
   .userStats h4 {
-    font-size: 28px;
+    font-size: 26px;
   }
 
   .userStats p {
@@ -128,5 +140,17 @@
   }
   .userStats {
     gap: 14px;
+  }
+  .messageButton {
+    margin-top: 0.5rem;
+  }
+  .userStats {
+    margin-top: 12px;
+  }
+  .userName p {
+    margin: 0.25rem 0;
+  }
+  .userName h3 {
+    margin: 0 0 0.25rem 0;
   }
 }
