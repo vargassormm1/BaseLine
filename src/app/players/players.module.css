@@ -46,5 +46,6 @@
 @media (max-width: 475px) {
   .players {
     row-gap: 30px;
+    grid-auto-rows: 300px;
   }
 }
