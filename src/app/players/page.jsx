@@ -1,4 +1,5 @@
 import styles from "./players.module.css";
+import prisma from "@/utils/db";
 import { auth } from "@clerk/nextjs/server";
 import PlayerCard from "../../components/PlayerCard/PlayerCard";
 import { redirect } from "next/navigation";
