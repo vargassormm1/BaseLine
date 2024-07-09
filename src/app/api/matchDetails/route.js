@@ -13,12 +13,10 @@ const ratelimit = new Ratelimit({
 
 export const POST = async (request) => {
   try {
-    const { protect } = auth();
+    const { protect, userId } = auth();
     protect();
 
-    const ip = request.headers.get("x-forwarded-for") ?? "";
-    const { success } = await ratelimit.limit(ip);
-
+    const { success } = await ratelimit.limit(userId);
     if (!success) {
       return NextResponse.json(
         { error: "Too many requests. Please try again later." },
@@ -26,8 +24,8 @@ export const POST = async (request) => {
       );
     }
 
+    // Validate the data
     const data = await request.json();
-
     if (
       !data.matchId ||
       !data.set ||
@@ -40,6 +38,7 @@ export const POST = async (request) => {
       );
     }
 
+    // Create new match detail
     const newMatchDetail = await prisma.matchDetails.create({
       data: {
         matchId: data.matchId,
@@ -63,17 +62,24 @@ export const POST = async (request) => {
 
 export const GET = async (request) => {
   try {
-    const { protect } = auth();
+    const { protect, userId } = auth();
     protect();
 
-    const ip = request.headers.get("x-forwarded-for") ?? "";
-    const { success } = await ratelimit.limit(ip);
-
+    const { success } = await ratelimit.limit(userId);
     if (!success) {
       return NextResponse.json(
         { error: "Too many requests. Please try again later." },
         { status: 429 }
       );
+    }
+
+    // Check if the user exists in the database
+    const prismaUser = await prisma.user.findUnique({
+      where: { clerkId: userId },
+    });
+
+    if (!prismaUser) {
+      return NextResponse.json({ error: "User not found." }, { status: 404 });
     }
 
     const matchesWithScores = await prisma.matches.findMany({

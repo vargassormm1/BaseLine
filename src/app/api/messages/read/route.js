@@ -12,26 +12,36 @@ const ratelimit = new Ratelimit({
 });
 
 export const PUT = async (request, response) => {
-  const { protect } = auth();
-  protect();
-
-  const ip = request.headers.get("x-forwarded-for") ?? "";
-  const { success } = await ratelimit.limit(ip);
-
-  if (!success) {
-    return NextResponse.json(
-      { error: "Too many requests. Please try again later." },
-      { status: 429 }
-    );
-  }
-
-  const data = await request.json();
-
-  if (!data.userId || !data.threadId) {
-    return NextResponse.json({ error: "Invalid input data" }, { status: 400 });
-  }
-
   try {
+    const { protect, userId } = auth();
+    protect();
+
+    const { success } = await ratelimit.limit(userId);
+    if (!success) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { status: 429 }
+      );
+    }
+
+    // Check if the user exists in the database
+    const prismaUser = await prisma.user.findUnique({
+      where: { clerkId: userId },
+    });
+
+    if (!prismaUser) {
+      return NextResponse.json({ error: "User not found." }, { status: 404 });
+    }
+
+    // Validate the data
+    const data = await request.json();
+    if (!data.userId || !data.threadId) {
+      return NextResponse.json(
+        { error: "Invalid input data" },
+        { status: 400 }
+      );
+    }
+
     await prisma.message.updateMany({
       where: {
         threadId: data.threadId,

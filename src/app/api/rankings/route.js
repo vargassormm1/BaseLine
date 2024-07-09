@@ -13,11 +13,10 @@ const ratelimit = new Ratelimit({
 
 export const GET = async (request) => {
   try {
-    const { protect } = auth();
+    const { protect, userId } = auth();
     protect();
 
-    const ip = request.headers.get("x-forwarded-for") ?? "";
-    const { success } = await ratelimit.limit(ip);
+    const { success } = await ratelimit.limit(userId);
 
     if (!success) {
       return NextResponse.json(
@@ -26,6 +25,16 @@ export const GET = async (request) => {
       );
     }
 
+    // Check if the user exists in the database
+    const prismaUser = await prisma.user.findUnique({
+      where: { clerkId: userId },
+    });
+
+    if (!prismaUser) {
+      return NextResponse.json({ error: "User not found." }, { status: 404 });
+    }
+
+    // Get rankings and format
     const rankingTable = await prisma.user.findMany({
       select: {
         username: true,

@@ -13,12 +13,10 @@ const ratelimit = new Ratelimit({
 
 export const DELETE = async (request) => {
   try {
-    const { protect } = auth();
+    const { protect, userId } = auth();
     protect();
 
-    const ip = request.headers.get("x-forwarded-for") ?? "";
-    const { success } = await ratelimit.limit(ip);
-
+    const { success } = await ratelimit.limit(userId);
     if (!success) {
       return NextResponse.json(
         { error: "Too many requests. Please try again later." },
@@ -26,8 +24,17 @@ export const DELETE = async (request) => {
       );
     }
 
-    const data = await request.json();
+    // Check if the user exists in the database
+    const prismaUser = await prisma.user.findUnique({
+      where: { clerkId: userId },
+    });
 
+    if (!prismaUser) {
+      return NextResponse.json({ error: "User not found." }, { status: 404 });
+    }
+
+    // Validate the data
+    const data = await request.json();
     if (!data.matchId) {
       return NextResponse.json(
         { error: "Invalid matchId. It must be a number." },
@@ -35,6 +42,7 @@ export const DELETE = async (request) => {
       );
     }
 
+    // Delete Match and MatchDetails
     await prisma.matchDetails.deleteMany({
       where: { matchId: data.matchId },
     });
