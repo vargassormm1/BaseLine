@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/utils/db";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
+import { auth } from "@clerk/nextjs/server";
 
 const ratelimit = new Ratelimit({
   redis: Redis.fromEnv(),
@@ -11,6 +12,9 @@ const ratelimit = new Ratelimit({
 });
 
 export const PUT = async (request, response) => {
+  const { protect } = auth();
+  protect();
+
   const ip = request.headers.get("x-forwarded-for") ?? "";
   const { success } = await ratelimit.limit(ip);
 
