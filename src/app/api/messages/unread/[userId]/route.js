@@ -13,12 +13,10 @@ const ratelimit = new Ratelimit({
 
 export const GET = async (request, { params }) => {
   try {
-    const { protect } = auth();
+    const { protect, userId } = auth();
     protect();
 
-    const ip = request.headers.get("x-forwarded-for") ?? "";
-    const { success } = await ratelimit.limit(ip);
-
+    const { success } = await ratelimit.limit(userId);
     if (!success) {
       return NextResponse.json(
         { error: "Too many requests. Please try again later." },
@@ -26,11 +24,20 @@ export const GET = async (request, { params }) => {
       );
     }
 
-    const userId = parseInt(params.userId, 10);
+    // Check if the user exists in the database
+    const prismaUser = await prisma.user.findUnique({
+      where: { clerkId: userId },
+    });
+
+    if (!prismaUser) {
+      return NextResponse.json({ error: "User not found." }, { status: 404 });
+    }
+
+    const user = parseInt(params.userId, 10);
 
     const unreadCount = await prisma.message.count({
       where: {
-        receiverId: userId,
+        receiverId: user,
         read: false,
       },
     });

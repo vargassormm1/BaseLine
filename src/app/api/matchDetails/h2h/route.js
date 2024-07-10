@@ -13,11 +13,10 @@ const ratelimit = new Ratelimit({
 
 export const GET = async (request) => {
   try {
-    const { protect } = auth();
+    const { protect, userId } = auth();
     protect();
 
-    const ip = request.headers.get("x-forwarded-for") ?? "";
-    const { success } = await ratelimit.limit(ip);
+    const { success } = await ratelimit.limit(userId);
 
     if (!success) {
       return NextResponse.json(
@@ -26,6 +25,16 @@ export const GET = async (request) => {
       );
     }
 
+    // Check if the user exists in the database
+    const prismaUser = await prisma.user.findUnique({
+      where: { clerkId: userId },
+    });
+
+    if (!prismaUser) {
+      return NextResponse.json({ error: "User not found." }, { status: 404 });
+    }
+
+    // Get user Ids
     const userId1 = request.nextUrl.searchParams.get("user1");
     const userId2 = request.nextUrl.searchParams.get("user2");
 
@@ -46,6 +55,7 @@ export const GET = async (request) => {
       );
     }
 
+    // Get all user matches
     const matches = await prisma.matches.findMany({
       where: {
         OR: [
@@ -73,9 +83,9 @@ export const GET = async (request) => {
 
     return NextResponse.json({ data: matches });
   } catch (error) {
-    console.error("Error fetching head-to-head matches:", error);
+    console.error("Error fetching h2h matches:", error);
     return NextResponse.json(
-      { error: "An error occurred while fetching head-to-head matches." },
+      { error: "An error occurred while fetching h2h matches." },
       { status: 500 }
     );
   }

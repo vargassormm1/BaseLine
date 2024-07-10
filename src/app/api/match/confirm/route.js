@@ -13,12 +13,10 @@ const ratelimit = new Ratelimit({
 
 export const PUT = async (request) => {
   try {
-    const { protect } = auth();
+    const { protect, userId } = auth();
     protect();
 
-    const ip = request.headers.get("x-forwarded-for") ?? "";
-    const { success } = await ratelimit.limit(ip);
-
+    const { success } = await ratelimit.limit(userId);
     if (!success) {
       return NextResponse.json(
         { error: "Too many requests. Please try again later." },
@@ -26,9 +24,17 @@ export const PUT = async (request) => {
       );
     }
 
-    const data = await request.json();
+    // Check if the user exists in the database
+    const prismaUser = await prisma.user.findUnique({
+      where: { clerkId: userId },
+    });
+
+    if (!prismaUser) {
+      return NextResponse.json({ error: "User not found." }, { status: 404 });
+    }
 
     // Validate the data
+    const data = await request.json();
     if (!data.matchId || !data.matchType || !data.winnerId || !data.loserId) {
       return NextResponse.json(
         { error: "Invalid input data" },
@@ -63,20 +69,21 @@ export const PUT = async (request) => {
     }
 
     // Update the winner's and loser's records
-    await prisma.user.update({
-      where: { userId: data.winnerId },
-      data: {
-        totalPoints: { increment: pointsToAdd },
-        totalWins: { increment: 1 },
-      },
-    });
-
-    await prisma.user.update({
-      where: { userId: data.loserId },
-      data: {
-        totalLosses: { increment: 1 },
-      },
-    });
+    await prisma.$transaction([
+      prisma.user.update({
+        where: { userId: data.winnerId },
+        data: {
+          totalPoints: { increment: pointsToAdd },
+          totalWins: { increment: 1 },
+        },
+      }),
+      prisma.user.update({
+        where: { userId: data.loserId },
+        data: {
+          totalLosses: { increment: 1 },
+        },
+      }),
+    ]);
 
     return NextResponse.json({ data: confirmedMatch });
   } catch (error) {
