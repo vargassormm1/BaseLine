@@ -62,8 +62,6 @@ const Match = ({ matchData }) => {
     return matchData.winnerId === record.playerUserId ? styles.boldRow : "";
   };
 
-  console.log(dataSource);
-
   return (
     <div className={styles.match}>
       <p className={styles.date}>
