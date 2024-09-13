@@ -62,6 +62,8 @@ const Match = ({ matchData }) => {
     return matchData.winnerId === record.playerUserId ? styles.boldRow : "";
   };
 
+  console.log(dataSource);
+
   return (
     <div className={styles.match}>
       <p className={styles.date}>
@@ -101,9 +103,9 @@ const Match = ({ matchData }) => {
               {uniqueSets.map((setNumber) => (
                 <td key={setNumber} style={{ textAlign: "center" }}>
                   {record[`set${setNumber}`].main}
-                  {record[`set${setNumber}`].tieBreaker && (
+                  {record[`set${setNumber}`].tieBreaker !== null ? (
                     <sup>{record[`set${setNumber}`].tieBreaker}</sup>
-                  )}
+                  ) : null}
                 </td>
               ))}
             </tr>
