@@ -2,9 +2,9 @@ const createUrl = (path) => {
   return window.location.origin + path;
 };
 
-export const getRankings = async () => {
+export const getRankings = async (year) => {
   try {
-    const res = await fetch(createUrl(`/api/rankings`), {
+    const res = await fetch(createUrl(`/api/rankings?year=${year}`), {
       method: "GET",
     });
     if (!res.ok) throw new Error("Network response was not ok");

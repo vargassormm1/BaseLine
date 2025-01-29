@@ -34,19 +34,74 @@ export const GET = async (request) => {
       return NextResponse.json({ error: "User not found." }, { status: 404 });
     }
 
-    // Get rankings and format
-    const rankingTable = await prisma.user.findMany({
-      select: {
-        username: true,
-        totalWins: true,
-        totalLosses: true,
-        totalPoints: true,
-        imageUrl: true,
-        userId: true,
+    const searchParams = request.nextUrl.searchParams.get("year");
+    const year = searchParams === "all" ? "all" : parseInt(searchParams, 10);
+
+    if (year !== "all" && (isNaN(year) || year < 2024)) {
+      return NextResponse.json(
+        {
+          error: "Invalid year parameter. Year must be 'all' or 2024 onwards.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Build the date filter based on the year
+    const dateFilter =
+      year === "all"
+        ? undefined
+        : {
+            playedAt: {
+              gte: new Date(`${year}-01-01`),
+              lt: new Date(`${year + 1}-01-01`),
+            },
+          };
+
+    // Fetch matches
+    const matches = await prisma.matches.findMany({
+      where: dateFilter,
+      include: {
+        playerOneUser: true,
+        playerTwoUser: true,
       },
     });
 
-    const rankedTable = rankingTable
+    // Aggregate rankings
+    const userStats = {};
+
+    matches.forEach((match) => {
+      const { playerOneUser, playerTwoUser, winnerId, loserId } = match;
+
+      if (!userStats[playerOneUser.userId]) {
+        userStats[playerOneUser.userId] = {
+          userId: playerOneUser.userId,
+          username: playerOneUser.username,
+          totalWins: 0,
+          totalLosses: 0,
+          totalPoints: playerOneUser.totalPoints,
+          imageUrl: playerOneUser.imageUrl,
+        };
+      }
+
+      if (!userStats[playerTwoUser.userId]) {
+        userStats[playerTwoUser.userId] = {
+          userId: playerTwoUser.userId,
+          username: playerTwoUser.username,
+          totalWins: 0,
+          totalLosses: 0,
+          totalPoints: playerTwoUser.totalPoints,
+          imageUrl: playerTwoUser.imageUrl,
+        };
+      }
+
+      if (winnerId) {
+        userStats[winnerId].totalWins += 1;
+        userStats[loserId].totalLosses += 1;
+      }
+    });
+
+    // Convert to an array and sort
+    const rankedTable = Object.values(userStats)
       .map((user) => ({
         ...user,
         winLossRatio:
