@@ -3,39 +3,41 @@ import prisma from "@/utils/db";
 import { auth } from "@clerk/nextjs/server";
 import HomeContent from "@/components/HomeContent/HomeContent";
 
-const getUserData = async (clerkId) => {
-  const [currentUser, allUsers] = await Promise.all([
+export const revalidate = 60;
+
+const Home = async () => {
+  const { userId } = auth();
+
+  const [currentUser, allUsers, matches] = await prisma.$transaction([
     prisma.user.findUnique({
-      where: { clerkId },
+      where: { clerkId: userId },
       select: { userId: true, username: true },
     }),
     prisma.user.findMany({
-      select: {
-        userId: true,
-        clerkId: true,
-        username: true,
+      select: { userId: true, clerkId: true, username: true },
+    }),
+    prisma.matches.findMany({
+      where: {
+        playerOneConfirmed: true,
+        playerTwoConfirmed: true,
+        scoreVisible: true,
+      },
+      orderBy: { playedAt: "desc" },
+      include: {
+        matchDetails: true,
+        playerOneUser: { select: { imageUrl: true } },
+        playerTwoUser: { select: { imageUrl: true } },
       },
     }),
   ]);
 
   const users = allUsers
-    .filter((user) => user.clerkId !== clerkId)
-    .map((user) => ({
-      ...user,
-      value: user.userId,
-      label: user.username,
-    }));
-
-  return { currentUser, users };
-};
-
-const Home = async () => {
-  const { userId } = auth();
-  const { currentUser, users } = await getUserData(userId);
+    .filter((u) => u.clerkId !== userId)
+    .map((u) => ({ ...u, label: u.username, value: u.userId }));
 
   return (
     <div className={styles.container}>
-      <HomeContent currentUser={currentUser} users={users} />
+      <HomeContent currentUser={currentUser} users={users} initialMatches={matches} />
     </div>
   );
 };

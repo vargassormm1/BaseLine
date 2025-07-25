@@ -1,39 +1,28 @@
 "use client";
-import { useEffect, useState, Suspense } from "react";
+import { useState } from "react";
 import styles from "./HomeContent.module.css";
 import NewMatchForm from "@/components/NewMatchForm/NewMatchForm";
-import Spinner from "@/components/Spinner/Spinner";
 import Match from "../Match/Match";
 import { getAllMatches } from "@/utils/api";
 
-const HomeContent = ({ currentUser, users }) => {
-  const [matches, setMatches] = useState([]);
-  const [loading, setLoading] = useState(true);
+const HomeContent = ({ currentUser, users, initialMatches }) => {
+  const [matches, setMatches] = useState(initialMatches);
 
-  const fetchMatches = async () => {
+  const refetchMatches = async () => {
     const data = await getAllMatches();
     setMatches(data);
-    setLoading(false);
   };
-
-  useEffect(() => {
-    fetchMatches();
-  }, []);
 
   return (
     <div className={styles.container}>
       <NewMatchForm
         currentUser={currentUser}
-        refetchMatches={fetchMatches}
+        refetchMatches={refetchMatches}
         users={users}
       />
-      {loading ? (
-        <Spinner />
-      ) : (
-        matches.map((match) => {
-          return <Match key={match.matchId} matchData={match} />;
-        })
-      )}
+      {matches.map((m) => (
+        <Match key={m.matchId} matchData={m} />
+      ))}
     </div>
   );
 };
