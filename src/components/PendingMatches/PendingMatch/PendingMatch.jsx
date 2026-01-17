@@ -5,7 +5,6 @@ import { confirmPendingMatch, denyPendingMatch } from "@/utils/api";
 import { PendingMatchContext } from "../../../context/PendingMatchContext";
 import Image from "next/image";
 import Link from "next/link";
-import { socket } from "@/utils/socket";
 
 const PendingMatch = ({
   pendingMatchData,
@@ -78,7 +77,6 @@ const PendingMatch = ({
   const handleConfirm = async () => {
     try {
       await confirmPendingMatch(pendingMatchData);
-      socket.emit("update pending match", { pendingMatchData });
       setPendingMatchHandled(!pendingMatchHandled);
       setPendingMatchChanged((prev) => !prev);
     } catch (error) {
@@ -89,7 +87,6 @@ const PendingMatch = ({
   const handleDeny = async () => {
     try {
       await denyPendingMatch(pendingMatchData);
-      socket.emit("update pending match", { pendingMatchData });
       setPendingMatchHandled(!pendingMatchHandled);
       setPendingMatchChanged((prev) => !prev);
     } catch (error) {

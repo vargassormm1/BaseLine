@@ -1,15 +1,26 @@
 .newGame {
   width: 200px;
-  border-radius: 5px;
-  background-color: #4b940b;
-  border-color: #3f8600;
-  color: white;
-  padding: 10px 15px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #FFD600 0%, #FFA500 100%);
+  color: #1a4d2e;
+  padding: 14px 24px;
   border: none;
   font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 214, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 .newGame:hover {
   cursor: pointer;
+  background: linear-gradient(135deg, #FFA500 0%, #FFD600 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 214, 0, 0.5);
 }
 .newMatchForm {
   display: flex;
@@ -21,16 +32,24 @@
   align-self: center;
 }
 .newMatchForm button {
-  background-color: #4b940b;
-  border-color: #3f8600;
-  color: white;
+  background: linear-gradient(135deg, #FFD600 0%, #FFA500 100%);
+  color: #1a4d2e;
   border: none;
-  padding: 10px 15px;
-  border-radius: 5px;
+  padding: 14px 24px;
+  border-radius: 12px;
   margin-top: 2rem;
+  font-weight: 700;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 214, 0, 0.3);
 }
 .newMatchForm button:hover {
   cursor: pointer;
+  background: linear-gradient(135deg, #FFA500 0%, #FFD600 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 214, 0, 0.5);
 }
 
 @media (max-width: 1536px) {

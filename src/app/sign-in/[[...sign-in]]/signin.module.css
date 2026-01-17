@@ -2,6 +2,155 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   width: 100%;
-  padding-top: 5rem;
+  min-height: calc(100vh - 115px);
+  padding: 3rem 2rem;
+  background: linear-gradient(135deg, #1a4d2e 0%, #2d5f3f 50%, #1a4d2e 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 48%,
+      rgba(255, 255, 255, 0.02) 48%,
+      rgba(255, 255, 255, 0.02) 52%,
+      transparent 52%
+    ),
+    radial-gradient(circle at 20% 30%, rgba(255, 214, 0, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(255, 214, 0, 0.08) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.container :global(.cl-rootBox) {
+  position: relative;
+  z-index: 1;
+  border-radius: 24px !important;
+  overflow: hidden !important;
+}
+
+.container :global(.cl-card) {
+  background: rgba(255, 255, 255, 0.98) !important;
+  backdrop-filter: blur(20px);
+  border-radius: 24px !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  padding: 2.5rem !important;
+}
+
+.container :global(.cl-headerTitle) {
+  color: #1a4d2e !important;
+  font-size: 28px !important;
+  font-weight: 800 !important;
+}
+
+.container :global(.cl-headerSubtitle) {
+  color: #666 !important;
+  font-size: 15px !important;
+}
+
+.container :global(.cl-socialButtonsBlockButton) {
+  background: white !important;
+  border: 2px solid #e0e0e0 !important;
+  border-radius: 12px !important;
+  transition: all 0.3s ease !important;
+  font-weight: 600 !important;
+}
+
+.container :global(.cl-socialButtonsBlockButton:hover) {
+  border-color: #FFD600 !important;
+  background: rgba(255, 214, 0, 0.05) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 214, 0, 0.2) !important;
+}
+
+.container :global(.cl-formFieldInput) {
+  background: white !important;
+  border: 2px solid #e0e0e0 !important;
+  border-radius: 12px !important;
+  padding: 12px 16px !important;
+  font-size: 15px !important;
+  transition: all 0.3s ease !important;
+}
+
+.container :global(.cl-formFieldInput:focus) {
+  border-color: #FFD600 !important;
+  box-shadow: 0 0 0 3px rgba(255, 214, 0, 0.1) !important;
+  outline: none !important;
+}
+
+.container :global(.cl-formButtonPrimary) {
+  background: linear-gradient(135deg, #FFD600 0%, #FFA500 100%) !important;
+  color: #1a4d2e !important;
+  border: none !important;
+  border-radius: 12px !important;
+  padding: 14px 24px !important;
+  font-weight: 700 !important;
+  font-size: 16px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 12px rgba(255, 214, 0, 0.3) !important;
+}
+
+.container :global(.cl-formButtonPrimary:hover) {
+  background: linear-gradient(135deg, #FFA500 0%, #FFD600 100%) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 214, 0, 0.5) !important;
+}
+
+.container :global(.cl-footerActionLink) {
+  color: #1a4d2e !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+}
+
+.container :global(.cl-footerActionLink:hover) {
+  color: #FFD600 !important;
+}
+
+.container :global(.cl-dividerRow) {
+  color: #888 !important;
+}
+
+.container :global(.cl-dividerLine) {
+  background: #e0e0e0 !important;
+}
+
+.container :global(.cl-footerActionText) {
+  color: #666 !important;
+}
+
+.container :global(.cl-internal-b3fm6y) {
+  color: #888 !important;
+  font-size: 13px !important;
+}
+
+.container :global(.cl-footer) {
+  background: white !important;
+  border-top: 1px solid #e0e0e0 !important;
+  margin: 2rem -2.5rem -2.5rem -2.5rem !important;
+  padding: 1.5rem 2.5rem 2.5rem 2.5rem !important;
+  border-radius: 0 0 24px 24px !important;
+}
+
+.container :global(.cl-footerAction) {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.container :global(.cl-footerPages) {
+  padding: 1rem 0 0 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
 }
