@@ -5,6 +5,7 @@
   top: 0;
   background-color: #1a4d2e;
   z-index: 1000;
+  padding-top: env(safe-area-inset-top);
 }
 .container {
   display: flex;
@@ -12,6 +13,18 @@
   justify-content: space-between;
   height: 100px;
   border-bottom: 15px solid white;
+}
+
+@media (max-width: 640px) {
+  .container {
+    height: 80px;
+  }
+}
+
+@media (max-width: 475px) {
+  .container {
+    height: 70px;
+  }
 }
 
 .logo {
