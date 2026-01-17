@@ -39,7 +39,7 @@
 
 .heroContent {
   position: relative;
-  z-index: 1;
+  z-index: 0;
   max-width: 900px;
 }
 
@@ -190,7 +190,7 @@
   text-align: center;
   margin-bottom: 4rem;
   position: relative;
-  z-index: 1;
+  z-index: 0;
 }
 
 .sectionHeader h2 {
@@ -469,7 +469,7 @@
   color: #FFFFFF;
   margin-bottom: 1rem;
   position: relative;
-  z-index: 1;
+  z-index: 0;
 }
 
 .cta p {
@@ -477,7 +477,7 @@
   color: rgba(255, 255, 255, 0.8);
   margin-bottom: 3rem;
   position: relative;
-  z-index: 1;
+  z-index: 0;
 }
 
 .ctaButton {
@@ -494,7 +494,7 @@
   text-transform: uppercase;
   letter-spacing: 1.5px;
   position: relative;
-  z-index: 1;
+  z-index: 0;
 }
 
 .ctaButton:hover {
