@@ -4,4 +4,8 @@
   align-items: center;
   justify-content: center;
   width: 100%;
+  max-width: 1200px;
+  position: relative;
+  z-index: 1;
+  gap: 24px;
 }

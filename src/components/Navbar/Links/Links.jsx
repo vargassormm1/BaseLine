@@ -7,15 +7,12 @@ import { UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
 import { MenuOutlined } from "@ant-design/icons";
 import { Dropdown, Space } from "antd";
 import { PendingMatchContext } from "../../../context/PendingMatchContext";
-import { getPendingMatchesCount, getUnreadMessagesCount } from "@/utils/api";
-import { MessageOutlined } from "@ant-design/icons";
-import { socket } from "@/utils/socket";
+import { getPendingMatchesCount } from "@/utils/api";
 import { useClerk } from "@clerk/nextjs";
 
 const Links = ({ userId, currentUser }) => {
   const { signOut } = useClerk();
-  const { pendingMatchChanged, unreadMessageCount, setUnreadMessageCount } =
-    useContext(PendingMatchContext);
+  const { pendingMatchChanged } = useContext(PendingMatchContext);
   const [pendingMatchCount, setPendingMatchCount] = useState(0);
   const pathName = usePathname();
   const NavbarLinks = [
@@ -42,10 +39,6 @@ const Links = ({ userId, currentUser }) => {
     {
       name: "Profile",
       path: `/profile/${currentUser?.userId}`,
-    },
-    {
-      name: "Messages",
-      path: `/messages`,
     },
   ];
   const items = userId
@@ -193,62 +186,16 @@ const Links = ({ userId, currentUser }) => {
     setPendingMatchCount(String(data));
   }, []);
 
-  const fetchUnreadMessagesCount = useCallback(
-    async (userId) => {
-      const data = await getUnreadMessagesCount(userId);
-      setUnreadMessageCount(data);
-    },
-    [setUnreadMessageCount]
-  );
-
   useEffect(() => {
     if (currentUser) {
       fetchPendingMatchesCount(currentUser?.userId);
-      fetchUnreadMessagesCount(currentUser?.userId);
     }
-  }, [
-    currentUser,
-    fetchPendingMatchesCount,
-    fetchUnreadMessagesCount,
-    pendingMatchChanged,
-  ]);
-
-  useEffect(() => {
-    const handleNewMessage = () => {
-      if (currentUser) {
-        fetchUnreadMessagesCount(currentUser.userId);
-      }
-    };
-    const handleNewPendingMatchAction = () => {
-      if (currentUser) {
-        fetchPendingMatchesCount(currentUser?.userId);
-      }
-    };
-
-    socket.on("new message", handleNewMessage);
-    socket.on("update pending match", handleNewPendingMatchAction);
-
-    return () => {
-      socket.off("new message", handleNewMessage);
-    };
-  }, [currentUser, fetchPendingMatchesCount, fetchUnreadMessagesCount]);
+  }, [currentUser, fetchPendingMatchesCount, pendingMatchChanged]);
 
   return (
     <>
       <div className={styles.drop}>
         <SignedIn>
-          <Link
-            href={`/messages`}
-            key="messages"
-            className={`${styles.messageLink}`}
-          >
-            <div className={styles.iconWithBadge}>
-              <MessageOutlined />
-              {unreadMessageCount > 0 && (
-                <span className={styles.countBadge}>{unreadMessageCount}</span>
-              )}
-            </div>
-          </Link>
           <UserButton afterSignOutUrl="/" />
         </SignedIn>
         <Dropdown
@@ -295,20 +242,11 @@ const Links = ({ userId, currentUser }) => {
                 prefetch={true}
                 href={link.path}
                 key={link.name}
-                className={`${
-                  link.path === "/messages" ? styles.messageLink : styles.link
-                } ${pathName === link.path ? styles.active : styles.link}`}
+                className={`${styles.link} ${
+                  pathName === link.path ? styles.active : styles.link
+                }`}
               >
-                {link.name === "Messages" ? (
-                  <div className={styles.iconWithBadge}>
-                    <MessageOutlined />
-                    {unreadMessageCount > 0 && (
-                      <span className={styles.countBadge}>
-                        {unreadMessageCount}
-                      </span>
-                    )}
-                  </div>
-                ) : link.name === "Pending" ? (
+                {link.name === "Pending" ? (
                   <div className={styles.iconWithBadge}>
                     {link.name}
                     {parseInt(pendingMatchCount) !== 0 && (

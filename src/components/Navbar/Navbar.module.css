@@ -3,7 +3,7 @@
   flex-direction: column;
   position: sticky;
   top: 0;
-  background-color: rgb(61, 99, 67);
+  background-color: #1a4d2e;
   z-index: 1000;
 }
 .container {

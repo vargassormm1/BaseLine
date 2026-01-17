@@ -1,45 +1,70 @@
 .container {
-  margin-top: 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 32px;
   width: 100%;
+  max-width: 1400px;
+  position: relative;
+  z-index: 1;
 }
 .players {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
+  gap: 60px;
   width: 100%;
   text-align: center;
 }
 .player {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
+}
+.player h3 {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .customSelect {
   width: 300px;
   position: relative;
+  margin-bottom: 1.5rem;
 }
 
 .customSelect select {
   appearance: none;
   -webkit-appearance: none;
   width: 100%;
-  padding: 10px;
-  background-color: #fff;
-  border: 1px solid #caced1;
-  border-radius: 5px;
-  color: black;
+  padding: 12px 16px;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  color: #1a4d2e;
   cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.customSelect select:focus {
+  outline: none;
+  border-color: #FFD600;
+  box-shadow: 0 0 0 3px rgba(255, 214, 0, 0.1);
+}
+
+.customSelect select:hover {
+  border-color: #FFD600;
 }
 
 .customSelect::before,
 .customSelect::after {
-  --size: 0.3rem;
+  --size: 0.35rem;
   content: "";
   position: absolute;
   right: 1rem;
@@ -49,75 +74,112 @@
 .customSelect::before {
   border-left: var(--size) solid transparent;
   border-right: var(--size) solid transparent;
-  border-bottom: var(--size) solid black;
-  top: 40%;
+  border-bottom: var(--size) solid #1a4d2e;
+  top: 38%;
 }
 
 .customSelect::after {
   border-left: var(--size) solid transparent;
   border-right: var(--size) solid transparent;
-  border-top: var(--size) solid black;
+  border-top: var(--size) solid #1a4d2e;
   top: 55%;
 }
 
 .image {
   min-height: 400px;
-  margin-top: 20px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+}
+.image p {
+  color: white;
+  font-size: 1rem;
+  font-weight: 500;
+}
+.image h3 {
+  color: white;
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 0;
 }
 .profileImage {
   border-radius: 50%;
+  border: 4px solid #FFD600;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+.profileImage:hover {
+  border-color: #FFA500;
+  transform: scale(1.02);
 }
 
-@media (max-width: 1536px) {
-}
-@media (max-width: 1366px) {
-}
-@media (max-width: 1280px) {
-}
 @media (max-width: 1024px) {
+  .customSelect {
+    width: 240px;
+  }
+  .players {
+    gap: 40px;
+  }
+}
+
+@media (max-width: 768px) {
   .customSelect {
     width: 220px;
   }
-}
-@media (max-width: 768px) {
-  .customSelect {
-    width: 200px;
-  }
   .players {
-    padding: 0 25px;
+    gap: 30px;
+    padding: 0 20px;
+  }
+  .player h3 {
+    font-size: 1.25rem;
   }
   .image {
     min-height: 300px;
-  }
-  .select {
-    width: 250px;
   }
   .profileImage {
     width: 250px;
     height: 250px;
   }
 }
+
 @media (max-width: 640px) {
   .customSelect {
     width: 180px;
   }
+  .players {
+    gap: 20px;
+    flex-direction: column;
+  }
+  .player h3 {
+    font-size: 1.15rem;
+  }
+  .image {
+    min-height: 250px;
+  }
+  .profileImage {
+    width: 200px;
+    height: 200px;
+  }
+}
+
+@media (max-width: 475px) {
+  .customSelect {
+    width: 160px;
+  }
+  .players {
+    padding: 0 10px;
+  }
+  .player h3 {
+    font-size: 1rem;
+  }
   .image {
     min-height: 200px;
-  }
-  .select {
-    width: 150px;
   }
   .profileImage {
     width: 150px;
     height: 150px;
-  }
-}
-@media (max-width: 475px) {
-  .customSelect {
-    width: 150px;
-  }
-  .players {
-    padding: 0 10px;
   }
 }

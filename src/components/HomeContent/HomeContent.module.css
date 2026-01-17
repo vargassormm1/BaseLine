@@ -2,22 +2,22 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   width: 100%;
-  margin-top: 2rem;
+  max-width: 1200px;
+  gap: 2rem;
+  position: relative;
+  z-index: 1;
 }
 
-@media (max-width: 1536px) {
-}
-@media (max-width: 1366px) {
-}
-@media (max-width: 1280px) {
-}
-@media (max-width: 1024px) {
-}
 @media (max-width: 768px) {
+  .container {
+    gap: 1.5rem;
+  }
 }
-@media (max-width: 640px) {
-}
+
 @media (max-width: 475px) {
+  .container {
+    gap: 1rem;
+  }
 }

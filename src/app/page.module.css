@@ -1,54 +1,664 @@
 .container {
-  margin: 0 auto;
-  text-align: center;
-  margin-top: 10%;
-}
-.container h1 {
-  font-size: 60px;
-  margin-top: 5rem;
-  margin-bottom: 2rem;
-}
-.container p {
-  font-size: 16px;
-}
-.getStarted {
-  font-size: 15px;
-  width: 150px;
-  margin-top: 3rem;
-  background-color: #4b940b;
-  border-color: #3f8600;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 5px;
-}
-.getStarted:hover {
-  cursor: pointer;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
 
-@media (max-width: 1536px) {
+.hero {
+  position: relative;
+  text-align: center;
+  padding: 6rem 2rem 8rem;
+  min-height: 75vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #1a4d2e 0%, #2d5f3f 50%, #1a4d2e 100%);
+  overflow: hidden;
 }
-@media (max-width: 1366px) {
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 48%,
+      rgba(255, 255, 255, 0.03) 48%,
+      rgba(255, 255, 255, 0.03) 52%,
+      transparent 52%
+    );
+  pointer-events: none;
 }
-@media (max-width: 1280px) {
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
 }
-@media (max-width: 1024px) {
+
+.badge {
+  display: inline-block;
+  padding: 8px 20px;
+  background: rgba(255, 214, 0, 0.15);
+  border: 2px solid #FFD600;
+  border-radius: 30px;
+  color: #FFD600;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin-bottom: 2rem;
+  animation: pulse 2s ease-in-out infinite;
 }
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.title {
+  margin-bottom: 1.5rem;
+}
+
+.titleMain {
+  display: block;
+  font-size: 80px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #FFFFFF 0%, #E0E0E0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -2px;
+  line-height: 1.1;
+  margin-bottom: 0.5rem;
+}
+
+.titleAccent {
+  display: block;
+  font-size: 28px;
+  font-weight: 600;
+  color: #FFD600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.subtitle {
+  font-size: 22px;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 3rem;
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+.getStarted {
+  font-size: 18px;
+  font-weight: 700;
+  padding: 18px 48px;
+  background: linear-gradient(135deg, #FFD600 0%, #FFA500 100%);
+  color: #1a4d2e;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 24px rgba(255, 214, 0, 0.4);
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.getStarted:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(255, 214, 0, 0.6);
+  background: linear-gradient(135deg, #FFA500 0%, #FFD600 100%);
+}
+
+.arrow {
+  font-size: 24px;
+  transition: transform 0.3s ease;
+}
+
+.getStarted:hover .arrow {
+  transform: translateX(5px);
+}
+
+.stats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+  margin-top: 4rem;
+  padding: 2rem 3rem;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat {
+  text-align: center;
+}
+
+.statNumber {
+  font-size: 24px;
+  font-weight: 800;
+  color: #FFD600;
+  margin-bottom: 0.25rem;
+}
+
+.statLabel {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.statDivider {
+  width: 1px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.features {
+  padding: 6rem 2rem;
+  background: linear-gradient(180deg, #0f3820 0%, #1a4d2e 50%, #0f3820 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.features::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(255, 214, 0, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(255, 214, 0, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: 4rem;
+  position: relative;
+  z-index: 1;
+}
+
+.sectionHeader h2 {
+  font-size: 42px;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin-bottom: 0.75rem;
+}
+
+.sectionHeader p {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.featuresGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 3rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.feature {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 214, 0, 0.2);
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.feature::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #FFD600 0%, #FFA500 100%);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.feature:hover::before {
+  transform: scaleX(1);
+}
+
+.feature:hover {
+  transform: translateY(-8px);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: #FFD600;
+  box-shadow: 0 12px 32px rgba(255, 214, 0, 0.3);
+}
+
+.featureIcon {
+  font-size: 56px;
+  margin-bottom: 1.5rem;
+  filter: drop-shadow(0 4px 8px rgba(255, 214, 0, 0.3));
+  transition: all 0.3s ease;
+}
+
+.feature:hover .featureIcon {
+  transform: scale(1.15) rotate(5deg);
+  filter: drop-shadow(0 8px 16px rgba(255, 214, 0, 0.5));
+}
+
+.feature h3 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #FFD600;
+}
+
+.feature p {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.7;
+}
+
+.scoring {
+  text-align: center;
+  padding: 6rem 2rem;
+  background: linear-gradient(180deg, #1a4d2e 0%, #0f3820 50%, #1a4d2e 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.scoring::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 49%,
+      rgba(255, 214, 0, 0.02) 49%,
+      rgba(255, 214, 0, 0.02) 51%,
+      transparent 51%
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 49%,
+      rgba(255, 214, 0, 0.02) 49%,
+      rgba(255, 214, 0, 0.02) 51%,
+      transparent 51%
+    );
+  background-size: 100px 100px;
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+.scoringGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.scoringCard {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 3rem 2rem;
+  border-radius: 24px;
+  border: 3px solid rgba(255, 214, 0, 0.25);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.scoringCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 214, 0, 0.05) 0%, rgba(255, 165, 0, 0.05) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.scoringCard:hover::before {
+  opacity: 1;
+}
+
+.scoringCard:hover {
+  transform: translateY(-12px) scale(1.02);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: #FFD600;
+  box-shadow: 0 20px 40px rgba(255, 214, 0, 0.4);
+}
+
+.scoringCard.featured {
+  border-color: #FFD600;
+  background: linear-gradient(135deg, rgba(255, 214, 0, 0.15) 0%, rgba(255, 165, 0, 0.15) 100%);
+  border-width: 4px;
+  transform: scale(1.05);
+  box-shadow: 0 8px 32px rgba(255, 214, 0, 0.3);
+}
+
+.scoringCard.featured:hover {
+  transform: translateY(-12px) scale(1.07);
+  box-shadow: 0 20px 48px rgba(255, 214, 0, 0.5);
+}
+
+.scoringCard.featured .scoringBadge {
+  background: #FFD600;
+  color: #1a4d2e;
+  box-shadow: 0 4px 12px rgba(255, 214, 0, 0.4);
+}
+
+.scoringCard.featured .points {
+  color: #FFD600;
+  text-shadow: 0 4px 12px rgba(255, 214, 0, 0.5);
+}
+
+.scoringCard.featured .points span {
+  color: #FFD600;
+}
+
+.scoringCard.featured .matchType {
+  color: #FFFFFF;
+}
+
+.scoringCard.featured .scoringDesc {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.scoringHeader {
+  margin-bottom: 1.5rem;
+}
+
+.scoringBadge {
+  display: inline-block;
+  padding: 6px 16px;
+  background: rgba(255, 214, 0, 0.2);
+  color: #FFD600;
+  border: 1px solid #FFD600;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.points {
+  font-size: 64px;
+  font-weight: 900;
+  color: #FFFFFF;
+  margin-bottom: 0.5rem;
+  line-height: 1;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.points span {
+  font-size: 24px;
+  font-weight: 700;
+  color: #FFD600;
+  margin-left: 4px;
+}
+
+.matchType {
+  font-size: 18px;
+  font-weight: 700;
+  color: #FFFFFF;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+}
+
+.scoringDesc {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+}
+
+.cta {
+  text-align: center;
+  padding: 6rem 2rem;
+  background: linear-gradient(135deg, #1a4d2e 0%, #2d5f3f 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.cta::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 48%,
+      rgba(255, 255, 255, 0.02) 48%,
+      rgba(255, 255, 255, 0.02) 52%,
+      transparent 52%
+    );
+  pointer-events: none;
+}
+
+.cta h2 {
+  font-size: 48px;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.cta p {
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 3rem;
+  position: relative;
+  z-index: 1;
+}
+
+.ctaButton {
+  font-size: 18px;
+  font-weight: 700;
+  padding: 20px 56px;
+  background: linear-gradient(135deg, #FFD600 0%, #FFA500 100%);
+  color: #1a4d2e;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 24px rgba(255, 214, 0, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  position: relative;
+  z-index: 1;
+}
+
+.ctaButton:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 16px 40px rgba(255, 214, 0, 0.6);
+}
+
 @media (max-width: 768px) {
-}
-@media (max-width: 640px) {
-  .container h1 {
-    font-size: 55px;
+  .titleMain {
+    font-size: 56px;
   }
-  .container p {
-    font-size: 15px;
+
+  .titleAccent {
+    font-size: 22px;
+  }
+
+  .subtitle {
+    font-size: 18px;
+  }
+
+  .stats {
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 2rem;
+  }
+
+  .statDivider {
+    width: 100px;
+    height: 1px;
+  }
+
+  .featuresGrid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .sectionHeader h2 {
+    font-size: 36px;
+  }
+
+  .scoringGrid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .scoringCard.featured {
+    transform: scale(1);
+  }
+
+  .cta h2 {
+    font-size: 36px;
+  }
+
+  .cta p {
+    font-size: 18px;
   }
 }
+
 @media (max-width: 475px) {
-  .container h1 {
-    font-size: 50px;
+  .hero {
+    padding: 4rem 1.5rem 6rem;
+    min-height: 70vh;
   }
-  .container p {
+
+  .badge {
+    font-size: 10px;
+    padding: 6px 16px;
+  }
+
+  .titleMain {
+    font-size: 48px;
+  }
+
+  .titleAccent {
+    font-size: 18px;
+  }
+
+  .subtitle {
+    font-size: 16px;
+    margin-bottom: 2rem;
+  }
+
+  .getStarted {
+    padding: 14px 32px;
+    font-size: 16px;
+  }
+
+  .stats {
+    padding: 1.5rem;
+    gap: 1rem;
+  }
+
+  .statNumber {
+    font-size: 20px;
+  }
+
+  .statLabel {
+    font-size: 12px;
+  }
+
+  .features,
+  .scoring {
+    padding: 4rem 1.5rem;
+  }
+
+  .sectionHeader h2 {
+    font-size: 30px;
+  }
+
+  .sectionHeader p {
+    font-size: 16px;
+  }
+
+  .feature {
+    padding: 2rem 1.5rem;
+  }
+
+  .featureIcon {
+    font-size: 48px;
+  }
+
+  .feature h3 {
+    font-size: 22px;
+  }
+
+  .feature p {
     font-size: 15px;
+  }
+
+  .scoringCard {
+    padding: 2.5rem 1.5rem;
+  }
+
+  .points {
+    font-size: 52px;
+  }
+
+  .points span {
+    font-size: 20px;
+  }
+
+  .matchType {
+    font-size: 16px;
+  }
+
+  .scoringDesc {
+    font-size: 13px;
+  }
+
+  .cta {
+    padding: 4rem 1.5rem;
+  }
+
+  .cta h2 {
+    font-size: 30px;
+  }
+
+  .cta p {
+    font-size: 16px;
+    margin-bottom: 2rem;
+  }
+
+  .ctaButton {
+    padding: 16px 40px;
+    font-size: 16px;
   }
 }
