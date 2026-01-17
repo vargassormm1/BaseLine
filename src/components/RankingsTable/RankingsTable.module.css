@@ -1,63 +1,117 @@
 .rankingTable {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  border-radius: 8px;
-  overflow: hidden;
-  color: black;
+  max-width: 1200px;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 400px;
   flex-direction: column;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
 }
 .rankingTable table {
   width: 100%;
-  border-collapse: collapse;
-  border-radius: 8px;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 12px;
   overflow: hidden;
-  min-height: 400px;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid #d0d0d0;
 }
 .rankingTable th,
 .rankingTable td {
-  border: 0.5px solid lightgrey;
-  padding: 20px 10px;
+  border: none;
+  border-right: 1px solid #e8e8e8;
+  padding: 16px 12px;
   text-align: center;
 }
+.rankingTable th:last-child,
+.rankingTable td:last-child {
+  border-right: none;
+}
+.rankingTable tbody tr:not(:last-child) td {
+  border-bottom: 1px solid #f0f0f0;
+}
 .rankingTable th {
-  background-color: rgb(241, 241, 241);
-  font-weight: 500;
+  background: #2d5f3f;
+  color: #FFD600;
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.rankingTable tbody tr:nth-child(even) td {
+  background-color: #f0f4f0;
+}
+.rankingTable tbody tr:nth-child(odd) td {
+  background-color: white;
+}
+.rankingTable tbody tr:hover td {
+  background-color: #d4edda;
 }
 .rankingTable td {
-  background-color: white;
+  color: #1a4d2e;
+  font-size: 15px;
+  transition: background-color 0.2s ease;
+}
+.rankingTable td a {
+  color: #1a4d2e;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+.rankingTable td a:hover {
+  color: #FFD600;
 }
 .rankingTable td img {
   border-radius: 50%;
+  border: 2px solid #FFD600;
+  transition: all 0.3s ease;
 }
-.rankingTable td:nth-child(1),
-.rankingTable td:nth-child(2),
-.rankingTable td:nth-child(3) {
-  border-left: none;
-  border-right: none;
+.rankingTable td img:hover {
+  border-color: #FFA500;
+  transform: scale(1.1);
+}
+.rankingTable td b {
+  color: #1a4d2e;
+  font-weight: 700;
 }
 .filterContainer {
   width: 100%;
+  max-width: 1200px;
   display: flex;
   justify-content: flex-end;
-  padding: 10px 0;
+  padding: 0 0 20px 0;
   box-sizing: border-box;
 }
 .filterContainer select {
   appearance: none;
   -webkit-appearance: none;
-  width: 100px;
-  padding: 8px;
-  background-color: #fff;
-  border: 1px solid #caced1;
-  border-radius: 5px;
-  color: black;
+  min-width: 120px;
+  padding: 10px 16px;
+  background: #FFD600;
+  border: none;
+  border-radius: 12px;
+  color: #1a4d2e;
   cursor: pointer;
   text-align: center;
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(255, 214, 0, 0.3);
+  transition: all 0.3s ease;
+}
+.filterContainer select:hover {
+  background: #FFA500;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 214, 0, 0.5);
+}
+.filterContainer select option {
+  background: white;
+  color: #1a4d2e;
 }
 .spinnerContainer {
   display: flex;

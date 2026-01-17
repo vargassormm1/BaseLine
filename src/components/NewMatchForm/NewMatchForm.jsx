@@ -5,7 +5,6 @@ import { createNewMatch, createNewMatchDetails } from "@/utils/api";
 import styles from "./NewmatchForm.module.css";
 import { PlusCircleOutlined } from "@ant-design/icons";
 import { PendingMatchContext } from "@/context/PendingMatchContext";
-import { socket } from "@/utils/socket";
 
 const NewMatchForm = ({ currentUser, refetchMatches, users }) => {
   const [form] = Form.useForm();
@@ -97,9 +96,6 @@ const NewMatchForm = ({ currentUser, refetchMatches, users }) => {
 
     setPendingMatchChanged((prev) => !prev);
     await refetchMatches();
-    socket.emit("update pending match", {
-      pendingMatchData: { ...values, winner, playerOneConfirmed: true },
-    });
     form.resetFields();
     setOpen(false);
     setBestOf(null);
