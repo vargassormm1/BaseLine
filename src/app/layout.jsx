@@ -12,6 +12,12 @@ export const metadata = {
   description: "Tennis App by Ralph Sormillon Vargas",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
 export default function RootLayout({ children }) {
   return (
     <ClerkProvider>
