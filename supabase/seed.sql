@@ -3,6 +3,9 @@
 -- e2e_* Clerk ids match the local test sign-in (/e2e/sign-in?u=ana → player "ana_e2e").
 select setseed(0.42);
 
+-- local tokens (tests and the local test sign-in) are issued as 'baseline-local-test'; production trusts Clerk only
+update public.app_settings set trusted_issuers = array['baseline-local-test'];
+
 insert into public.players (id, clerk_user_id, username, first_name, last_name, is_admin) values
   ('00000000-0000-4000-8000-00000000000a', 'e2e_ana',  'ana_e2e',  'Ana',    'Reyes',   true),
   ('00000000-0000-4000-8000-00000000000b', 'e2e_ben',  'ben_e2e',  'Ben',    'Okafor',  false),
@@ -58,3 +61,7 @@ values ('00000000-0000-4000-8000-0000000000f1', 1, '00000000-0000-4000-8000-0000
 insert into public.match_sets values ('00000000-0000-4000-8000-0000000000f1', 1, 6, 4, null, null, false);
 insert into public.challenges (challenger, opponent, format, message)
 values ('00000000-0000-4000-8000-00000000000c', '00000000-0000-4000-8000-00000000000a', 3, 'Rematch. Saturday morning?');
+
+-- a known invite for the new-player browser test (code TESTINVITE23, from Ana)
+insert into public.invites (code_hash, created_by)
+values (encode(extensions.digest('TESTINVITE23', 'sha256'), 'hex'), '00000000-0000-4000-8000-00000000000a');

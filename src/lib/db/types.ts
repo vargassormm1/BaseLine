@@ -5,7 +5,21 @@ export type Database = {
   
   "public": {
           Tables: {
-            "challenges": {
+            "app_settings": {
+                  Row: {
+                    "id": boolean,"trusted_issuers": (string)[]
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "id"?: boolean,"trusted_issuers"?: (string)[]
+                  }
+                  Update: {
+                    "id"?: boolean,"trusted_issuers"?: (string)[]
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"challenges": {
                   Row: {
                     "challenger": string,"closed_at": string | null,"created_at": string,"expires_at": string,"format": number,"id": string,"message": string | null,"opponent": string,"proposed_for": string | null,"responded_at": string | null,"status": Database["public"]['Enums']["challenge_status"]
                   }
@@ -27,6 +41,32 @@ isOneToOne: false
       foreignKeyName: "challenges_opponent_fkey"
       columns: ["opponent"]
 isOneToOne: false
+      referencedRelation: "players"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"invites": {
+                  Row: {
+                    "code_hash": string,"created_at": string,"created_by": string,"expires_at": string,"used_at": string | null,"used_by": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "code_hash": string,"created_at"?: string,"created_by": string,"expires_at"?: string,"used_at"?: string | null,"used_by"?: string | null
+                  }
+                  Update: {
+                    "code_hash"?: string,"created_at"?: string,"created_by"?: string,"expires_at"?: string,"used_at"?: string | null,"used_by"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "invites_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "players"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "invites_used_by_fkey"
+      columns: ["used_by"]
+isOneToOne: true
       referencedRelation: "players"
       referencedColumns: ["id"]
     }
@@ -187,14 +227,20 @@ isOneToOne: false
 "create_challenge":
 { Args: { "p_format": number,"p_message"?: string,"p_opponent": string,"p_proposed_for"?: string }; Returns: string
                            },
+"create_invite":
+{ Args: Record<PropertyKey, never>; Returns: string
+                           },
 "ensure_player":
-{ Args: { "p_avatar_url": string,"p_email": string,"p_first_name": string,"p_last_name": string,"p_username": string }; Returns: string
+{ Args: { "p_avatar_url": string,"p_email": string,"p_first_name": string,"p_invite"?: string,"p_last_name": string,"p_username": string }; Returns: string
                            },
 "expire_challenges":
 { Args: { "p_a": string,"p_b": string }; Returns: undefined
                            },
 "is_admin":
 { Args: Record<PropertyKey, never>; Returns: boolean
+                           },
+"jwt_sub":
+{ Args: Record<PropertyKey, never>; Returns: string
                            },
 "me":
 { Args: Record<PropertyKey, never>; Returns: string
@@ -203,13 +249,13 @@ isOneToOne: false
 { Args: { "p_format": number }; Returns: number
                            },
 "record_match":
-{ Args: { "p_challenge"?: string,"p_client_key": string,"p_deciding": string,"p_format": number,"p_note"?: string,"p_opponent": string,"p_played_on": string,"p_sets": Json }; Returns: string
+{ Args: { "p_allow_duplicate"?: boolean,"p_challenge"?: string,"p_client_key": string,"p_deciding": string,"p_format": number,"p_note"?: string,"p_opponent": string,"p_played_on": string,"p_sets": Json }; Returns: string
                            },
 "require_me":
 { Args: Record<PropertyKey, never>; Returns: string
                            },
 "respond_challenge":
-{ Args: { "p_accept": boolean,"p_challenge": string }; Returns: undefined
+{ Args: { "p_accept": boolean,"p_challenge": string }; Returns: string
                            },
 "respond_match":
 { Args: { "p_accept": boolean,"p_match": string }; Returns: undefined

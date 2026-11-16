@@ -1,11 +1,13 @@
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { randomUUID } from "node:crypto";
 import vectors from "../fixtures/scores.json";
-import { anon, cleanup, db, player, record, today, type TestPlayer } from "./harness";
+import { anon, as, cleanup, db, invite, player, record, today, type TestPlayer } from "./harness";
 
 let a: TestPlayer, b: TestPlayer, c: TestPlayer, admin: TestPlayer;
 beforeAll(async () => { [a, b, c, admin] = await Promise.all([player("ana"), player("ben"), player("cy"), player("adm", true)]); });
 afterAll(async () => { await cleanup(); await db.end(); });
+// every test starts with fresh rate limits (the rate-limit test sets its own)
+beforeEach(async () => { await db`delete from public.rate_limits where player_id in ${db([a, b, c, admin].filter(Boolean).map((p) => p.id))}`; });
 
 describe("score validation in the database matches the app (shared vectors)", () => {
   for (const v of vectors) {
@@ -121,7 +123,9 @@ describe("challenges", () => {
   it("an expired challenge can't be accepted and doesn't block a new one", async () => {
     const { data: ch } = await b.sb.rpc("create_challenge", { p_opponent: c.id, p_format: 1 });
     await db`update public.challenges set expires_at = now() - interval '1 minute' where id = ${ch}`;
-    expect((await c.sb.rpc("respond_challenge", { p_challenge: ch, p_accept: true })).error?.message).toMatch(/challenge_expired/);
+    const r = await c.sb.rpc("respond_challenge", { p_challenge: ch, p_accept: true });
+    expect([r.error, r.data]).toEqual([null, "expired"]);
+    expect((await db`select status from public.challenges where id = ${ch}`)[0]!.status).toBe("expired"); // stays expired
     expect((await b.sb.rpc("create_challenge", { p_opponent: c.id, p_format: 1 })).error).toBeNull();
   });
 });
@@ -142,5 +146,64 @@ describe("profiles and limits", () => {
     await db`insert into public.rate_limits (player_id, bucket, window_start, hits) values (${c.id}, 'record_match', now(), 20)
              on conflict (player_id, bucket) do update set hits = 20, window_start = now()`;
     expect((await record(c, b.id, [{ p1: 6, p2: 2 }])).error?.message).toMatch(/rate_limited/);
+  });
+});
+
+describe("hardening (independent review)", () => {
+  it("tokens from an untrusted issuer (e.g. Supabase's own sign-up) are never a player", async () => {
+    const evil = as(a.sub, "http://127.0.0.1:55321/auth/v1");
+    expect((await evil.rpc("me")).data).toBeNull();
+    expect((await evil.from("players").select("id")).data).toEqual([]);
+    expect((await evil.rpc("record_match", { p_client_key: randomUUID(), p_opponent: b.id, p_format: 1, p_deciding: "set", p_played_on: today(), p_sets: [{ p1: 6, p2: 0 }] })).error?.code).toBe("42501");
+    expect((await evil.rpc("ensure_player", { p_username: "intruder", p_first_name: "", p_last_name: "", p_avatar_url: "", p_email: "", p_invite: await invite() })).error?.code).toBe("42501");
+  });
+  it("internal helpers can't be called by anyone through the API", async () => {
+    const rows = await db`select p.proname, has_function_privilege('anon', p.oid, 'execute') a, has_function_privilege('authenticated', p.oid, 'execute') u
+                          from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+                          where n.nspname = 'public' and p.proname in ('take_rate_limit', 'expire_challenges', 'require_me', 'jwt_sub')`;
+    expect(rows.length).toBe(4);
+    for (const r of rows) expect([r.proname, r.a, r.u]).toEqual([r.proname, false, false]);
+    expect((await a.sb.rpc("take_rate_limit", { p_player: b.id, p_bucket: "record_match", p_max: 1, p_window: "100 years" })).error).not.toBeNull();
+    // and nothing in public is executable by anon except what's explicitly granted (none)
+    const anonExec = await db`select p.proname from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+                              where n.nspname = 'public' and has_function_privilege('anon', p.oid, 'execute')`;
+    expect(anonExec.map((r) => r.proname)).toEqual([]);
+  });
+  it("new players need a valid, unused invite; existing players never do", async () => {
+    const stranger = as("user_test_stranger_" + randomUUID().slice(0, 6));
+    const args = { p_username: `s${randomUUID().slice(0, 8)}`, p_first_name: "S", p_last_name: "T", p_avatar_url: "", p_email: "" };
+    expect((await stranger.rpc("ensure_player", args)).error?.message).toMatch(/invite_required/);
+    expect((await stranger.rpc("ensure_player", { ...args, p_invite: "NOTAREALCODE" })).error?.message).toMatch(/invalid_invite/);
+    const code = await invite();
+    const { data: id, error } = await stranger.rpc("ensure_player", { ...args, p_invite: code.toLowerCase().replace(/(.{4})/g, "$1-") });
+    expect(error).toBeNull();
+    const other = as("user_test_other_" + randomUUID().slice(0, 6));
+    expect((await other.rpc("ensure_player", { ...args, p_username: `o${randomUUID().slice(0, 8)}`, p_invite: code })).error?.message).toMatch(/invalid_invite/); // used
+    expect((await a.sb.rpc("ensure_player", { ...args })).data).toBe(a.id); // existing: no invite needed
+    await db`delete from public.invites where used_by = ${id}`; await db`delete from public.players where id = ${id}`;
+  });
+  it("players can create invites and see only their own, never the codes", async () => {
+    const { data: code, error } = await a.sb.rpc("create_invite");
+    expect(error).toBeNull();
+    expect(code).toMatch(/^[A-HJ-NP-Z2-9]{12}$/);
+    expect((await a.sb.from("invites").select("code_hash")).error).not.toBeNull();
+    expect(((await b.sb.from("invites").select("created_at")).data ?? []).length).toBe(0);
+  });
+  it("the same match twice (same pair, day, score) needs an explicit override", async () => {
+    const strict = { p_allow_duplicate: false };
+    expect((await record(a, c.id, [{ p1: 6, p2: 1 }], strict)).error).toBeNull();
+    expect((await record(c, a.id, [{ p1: 1, p2: 6 }], strict)).error?.message).toMatch(/possible_duplicate/); // same match from the other side
+    expect((await record(a, c.id, [{ p1: 6, p2: 1 }], { p_allow_duplicate: true })).error).toBeNull();
+    expect((await record(a, c.id, [{ p1: 7, p2: 5 }], strict)).error).toBeNull(); // a different score is a different match
+  });
+  it("a result more than a year old can't be confirmed (but can still be rejected)", async () => {
+    const { data: id } = await record(a, b.id, [{ p1: 6, p2: 4 }], { p_note: "old" });
+    await db`update public.matches set played_on = current_date - 400 where id = ${id}`;
+    expect((await b.sb.rpc("respond_match", { p_match: id, p_accept: true })).error?.message).toMatch(/too_old_to_confirm/);
+    expect((await b.sb.rpc("respond_match", { p_match: id, p_accept: false })).error).toBeNull();
+  });
+  it("players can't read idempotency keys or who voided a match", async () => {
+    expect((await a.sb.from("matches").select("client_key")).error).not.toBeNull();
+    expect((await a.sb.from("matches").select("voided_by")).error).not.toBeNull();
   });
 });

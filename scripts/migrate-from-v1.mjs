@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Baseline V1 (Neon/Prisma) → V2 (Supabase) data migration. See docs/MIGRATION.md.
 //
-//   node scripts/migrate-from-v1.mjs --source "$V1_DATABASE_URL" --target "$SUPABASE_DB_URL" [--dry-run]
+//   node scripts/migrate-from-v1.mjs --source "$V1_DATABASE_URL" --target "$SUPABASE_DB_URL" [--target-ca supabase-ca.crt] [--dry-run]
 //
 // Safety:
 // - The V1 side is only ever read: one REPEATABLE READ, READ ONLY transaction (a consistent snapshot).
@@ -31,8 +31,16 @@ const fingerprint = async (sql, schema) => {
 };
 
 class DryRun extends Error {}
-const src = postgres(source, { max: 1, ssl: /localhost|127\.0\.0\.1/.test(source) ? false : "require", onnotice: () => {} });
-const dst = postgres(target, { max: 1, ssl: /localhost|127\.0\.0\.1/.test(target) ? false : "require", onnotice: () => {} });
+// TLS with certificate verification for anything that isn't this machine (exact hostname match, not a substring).
+// Supabase's direct connection uses its own CA: download it from the dashboard and pass --target-ca <file>.
+import { readFileSync } from "node:fs";
+const tls = (url, caFile) => {
+  const host = new URL(url).hostname;
+  if (host === "127.0.0.1" || host === "localhost" || host === "::1") return false;
+  return caFile ? { rejectUnauthorized: true, ca: readFileSync(caFile, "utf8") } : { rejectUnauthorized: true };
+};
+const src = postgres(source, { max: 1, ssl: tls(source, arg("--source-ca")), onnotice: () => {} });
+const dst = postgres(target, { max: 1, ssl: tls(target, arg("--target-ca")), onnotice: () => {} });
 
 let report;
 try {
