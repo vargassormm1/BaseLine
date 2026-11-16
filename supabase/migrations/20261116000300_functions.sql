@@ -109,8 +109,8 @@ begin
       raise exception 'username_taken';
     end;
   end if;
-  if p_email is not null and length(p_email) <= 254 then
-    insert into public.player_private (player_id, email) values (v_id, p_email) on conflict do nothing;
+  if nullif(trim(p_email), '') is not null and length(p_email) <= 254 then
+    insert into public.player_private (player_id, email) values (v_id, trim(p_email)) on conflict do nothing;
   end if;
   return v_id;
 end $$;

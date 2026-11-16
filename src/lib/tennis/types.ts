@@ -26,6 +26,8 @@ export interface Match {
   sets: SetRow[];
   challengeId: string | null;
   legacy: boolean;
+  note?: string | null;
+  voidReason?: string | null;
 }
 
 export interface Player { id: string; username: string; firstName: string; lastName: string; avatarUrl: string | null }
