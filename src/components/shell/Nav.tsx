@@ -4,7 +4,11 @@ import { usePathname } from "next/navigation";
 import { House, Trophy, Plus, Swords, UserRound, Flag, Users, Settings } from "lucide-react";
 
 export interface NavProps { meHref: string; attention: number }
-const isOn = (path: string, href: string) => (href === "/home" ? path === "/home" : path === href || path.startsWith(`${href}/`) || (href.startsWith("/players/") && path === href));
+/** Exactly one nav item is active: your own profile lights "Me", other players light "Players". */
+const isOn = (path: string, href: string, meHref = "") =>
+  href === "/players" ? path === "/players" || (path.startsWith("/players/") && path.toLowerCase() !== meHref.toLowerCase())
+    : href.startsWith("/players/") ? path.toLowerCase() === href.toLowerCase()
+    : path === href || path.startsWith(`${href}/`);
 
 /** Phones: five tabs with Record (the ball) in the thumb-reach center. */
 export function TabBar({ meHref, attention }: NavProps) {
@@ -27,9 +31,9 @@ export function TabBar({ meHref, attention }: NavProps) {
           </li>
         ) : (
           <li key={t.href}>
-            <Link href={t.href} aria-current={isOn(path, t.href) ? "page" : undefined}
-              className={`press relative flex h-14 flex-col items-center justify-center gap-0.5 text-micro font-semibold ${isOn(path, t.href) ? "text-text" : "text-text-3"}`}>
-              <t.icon size={22} strokeWidth={isOn(path, t.href) ? 2.4 : 1.9} aria-hidden="true" />
+            <Link href={t.href} aria-current={isOn(path, t.href, meHref) ? "page" : undefined}
+              className={`press relative flex h-14 flex-col items-center justify-center gap-0.5 text-micro font-semibold ${isOn(path, t.href, meHref) ? "text-text" : "text-text-3"}`}>
+              <t.icon size={22} strokeWidth={isOn(path, t.href, meHref) ? 2.4 : 1.9} aria-hidden="true" />
               {t.label}
               {t.dot ? <><span className="absolute top-2 right-[calc(50%-16px)] size-2 rounded-full bg-clay ring-2 ring-surface" aria-hidden="true" /><span className="sr-only">, {attention} waiting for you</span></> : null}
             </Link>
@@ -57,9 +61,9 @@ export function Rail({ meHref, attention }: NavProps) {
         <Plus size={20} strokeWidth={2.75} aria-hidden="true" />Record match
       </Link>
       {items.map((it) => (
-        <Link key={it.href} href={it.href} aria-current={isOn(path, it.href) ? "page" : undefined}
-          className={`press flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold ${isOn(path, it.href) ? "bg-surface-3 text-text" : "text-text-2 hover:bg-surface-3 hover:text-text"}`}>
-          <it.icon size={19} strokeWidth={isOn(path, it.href) ? 2.4 : 1.9} aria-hidden="true" />{it.label}
+        <Link key={it.href} href={it.href} aria-current={isOn(path, it.href, meHref) ? "page" : undefined}
+          className={`press flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold ${isOn(path, it.href, meHref) ? "bg-surface-3 text-text" : "text-text-2 hover:bg-surface-3 hover:text-text"}`}>
+          <it.icon size={19} strokeWidth={isOn(path, it.href, meHref) ? 2.4 : 1.9} aria-hidden="true" />{it.label}
           {it.count ? <span className="ml-auto grid h-5 min-w-5 place-items-center rounded-full bg-clay px-1.5 text-micro font-bold text-on-ball">{it.count}</span> : null}
         </Link>
       ))}
