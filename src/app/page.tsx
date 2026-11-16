@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/server/session";
-import { e2eAuthEnabled } from "@/lib/server/env";
 import { Wordmark } from "@/components/shell/Nav";
 import { buttonClass } from "@/components/ui/Button";
 
@@ -13,7 +12,7 @@ const STEPS = [
 
 export default async function Landing() {
   if (await getSession()) redirect("/home");
-  const signIn = e2eAuthEnabled() ? "/e2e/sign-in?u=ana" : "/sign-in";
+  const signIn = "/sign-in";
   return (
     <main className="pt-safe min-h-dvh">
       <header className="mx-auto flex max-w-[1040px] items-center justify-between px-5 py-5">
@@ -25,8 +24,8 @@ export default async function Landing() {
         <h1 className="display max-w-[11ch] text-[64px] sm:text-[104px]">Every match counts.</h1>
         <p className="mt-6 max-w-[46ch] text-lg text-text-2">Baseline is where your tennis group keeps score: log matches, settle rivalries and see who&apos;s really on top.</p>
         <div className="mt-9 flex flex-wrap gap-3">
-          <Link href={e2eAuthEnabled() ? signIn : "/sign-up"} prefetch={false} className={buttonClass("primary", "lg")}>Join your group</Link>
-          <Link href={signIn} prefetch={false} className={buttonClass("secondary", "lg")}>I have an account</Link>
+          <Link href={signIn} prefetch={false} className={buttonClass("primary", "lg")}>Sign in with Google</Link>
+          <span className="self-center text-sm text-text-2">Invite-only: ask a player for a link.</span>
         </div>
       </section>
 

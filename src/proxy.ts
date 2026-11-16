@@ -1,34 +1,65 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
+import { createServerClient } from "@supabase/ssr";
 
-// Public: the landing page and Clerk's sign-in/up. Everything else needs a signed-in player (pages check again).
-const isPublic = createRouteMatcher(["/", "/sign-in(.*)", "/sign-up(.*)"]);
+// Every request: a per-request nonce CSP, a Supabase session refresh (rotated cookies), and a sign-in gate for the
+// app (pages check again with requirePlayer()). Public: landing, sign-in, the Google round trip, invite links.
+const PUBLIC = [/^\/$/, /^\/sign-in$/, /^\/auth\/(google|callback)$/, /^\/join\/[^/]+$/, /^\/e2e\/sign-in$/];
+const COOKIE = { httpOnly: true, sameSite: "lax" as const, path: "/" };
 
-const clerk = clerkMiddleware(async (auth, req) => {
-  if (!isPublic(req)) await auth.protect();
-}, {
-  // Clerk builds a nonce-based CSP that includes what its sign-in needs; we add our image hosts.
-  contentSecurityPolicy: { strict: true, directives: { "img-src": ["'self'", "data:", "https://img.clerk.com", "https://images.clerk.dev"], "frame-ancestors": ["'none'"], "object-src": ["'none'"], "base-uri": ["'self'"], "form-action": ["'self'"] } },
-});
-
-// Local browser tests only (BASELINE_E2E=1, local database, never on Vercel): no Clerk, same strict CSP shape.
-function e2e(req: NextRequest) {
-  const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
+function csp(nonce: string) {
   const dev = process.env.NODE_ENV === "development";
-  const csp = [
+  return [
     "default-src 'self'", `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${dev ? " 'unsafe-eval'" : ""}`, "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: https://img.clerk.com", "font-src 'self'", "connect-src 'self'", "frame-ancestors 'none'", "object-src 'none'",
-    "base-uri 'self'", "form-action 'self'",
+    "img-src 'self' data: https://lh3.googleusercontent.com https://img.clerk.com", "font-src 'self'", "connect-src 'self'",
+    "frame-ancestors 'none'", "object-src 'none'", "base-uri 'self'", "form-action 'self'",
   ].join("; ");
-  const h = new Headers(req.headers);
-  h.set("x-nonce", nonce);
-  h.set("Content-Security-Policy", csp);
-  const res = NextResponse.next({ request: { headers: h } });
-  res.headers.set("Content-Security-Policy", csp);
+}
+
+const testMode = () => process.env.BASELINE_E2E === "1" && !process.env.VERCEL && /^http:\/\/(127\.0\.0\.1|localhost):\d+$/.test(process.env.SUPABASE_URL ?? "");
+
+export default async function proxy(req: NextRequest) {
+  const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
+  const policy = csp(nonce);
+  const headers = new Headers(req.headers);
+  headers.set("x-nonce", nonce);
+  headers.set("Content-Security-Policy", policy);
+  let res = NextResponse.next({ request: { headers } });
+
+  let signedIn = false;
+  if (testMode()) {
+    signedIn = req.cookies.has("baseline_e2e_user");
+  } else {
+    const url = process.env.SUPABASE_URL, key = process.env.SUPABASE_PUBLISHABLE_KEY;
+    if (url && key) {
+      const sb = createServerClient(url, key, {
+        cookieOptions: COOKIE,
+        cookies: {
+          getAll: () => req.cookies.getAll(),
+          setAll: (list, extra) => {
+            for (const { name, value } of list) req.cookies.set(name, value);
+            res = NextResponse.next({ request: { headers } });
+            for (const { name, value, options } of list) res.cookies.set(name, value, { ...options, ...COOKIE, secure: req.nextUrl.protocol === "https:" });
+            for (const [k, v] of Object.entries(extra)) res.headers.set(k, v);
+          },
+        },
+      });
+      const { data } = await sb.auth.getUser();
+      signedIn = !!data.user && !data.user.is_anonymous;
+    }
+  }
+  const path = req.nextUrl.pathname;
+  if (!signedIn && !PUBLIC.some((r) => r.test(path))) {
+    const to = new URL("/sign-in", req.nextUrl.origin);
+    if (path !== "/home") to.searchParams.set("next", path);
+    const redirect = NextResponse.redirect(to);
+    redirect.headers.set("Content-Security-Policy", policy);
+    return redirect;
+  }
+  res.headers.set("Content-Security-Policy", policy);
+  res.headers.set("Cache-Control", "private, no-store"); // per-player pages are never cached
   return res;
 }
 
-const testMode = process.env.BASELINE_E2E === "1" && !process.env.VERCEL && /^http:\/\/(127\.0\.0\.1|localhost):\d+$/.test(process.env.SUPABASE_URL ?? "");
-export default testMode ? e2e : clerk;
-
-export const config = { matcher: ["/((?!_next/static|_next/image|favicon.ico|icon|apple-icon|manifest.webmanifest|.*\\.(?:png|jpg|svg|webp|ico|txt)$).*)"] };
+export const config = {
+  matcher: [{ source: "/((?!_next/static|_next/image|favicon.ico|icon.svg|manifest.webmanifest).*)", missing: [{ type: "header", key: "next-router-prefetch" }, { type: "header", key: "purpose", value: "prefetch" }] }],
+};

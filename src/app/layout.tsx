@@ -1,9 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Archivo } from "next/font/google";
 import { cookies } from "next/headers";
-import { ClerkProvider } from "@clerk/nextjs";
 import { THEME_COOKIE, themeFrom } from "@/lib/ui/theme";
-import { e2eAuthEnabled } from "@/lib/server/env";
 import "./globals.css";
 
 const archivo = Archivo({ subsets: ["latin"], axes: ["wdth"], variable: "--font-archivo", display: "swap" });
@@ -19,16 +17,11 @@ export const viewport: Viewport = {
   themeColor: [{ media: "(prefers-color-scheme: light)", color: "#f2f1ea" }, { media: "(prefers-color-scheme: dark)", color: "#0d0f0c" }],
 };
 
-const clerkAppearance = {
-  variables: { colorPrimary: "#d6f24a", colorTextOnPrimaryBackground: "#11140d", borderRadius: "14px", fontFamily: "var(--font-archivo)" },
-};
-
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const theme = themeFrom((await cookies()).get(THEME_COOKIE)?.value);
-  const html = (
+  return (
     <html lang="en" className={archivo.variable} {...(theme !== "system" ? { "data-theme": theme } : {})} suppressHydrationWarning>
       <body>{children}</body>
     </html>
   );
-  return e2eAuthEnabled() ? html : <ClerkProvider dynamic appearance={clerkAppearance}>{html}</ClerkProvider>;
 }

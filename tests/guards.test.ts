@@ -33,7 +33,8 @@ describe("code structure", () => {
   });
   it("every server action checks who is signed in first", () => {
     const actions = read("src/app/actions.ts");
-    const bodies = actions.split(/\nexport async function /).slice(1);
+    // signOut is the one action that needs no player (it only clears the session)
+    const bodies = actions.split(/\nexport async function /).slice(1).filter((b) => !b.startsWith("signOut("));
     expect(bodies.length).toBeGreaterThan(8);
     for (const b of bodies) expect(b.split("\n").slice(1, 3).join("\n"), b.split("(")[0]).toMatch(/await (requirePlayer|getSession)\(\)/);
   });

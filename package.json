@@ -20,7 +20,7 @@
     "migrate:v1": "node scripts/migrate-from-v1.mjs"
   },
   "dependencies": {
-    "@clerk/nextjs": "7.9.22",
+    "@supabase/ssr": "0.12.7",
     "@supabase/supabase-js": "2.118.0",
     "lucide-react": "1.65.0",
     "motion": "14.7.1",
@@ -32,7 +32,6 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
-    "@clerk/testing": "2.2.52",
     "@playwright/test": "1.64.1",
     "@tailwindcss/postcss": "4.3.3",
     "@types/node": "22.20.5",

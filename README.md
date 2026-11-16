@@ -4,15 +4,15 @@ A tennis competition app for a group of friends: record matches (your opponent c
 (5 / 10 / 20 for a one-set / best-of-3 / best-of-5 win), climb the rankings, settle rivalries head to head, and
 challenge each other. Invite-only.
 
-**Stack:** Next.js 16 (App Router, TypeScript strict) · React 19 · Tailwind 4 · Clerk (sign-in) · Supabase Postgres
-(RLS, validated SQL write functions) · Vercel. Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+**Stack:** Next.js 16 (App Router, TypeScript strict) · React 19 · Tailwind 4 · Supabase (Postgres with RLS and
+validated SQL write functions; Auth with Google sign-in) · Vercel. Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Develop
 ```bash
 npm install                 # uses .npmrc (legacy-peer-deps) — see docs/DECISIONS.md
 supabase start              # local Supabase on ports 553xx (fictional seed data)
 supabase db reset           # re-apply migrations + seed
-cp .env.example .env.development.local   # point at local Supabase + the TEST Clerk instance
+cp .env.example .env.development.local   # point at local Supabase (Google sign-in needs a Google client; tests don't)
 npm run dev                 # http://localhost:3100
 ```
 

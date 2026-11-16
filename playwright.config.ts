@@ -8,8 +8,6 @@ export const E2E_ENV = {
   SUPABASE_URL: "http://127.0.0.1:55321",
   SUPABASE_PUBLISHABLE_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0",
   E2E_JWT_SECRET: "super-secret-jwt-token-with-at-least-32-characters-long",
-  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: "pk_test_ZTJlLmV4YW1wbGUuY29tJA",
-  CLERK_SECRET_KEY: "sk_test_e2e_not_used",
 };
 
 export default defineConfig({

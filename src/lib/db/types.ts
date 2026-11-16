@@ -5,21 +5,7 @@ export type Database = {
   
   "public": {
           Tables: {
-            "app_settings": {
-                  Row: {
-                    "id": boolean,"trusted_issuers": (string)[]
-                  }
-                  ComputedFields: never
-                  Insert: {
-                    "id"?: boolean,"trusted_issuers"?: (string)[]
-                  }
-                  Update: {
-                    "id"?: boolean,"trusted_issuers"?: (string)[]
-                  }
-                  Relationships: [
-                    
-                  ]
-                },"challenges": {
+            "challenges": {
                   Row: {
                     "challenger": string,"closed_at": string | null,"created_at": string,"expires_at": string,"format": number,"id": string,"message": string | null,"opponent": string,"proposed_for": string | null,"responded_at": string | null,"status": Database["public"]['Enums']["challenge_status"]
                   }
@@ -157,14 +143,14 @@ isOneToOne: true
                   ]
                 },"players": {
                   Row: {
-                    "avatar_url": string | null,"clerk_user_id": string,"created_at": string,"first_name": string,"id": string,"is_admin": boolean,"last_name": string,"legacy_user_id": number | null,"updated_at": string,"username": string
+                    "auth_user_id": string | null,"avatar_url": string | null,"clerk_user_id": string | null,"created_at": string,"first_name": string,"id": string,"is_admin": boolean,"last_name": string,"legacy_user_id": number | null,"updated_at": string,"username": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "avatar_url"?: string | null,"clerk_user_id": string,"created_at"?: string,"first_name"?: string,"id"?: string,"is_admin"?: boolean,"last_name"?: string,"legacy_user_id"?: number | null,"updated_at"?: string,"username": string
+                    "auth_user_id"?: string | null,"avatar_url"?: string | null,"clerk_user_id"?: string | null,"created_at"?: string,"first_name"?: string,"id"?: string,"is_admin"?: boolean,"last_name"?: string,"legacy_user_id"?: number | null,"updated_at"?: string,"username": string
                   }
                   Update: {
-                    "avatar_url"?: string | null,"clerk_user_id"?: string,"created_at"?: string,"first_name"?: string,"id"?: string,"is_admin"?: boolean,"last_name"?: string,"legacy_user_id"?: number | null,"updated_at"?: string,"username"?: string
+                    "auth_user_id"?: string | null,"avatar_url"?: string | null,"clerk_user_id"?: string | null,"created_at"?: string,"first_name"?: string,"id"?: string,"is_admin"?: boolean,"last_name"?: string,"legacy_user_id"?: number | null,"updated_at"?: string,"username"?: string
                   }
                   Relationships: [
                     
@@ -231,16 +217,13 @@ isOneToOne: false
 { Args: Record<PropertyKey, never>; Returns: string
                            },
 "ensure_player":
-{ Args: { "p_avatar_url": string,"p_email": string,"p_first_name": string,"p_invite"?: string,"p_last_name": string,"p_username": string }; Returns: string
+{ Args: { "p_avatar_url": string,"p_first_name": string,"p_invite"?: string,"p_last_name": string,"p_username": string }; Returns: string
                            },
 "expire_challenges":
 { Args: { "p_a": string,"p_b": string }; Returns: undefined
                            },
 "is_admin":
 { Args: Record<PropertyKey, never>; Returns: boolean
-                           },
-"jwt_sub":
-{ Args: Record<PropertyKey, never>; Returns: string
                            },
 "me":
 { Args: Record<PropertyKey, never>; Returns: string

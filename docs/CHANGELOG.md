@@ -10,6 +10,7 @@
 - **Head to head:** a full matchup page (record, split bar, sets, games, tiebreaks, by format, biggest wins, every meeting). It now counts confirmed matches only.
 - **Athlete profiles:** stats, last 10, by format, achievements, rivals and history.
 - **Challenges:** they now actually exist.
+- **Google sign-in through Supabase Auth,** replacing Clerk. V1 players link automatically by email.
 - **Invite-only membership:** invite links.
 - **Admin void:** with a reason; the match is kept.
 - **Settings:** theme (system/light/dark) and profile.
@@ -30,6 +31,6 @@
 New in V2: RLS, SQL write functions, rate limits, a nonce CSP, an independent review with all findings addressed, and DB, guard and browser tests.
 
 **Tech**
-- **Stack:** Next 16, React 19, TypeScript strict, Tailwind 4, Clerk 7, supabase-js.
-- **Removed:** antd, Prisma, Upstash, socket.io, @vercel/postgres and react-responsive.
+- **Stack:** Next 16, React 19, TypeScript strict, Tailwind 4, Supabase (Postgres + Auth), supabase-js and @supabase/ssr.
+- **Removed:** Clerk, antd, Prisma, Upstash, socket.io, @vercel/postgres and react-responsive.
 - **Dependencies:** `npm audit` reports 0 vulnerabilities.

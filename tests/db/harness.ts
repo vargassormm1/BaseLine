@@ -1,5 +1,5 @@
-// Local Supabase only (supabase start). Tokens are minted with the local JWT secret, standing in for Clerk session
-// tokens (same claims Supabase reads: sub = Clerk user id, role = authenticated).
+// Local Supabase only (supabase start). Tokens are minted with the local JWT secret and look like Supabase Auth
+// sessions from a Google sign-in (sub = auth user id, email, provider google, email_verified).
 import { createHmac, randomUUID } from "node:crypto";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import postgres from "postgres";
@@ -10,15 +10,27 @@ const SECRET = "super-secret-jwt-token-with-at-least-32-characters-long";
 export const db = postgres("postgresql://postgres:postgres@127.0.0.1:55322/postgres", { max: 2, onnotice: () => {} });
 
 const b64 = (o: object) => Buffer.from(JSON.stringify(o)).toString("base64url");
-export function token(sub: string, iss = "baseline-local-test") {
+export interface Claims { email?: string; provider?: string; verified?: boolean; anonymous?: boolean }
+export function token(sub: string, c: Claims = {}) {
   const now = Math.floor(Date.now() / 1000);
-  const body = `${b64({ alg: "HS256", typ: "JWT" })}.${b64({ iss, sub, role: "authenticated", aud: "authenticated", iat: now, exp: now + 600 })}`;
+  const claims = { sub, role: "authenticated", aud: "authenticated", iat: now, exp: now + 600, email: c.email, is_anonymous: c.anonymous ?? false,
+    app_metadata: { provider: c.provider ?? "google", providers: [c.provider ?? "google"] }, user_metadata: { email_verified: c.verified ?? true } };
+  const body = `${b64({ alg: "HS256", typ: "JWT" })}.${b64(claims)}`;
   return `${body}.${createHmac("sha256", SECRET).update(body).digest("base64url")}`;
 }
+/** A fresh auth user (as Supabase Auth would create on a first Google sign-in). */
+export async function authUser(email: string | null = null): Promise<string> {
+  const id = randomUUID();
+  await db`insert into auth.users (instance_id, id, aud, role, email, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
+           values ('00000000-0000-0000-0000-000000000000', ${id}, 'authenticated', 'authenticated', ${email}, now(), '{"provider":"google"}', '{}', now(), now())`;
+  createdAuth.push(id);
+  return id;
+}
+const createdAuth: string[] = [];
 export const anon = () => createClient(API, ANON, { auth: { persistSession: false, autoRefreshToken: false } });
-export const as = (sub: string, iss?: string): SupabaseClient => createClient(API, ANON, { accessToken: async () => token(sub, iss), auth: { persistSession: false, autoRefreshToken: false } });
+export const as = (sub: string, c: Claims = {}): SupabaseClient => createClient(API, ANON, { accessToken: async () => token(sub, c), auth: { persistSession: false, autoRefreshToken: false } });
 
-export interface TestPlayer { sub: string; id: string; sb: SupabaseClient; username: string }
+export interface TestPlayer { sub: string; id: string; sb: SupabaseClient; username: string; email: string }
 const run = randomUUID().slice(0, 6);
 /** A fresh one-time invite (created directly in the database, as an existing player would). */
 export async function invite(): Promise<string> {
@@ -28,16 +40,17 @@ export async function invite(): Promise<string> {
   return code;
 }
 export async function player(name: string, admin = false): Promise<TestPlayer> {
-  const sub = `user_test_${run}_${name}`;
-  const sb = as(sub);
   const username = `t${run}${name}`.slice(0, 24);
-  const { data, error } = await sb.rpc("ensure_player", { p_username: username, p_first_name: name, p_last_name: "Test", p_avatar_url: "", p_email: `${username}@example.test`, p_invite: await invite() });
+  const email = `${username}@example.test`;
+  const sub = await authUser(email);
+  const sb = as(sub, { email });
+  const { data, error } = await sb.rpc("ensure_player", { p_username: username, p_first_name: name, p_last_name: "Test", p_avatar_url: "", p_invite: await invite() });
   if (error) throw new Error(error.message);
   if (admin) await db`update public.players set is_admin = true where id = ${data}`;
-  return { sub, id: data as string, sb, username };
+  return { sub, id: data as string, sb, username, email };
 }
 export async function cleanup() {
-  const ids = (await db`select id from public.players where clerk_user_id like ${`user_test_${run}_%`}`).map((r) => r.id as string);
+  const ids = (await db`select id from public.players where username like ${`t${run}%`} or auth_user_id in ${db(createdAuth.length ? createdAuth : ["00000000-0000-0000-0000-000000000000"])}`).map((r) => r.id as string);
   if (ids.length) {
     await db`delete from public.matches where player_one in ${db(ids)} or player_two in ${db(ids)}`;
     await db`delete from public.challenges where challenger in ${db(ids)} or opponent in ${db(ids)}`;
@@ -45,6 +58,7 @@ export async function cleanup() {
     await db`delete from public.invites where used_by in ${db(ids)} or created_by in ${db(ids)}`;
     await db`delete from public.players where id in ${db(ids)}`;
   }
+  if (createdAuth.length) await db`delete from auth.users where id in ${db(createdAuth)}`;
 }
 export const today = () => new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York" }).format(new Date());
 export const record = (p: TestPlayer, opponent: string, sets: object[], o: Record<string, unknown> = {}) => p.sb.rpc("record_match", {

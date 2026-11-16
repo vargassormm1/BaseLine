@@ -370,9 +370,7 @@ enabled = false
 
 # Use Clerk as a third-party provider alongside Supabase Auth.
 [auth.third_party.clerk]
-# Local/dev: the TEST Clerk instance (never the production one). Production: set in the Supabase dashboard.
-enabled = true
-domain = "electric-squirrel-97.clerk.accounts.dev"
+enabled = false
 
 # OAuth server configuration
 [auth.oauth_server]

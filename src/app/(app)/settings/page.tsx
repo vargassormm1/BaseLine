@@ -1,7 +1,6 @@
 import { cookies } from "next/headers";
 import { requirePlayer } from "@/lib/server/session";
 import { loadBoard } from "@/lib/server/data";
-import { e2eAuthEnabled } from "@/lib/server/env";
 import { THEME_COOKIE, themeFrom } from "@/lib/ui/theme";
 import { PageHeader } from "@/components/ui/bits";
 import { ProfileForm } from "@/components/settings/ProfileForm";
@@ -35,8 +34,8 @@ export default async function Settings() {
         </ul>
       </section>
       <section className={card} aria-labelledby="s-account"><h2 id="s-account" className="text-lg font-bold">Account</h2>
-        <p className="text-sm text-text-2">Email, password and sign-in methods are managed by Clerk from the sign-in screen.</p>
-        <SignOut testMode={e2eAuthEnabled()} />
+        <p className="text-sm text-text-2">Signed in with Google{s.id.profile.email ? <> as <span className="font-semibold text-text">{s.id.profile.email}</span></> : null}. Your email is only visible to you.</p>
+        <SignOut />
       </section>
     </div>
   );

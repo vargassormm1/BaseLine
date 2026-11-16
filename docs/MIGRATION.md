@@ -13,7 +13,7 @@ Integer ids; stored, mutable totals on `User`.
 ## Mapping
 | V1 | V2 |
 |---|---|
-| `User` | `players`: `clerkId` → `clerk_user_id` (**same Clerk instance**, so everyone keeps their login and history), username, names, avatar, `userId` → `legacy_user_id`; email → `player_private` |
+| `User` | `players`: username, names, avatar, `userId` → `legacy_user_id`, `clerkId` kept as `clerk_user_id` (history); email → `player_private`. `auth_user_id` starts empty: each player links on their **first Google sign-in** by that same email. |
 | `Matches` | `matches`: confirmed + visible → `confirmed`; recorded but unconfirmed → `pending`; `matchType` → `format`; `playedAt` → `created_at` (exact) and `played_on` (date in US Eastern); `points_awarded` = 5/10/20 |
 | `MatchDetails` | `match_sets`, games and tiebreaks copied **exactly** (two V1 deciding "sets" of 10–7 and 9–7 were match tiebreaks; they're kept as recorded, not reinterpreted) |
 | `User` totals | V1 stored totals that its own match history doesn't explain → `standing_adjustments` (`v1_carry_over`): **2 rows**. Every player's all-time wins, losses and points equal V1 exactly. |
@@ -41,33 +41,52 @@ Any failure, or `--dry-run`, rolls back everything. TLS certificates are verifie
 - **Rerun:** refused.
 
 ## Cutover runbook (needs the owner's go-ahead at each ★)
-1. ★ **Create the Supabase project** (Free). In its dashboard:
-   - **Authentication:** turn off email/phone sign-ups and anonymous sign-ins.
-   - **Third-party auth:** add **Clerk** with domain `capable-baboon-71.clerk.accounts.dev` (the production Clerk instance).
-2. ★ **Clerk dashboard** (that instance): Integrations → **Supabase** → activate. This adds `role: authenticated` to session tokens.
-3. **Apply migrations:**
-   - Run `supabase link --project-ref <ref>`, then `supabase db push`.
-   - Set the trusted issuer: `update public.app_settings set trusted_issuers = array['https://capable-baboon-71.clerk.accounts.dev'];`
-   - Do **not** run `seed.sql` remotely.
+1. ★ **Google Cloud console** (free, about 10 minutes):
+   - **Create a project.**
+   - **OAuth consent screen:**
+     - External, app name "Baseline".
+     - Scopes: `openid`, `email`, `profile` only.
+     - **Publish** it ("In production"). Basic scopes need no Google review, and while it's in "Testing" only listed test users can sign in.
+   - **Credentials → OAuth client ID:**
+     - Type: Web application.
+     - Authorized redirect URI: `https://<project-ref>.supabase.co/auth/v1/callback`.
+     - Keep the client ID and secret.
+2. ★ **Create the Supabase project** (Free). In its dashboard:
+   - **Auth → Sign In / Providers:**
+     - **Google** on, with the client ID and secret.
+     - **Email** provider **off**.
+     - Anonymous sign-ins **off**.
+     - "Allow new users to sign up" stays on. Google needs it to create accounts, and Baseline still requires an invite or a V1 email match before anyone becomes a player.
+   - **Auth → URL Configuration:**
+     - Site URL: `https://base-line.vercel.app`.
+     - Redirect URLs: `https://base-line.vercel.app/auth/callback**`, plus your Vercel preview URL pattern if you want to test previews.
+3. **Apply migrations:** run `supabase link --project-ref <ref>`, then `supabase db push`. Do **not** run `seed.sql` remotely.
 4. **Freeze V1.** It's been inactive since 2025-10-02. Tell the group not to log matches during the switch.
 5. ★ **Fresh backup of V1** and verify it, exactly as above.
-6. ★ **Run the migration:** `--dry-run` first, then for real. Use the session-pooler or direct URL, with `--target-ca` (Supabase CA from the dashboard).
-7. **Make yourself admin:** `update public.players set is_admin = true where username = '<yours>';`
-8. **Set Vercel env vars:**
-   - Set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`. Keep the existing Clerk keys.
-   - Leave the V1 vars (`DATABASE_URL`, `POSTGRES_*`, `UPSTASH_*`) in place until V2 is verified; remove them after.
-9. ★ **Deploy a preview and smoke test it** with your real sign-in: home shows your rank, rankings match V1, open a profile, record a test match and withdraw it.
+6. ★ **Run the migration:** `--dry-run` first, then for real. Use the session-pooler or direct URL, with `--target-ca`.
+7. **Set Vercel env vars:**
+   - Set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`.
+   - Leave the V1 vars (`DATABASE_URL`, `POSTGRES_*`, `UPSTASH_*`, Clerk keys) in place until V2 is verified, so V1 can still be rolled back to; remove them after.
+8. ★ **Deploy a preview and smoke test it:**
+   - Sign in with **your Google account**. You should land on Home as yourself, with your V1 rank and history.
+   - Check that rankings match V1. Record a test match and withdraw it.
+9. **Make yourself admin:** `update public.players set is_admin = true where username = '<yours>';`
 10. ★ **Production deploy** of branch `v2` (merge to `main`).
-11. **Afterwards:** keep Neon read-only for 30 days, then decide whether to archive it. The backup stays in `~/Backups/baseline/`.
+11. **Friends sign in** with their Google accounts and link automatically.
+    - If someone lands on "Get on the board" instead, their Google email differs from V1's.
+    - Link them with the snippet at the end of `supabase/migrations/…0600_supabase_auth.sql`. Don't send them an invite.
+12. **Afterwards:**
+    - Keep Neon read-only for 30 days, then decide whether to archive it. The backup stays in `~/Backups/baseline/`.
+    - Once V2 has been stable for 30 days, delete the Clerk application. V1 rollback needs it until then.
+    - V1 profile photos are served by Clerk until each player's first Google sign-in replaces them with their Google photo.
 
 ### Writes between steps 5 and 10
 If anything was logged in V1 after the backup, re-run steps 5 and 6. The target refuses to import twice, so first empty it with `truncate public.players, public.matches, … cascade; truncate legacy.* ;` or recreate the project.
 
 ### Rollback
-- **Instant:** Vercel → Deployments → the last V1 deployment → *Promote to production*.
+- **Instant:** Vercel → Deployments → the last V1 deployment → *Promote to production* (V1 still uses Clerk and Neon, both untouched).
 - **V1's data is untouched,** because the migration only reads it. Matches logged in V2 after cutover would need re-entering in V1.
 - **V2's data stays** in Supabase for a retry.
 
 ## Known follow-ups
-- Production runs on a Clerk **development** instance. That's acceptable for a friends app, but Clerk shows a dev banner and limits dev instances.
-- A Clerk **production** instance needs a custom domain, and moving there changes every Clerk user id. When that happens, remap `players.clerk_user_id` by verified email; `player_private` has them.
+- Google sign-in only. Adding email sign-in later needs an email provider (and a domain to send from).

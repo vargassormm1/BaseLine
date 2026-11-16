@@ -13,7 +13,8 @@ const headers = [
 const config: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
-  images: { remotePatterns: [{ protocol: "https", hostname: "img.clerk.com" }, { protocol: "https", hostname: "images.clerk.dev" }] },
+  // Google profile photos; img.clerk.com for V1 photos until each player's first Google sign-in replaces them
+  images: { remotePatterns: [{ protocol: "https", hostname: "lh3.googleusercontent.com" }, { protocol: "https", hostname: "img.clerk.com" }] },
   async headers() { return [{ source: "/:path*", headers }]; },
 };
 export default config;

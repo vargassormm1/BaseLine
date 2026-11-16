@@ -11,11 +11,13 @@ test("signed out: the landing page is public, everything else is closed", async 
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Every match counts." })).toBeVisible();
   await axe(page);
-  for (const path of ["/home", "/rankings", "/players/ana_e2e", "/h2h", "/record"]) {
-    const r = await page.goto(path);
+  for (const path of ["/home", "/rankings", "/players/ana_e2e", "/h2h", "/record", "/matches/00000000-0000-4000-8000-0000000000f1"]) {
+    await page.goto(path);
+    await expect(page, path).toHaveURL(/\/sign-in(\?next=.*)?$/);
+    await expect(page.getByRole("heading", { name: "Step on court." })).toBeVisible();
     expect(await page.content(), path).not.toContain("Ana Reyes");
-    expect(r?.status(), path).not.toBe(200);
   }
+  await axe(page);
   expect(problems).toEqual([]);
 });
 
@@ -181,4 +183,16 @@ test("someone else's pending result, an unknown match and a bad id all show not 
   await signIn(page, "ana");
   await page.goto(`/matches/${m!.id}`);
   await expect(page.getByRole("region", { name: "Score" })).toBeVisible(); // but Ana (a player in it) can
+});
+
+test("a V1 player's first Google sign-in links their history (no invite, no welcome)", async ({ page }) => {
+  await page.goto("/e2e/sign-in?u=claimer"); // claimer@e2e.test = the email on file for Fay, who isn't linked yet
+  await expect(page).toHaveURL(/\/home$/);
+  await expect(page.getByRole("region", { name: "Your standing" })).toContainText("Hey, Fay");
+  await page.goto("/settings");
+  await expect(page.getByText("claimer@e2e.test")).toBeVisible();
+  await page.getByRole("button", { name: "Sign out" }).click();
+  await expect(page).toHaveURL(/\/$/);
+  await page.goto("/home");
+  await expect(page).toHaveURL(/\/sign-in/);
 });

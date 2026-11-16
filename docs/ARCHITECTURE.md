@@ -2,11 +2,12 @@
 
 ## Shape
 ```
-browser ──▶ Next.js on Vercel (server components + server actions; src/proxy.ts: Clerk + nonce CSP)
-              │  Clerk session (auth()) → the player's Clerk session token
-              ▼
-           Supabase Postgres (PostgREST)  ── verifies the Clerk token (third-party auth), RLS on every read,
-                                              writes only through SECURITY DEFINER functions
+browser ──▶ Next.js on Vercel (server components + server actions; src/proxy.ts: nonce CSP, session refresh, gate)
+   │            │  Supabase Auth session in httpOnly cookies (@supabase/ssr) → the player's access token
+   │            ▼
+   │         Supabase Postgres (PostgREST) ── RLS on every read (auth.uid() → player), writes only through
+   │                                          SECURITY DEFINER functions
+   └── Google sign-in: /auth/google → Google → Supabase Auth → /auth/callback (PKCE code exchange)
 ```
 The browser never talks to Supabase. Every query runs as the signed-in player, so RLS applies even if app code is wrong.
 
@@ -14,10 +15,10 @@ The browser never talks to Supabase. Every query runs as the signed-in player, s
 | Path | What |
 |---|---|
 | `src/lib/tennis/` | Pure domain: score rules (`score.ts`), points, standings, stats, head-to-head, achievements, dates. No React, no DB. Unit-tested. |
-| `src/lib/server/` | Server-only: `identity.ts` (Clerk, or the guarded local test sign-in), `session.ts` (Supabase client per player, `requirePlayer()`), `data.ts` (one cached read per request), `env.ts`. |
+| `src/lib/server/` | Server-only: `identity.ts` (Supabase Auth user via `getUser()`, or the guarded local test sign-in), `session.ts` (`getSession()`/`requirePlayer()`, links or joins on first visit), `data.ts` (one cached read per request), `redirects.ts` (`safeNext`), `env.ts`. |
 | `src/app/actions.ts` | Every write: identify → zod-validate (`src/lib/validation.ts`) → one SQL function → friendly error (`src/lib/errors.ts`). |
 | `src/app/(app)/` | Signed-in screens. `layout.tsx` = shell (rail / tab bar) + toasts. |
-| `src/app/` | Landing, welcome, Clerk sign-in/up, `join/[code]` (invite link), `e2e/sign-in` (local tests only). |
+| `src/app/` | Landing, `sign-in`, `auth/google` + `auth/callback` (Google round trip), welcome, `join/[code]` (invite link), `e2e/sign-in` (local tests only). |
 | `src/components/` | `ui/` primitives, `shell/`, `tennis/` (scoreboard, leaderboard row, split bar), `record/`, `actions/`, `settings/`. |
 | `supabase/migrations/` | Schema, RLS, write functions, V1 import, hardening. `seed.sql` = fictional local data. |
 | `scripts/migrate-from-v1.mjs` | The V1 → V2 data migration. |

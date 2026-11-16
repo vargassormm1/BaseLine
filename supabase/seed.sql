@@ -3,16 +3,21 @@
 -- e2e_* Clerk ids match the local test sign-in (/e2e/sign-in?u=ana → player "ana_e2e").
 select setseed(0.42);
 
--- local tokens (tests and the local test sign-in) are issued as 'baseline-local-test'; production trusts Clerk only
-update public.app_settings set trusted_issuers = array['baseline-local-test'];
+-- local auth users for the test sign-in (fictional, Google-style); e2e user N → auth id 10000000-…-00000000000N
+insert into auth.users (instance_id, id, aud, role, email, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
+select '00000000-0000-0000-0000-000000000000', ('10000000-0000-4000-8000-0000000000' || k)::uuid, 'authenticated', 'authenticated',
+       name || '@e2e.test', now(), '{"provider":"google","providers":["google"]}', jsonb_build_object('email_verified', true, 'full_name', initcap(name) || ' Tester'), now(), now()
+from (values ('0a', 'ana'), ('0b', 'ben'), ('0c', 'cy'), ('0d', 'dee'), ('ff', 'newbie'), ('fe', 'claimer')) as t(k, name);
 
-insert into public.players (id, clerk_user_id, username, first_name, last_name, is_admin) values
-  ('00000000-0000-4000-8000-00000000000a', 'e2e_ana',  'ana_e2e',  'Ana',    'Reyes',   true),
-  ('00000000-0000-4000-8000-00000000000b', 'e2e_ben',  'ben_e2e',  'Ben',    'Okafor',  false),
-  ('00000000-0000-4000-8000-00000000000c', 'e2e_cy',   'cy_e2e',   'Cy',     'Lindqvist', false),
-  ('00000000-0000-4000-8000-00000000000d', 'e2e_dee',  'dee_e2e',  'Dee',    'Marsh',   false),
-  ('00000000-0000-4000-8000-00000000000e', 'seed_eli', 'eli.court','Eli',    'Navarro', false),
-  ('00000000-0000-4000-8000-00000000000f', 'seed_fay', 'fayserves','Fay',    'Whitlock',false);
+insert into public.players (id, auth_user_id, username, first_name, last_name, is_admin) values
+  ('00000000-0000-4000-8000-00000000000a', '10000000-0000-4000-8000-00000000000a', 'ana_e2e',  'Ana', 'Reyes',     true),
+  ('00000000-0000-4000-8000-00000000000b', '10000000-0000-4000-8000-00000000000b', 'ben_e2e',  'Ben', 'Okafor',    false),
+  ('00000000-0000-4000-8000-00000000000c', '10000000-0000-4000-8000-00000000000c', 'cy_e2e',   'Cy',  'Lindqvist', false),
+  ('00000000-0000-4000-8000-00000000000d', '10000000-0000-4000-8000-00000000000d', 'dee_e2e',  'Dee', 'Marsh',     false),
+  ('00000000-0000-4000-8000-00000000000e', null, 'eli.court', 'Eli', 'Navarro',  false),
+  ('00000000-0000-4000-8000-00000000000f', null, 'fayserves', 'Fay', 'Whitlock', false);
+-- Fay is a "V1-style" player not yet linked: the claimer test user (claimer@e2e.test) links to her on first sign-in
+insert into public.player_private (player_id, email) values ('00000000-0000-4000-8000-00000000000f', 'claimer@e2e.test');
 
 -- ~70 confirmed matches over the last ~14 months, weighted so there's a real table (Ana and Ben lead, a rivalry with Cy)
 do $$

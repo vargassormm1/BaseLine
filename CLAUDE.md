@@ -1,6 +1,6 @@
 # Baseline (V2)
 
-Tennis match tracker for a group of friends. Next.js 16 + TypeScript + Tailwind 4 + Clerk + Supabase. Docs in `docs/`
+Tennis match tracker for a group of friends. Next.js 16 + TypeScript + Tailwind 4 + Supabase (Postgres + Auth with Google). Docs in `docs/`
 (start with PRODUCT_SPEC, ARCHITECTURE, SECURITY, MIGRATION). Project status/log also in
 `~/Coding/SideProjects/documentation/baseline/`.
 

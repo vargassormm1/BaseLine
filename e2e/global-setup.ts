@@ -11,7 +11,8 @@ export async function resetFixtures() {
     await db`insert into public.challenges (challenger, opponent, format, message) values (${CY}, ${ANA}, 3, 'Rematch. Saturday morning?')`;
     await db`delete from public.rate_limits`;
     await db`update public.invites set used_by = null, used_at = null where code_hash = encode(extensions.digest('TESTINVITE23', 'sha256'), 'hex')`;
-    await db`delete from public.players where clerk_user_id = 'e2e_newbie'`;
+    await db`delete from public.players where auth_user_id = '10000000-0000-4000-8000-0000000000ff'`; // newbie
+    await db`update public.players set auth_user_id = null where id = '00000000-0000-4000-8000-00000000000f'`; // Fay: unlinked again
   } finally { await db.end(); }
 }
 

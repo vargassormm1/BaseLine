@@ -2,7 +2,10 @@
 // Every write in the app. Each action: identify the player (Clerk, then RLS) → validate → one database function call.
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { getSession, requirePlayer } from "@/lib/server/session";
+import { E2E_COOKIE, supabaseForRequest } from "@/lib/server/identity";
+import { e2eAuthEnabled } from "@/lib/server/env";
 import { friendlyError } from "@/lib/errors";
 import * as V from "@/lib/validation";
 
@@ -103,10 +106,10 @@ export async function chooseUsername(input: unknown): Promise<ActionResult> {
   if (s.me) redirect("/home");
   const v = V.welcome.safeParse(input);
   if (!v.success) return fail(v.error.issues[0]?.message ?? "Check your details.");
-  const p = await s.id.profile();
+  const p = s.id.profile;
   const { error } = await s.sb.rpc("ensure_player", {
     p_username: v.data.username, p_first_name: v.data.firstName || p.firstName, p_last_name: v.data.lastName || p.lastName,
-    p_avatar_url: p.avatarUrl ?? "", p_email: p.email ?? "", p_invite: v.data.invite,
+    p_avatar_url: p.avatarUrl ?? "", p_invite: v.data.invite,
   });
   if (error) return fail(friendlyError(error.message));
   redirect("/home");
@@ -118,4 +121,10 @@ export async function createInvite(): Promise<ActionResult & { code?: string }> 
   const { data, error } = await s.sb.rpc("create_invite");
   if (error || !data) return fail(friendlyError(error?.message));
   return { ok: true, code: data };
+}
+
+export async function signOut(): Promise<void> {
+  if (e2eAuthEnabled()) (await cookies()).delete(E2E_COOKIE);
+  else await (await supabaseForRequest()).auth.signOut();
+  redirect("/");
 }

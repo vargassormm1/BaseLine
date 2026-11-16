@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { randomUUID } from "node:crypto";
 import vectors from "../fixtures/scores.json";
-import { anon, as, cleanup, db, invite, player, record, today, type TestPlayer } from "./harness";
+import { anon, as, authUser, cleanup, db, invite, player, record, today, type TestPlayer } from "./harness";
 
 let a: TestPlayer, b: TestPlayer, c: TestPlayer, admin: TestPlayer;
 beforeAll(async () => { [a, b, c, admin] = await Promise.all([player("ana"), player("ben"), player("cy"), player("adm", true)]); });
@@ -135,8 +135,8 @@ describe("profiles and limits", () => {
     expect((await a.sb.rpc("update_profile", { p_username: b.username.toUpperCase(), p_first_name: "A", p_last_name: "B" })).error?.message).toMatch(/username_taken/);
     expect((await a.sb.rpc("update_profile", { p_username: "a b<script>", p_first_name: "A", p_last_name: "B" })).error?.message).toMatch(/invalid_username/);
   });
-  it("signing in again keeps the same player (identity is the Clerk user id)", async () => {
-    const { data } = await a.sb.rpc("ensure_player", { p_username: "different", p_first_name: "x", p_last_name: "y", p_avatar_url: "https://evil.example/x.png", p_email: null });
+  it("signing in again keeps the same player (identity is the auth user id)", async () => {
+    const { data } = await a.sb.rpc("ensure_player", { p_username: "different", p_first_name: "x", p_last_name: "y", p_avatar_url: "https://evil.example/x.png" });
     expect(data).toBe(a.id);
     const [p] = await db`select username, avatar_url from public.players where id = ${a.id}`;
     expect(p!.username).toBe(a.username);
@@ -150,18 +150,17 @@ describe("profiles and limits", () => {
 });
 
 describe("hardening (independent review)", () => {
-  it("tokens from an untrusted issuer (e.g. Supabase's own sign-up) are never a player", async () => {
-    const evil = as(a.sub, "http://127.0.0.1:55321/auth/v1");
-    expect((await evil.rpc("me")).data).toBeNull();
-    expect((await evil.from("players").select("id")).data).toEqual([]);
-    expect((await evil.rpc("record_match", { p_client_key: randomUUID(), p_opponent: b.id, p_format: 1, p_deciding: "set", p_played_on: today(), p_sets: [{ p1: 6, p2: 0 }] })).error?.code).toBe("42501");
-    expect((await evil.rpc("ensure_player", { p_username: "intruder", p_first_name: "", p_last_name: "", p_avatar_url: "", p_email: "", p_invite: await invite() })).error?.code).toBe("42501");
+  it("an anonymous session is never a player", async () => {
+    const ghost = as(a.sub, { email: a.email, anonymous: true });
+    expect((await ghost.rpc("me")).data).toBeNull();
+    expect((await ghost.from("players").select("id")).data).toEqual([]);
+    expect((await ghost.rpc("ensure_player", { p_username: "ghost", p_first_name: "", p_last_name: "", p_avatar_url: "", p_invite: await invite() })).error?.code).toBe("42501");
   });
   it("internal helpers can't be called by anyone through the API", async () => {
     const rows = await db`select p.proname, has_function_privilege('anon', p.oid, 'execute') a, has_function_privilege('authenticated', p.oid, 'execute') u
                           from pg_proc p join pg_namespace n on n.oid = p.pronamespace
-                          where n.nspname = 'public' and p.proname in ('take_rate_limit', 'expire_challenges', 'require_me', 'jwt_sub')`;
-    expect(rows.length).toBe(4);
+                          where n.nspname = 'public' and p.proname in ('take_rate_limit', 'expire_challenges', 'require_me')`;
+    expect(rows.length).toBe(3);
     for (const r of rows) expect([r.proname, r.a, r.u]).toEqual([r.proname, false, false]);
     expect((await a.sb.rpc("take_rate_limit", { p_player: b.id, p_bucket: "record_match", p_max: 1, p_window: "100 years" })).error).not.toBeNull();
     // and nothing in public is executable by anon except what's explicitly granted (none)
@@ -170,17 +169,37 @@ describe("hardening (independent review)", () => {
     expect(anonExec.map((r) => r.proname)).toEqual([]);
   });
   it("new players need a valid, unused invite; existing players never do", async () => {
-    const stranger = as("user_test_stranger_" + randomUUID().slice(0, 6));
-    const args = { p_username: `s${randomUUID().slice(0, 8)}`, p_first_name: "S", p_last_name: "T", p_avatar_url: "", p_email: "" };
+    const email = `s${randomUUID().slice(0, 8)}@example.test`;
+    const stranger = as(await authUser(email), { email });
+    const args = { p_username: `s${randomUUID().slice(0, 8)}`, p_first_name: "S", p_last_name: "T", p_avatar_url: "" };
     expect((await stranger.rpc("ensure_player", args)).error?.message).toMatch(/invite_required/);
     expect((await stranger.rpc("ensure_player", { ...args, p_invite: "NOTAREALCODE" })).error?.message).toMatch(/invalid_invite/);
     const code = await invite();
-    const { data: id, error } = await stranger.rpc("ensure_player", { ...args, p_invite: code.toLowerCase().replace(/(.{4})/g, "$1-") });
-    expect(error).toBeNull();
-    const other = as("user_test_other_" + randomUUID().slice(0, 6));
+    expect((await stranger.rpc("ensure_player", { ...args, p_invite: code.toLowerCase().replace(/(.{4})/g, "$1-") })).error).toBeNull();
+    const e2 = `o${randomUUID().slice(0, 8)}@example.test`;
+    const other = as(await authUser(e2), { email: e2 });
     expect((await other.rpc("ensure_player", { ...args, p_username: `o${randomUUID().slice(0, 8)}`, p_invite: code })).error?.message).toMatch(/invalid_invite/); // used
     expect((await a.sb.rpc("ensure_player", { ...args })).data).toBe(a.id); // existing: no invite needed
-    await db`delete from public.invites where used_by = ${id}`; await db`delete from public.players where id = ${id}`;
+  });
+  it("a V1 player links by their verified Google email on first sign-in, and only once", async () => {
+    const email = `v1${randomUUID().slice(0, 6)}@example.test`;
+    await db`delete from public.players where clerk_user_id like 'user_v1_test%'`;
+    const [v1] = await db`insert into public.players (clerk_user_id, username, first_name, last_name)
+                          values (${`user_v1_test_${randomUUID().slice(0, 6)}`}, ${`v1${randomUUID().slice(0, 6)}`}, 'Old', 'Timer') returning id`;
+    await db`insert into public.player_private (player_id, email) values (${v1!.id}, ${email})`;
+    const none = { p_username: "", p_first_name: "", p_last_name: "", p_avatar_url: "" };
+    // not Google, or not verified: no link (would need an invite instead)
+    // (Supabase Auth keeps one account per email; the database still only trusts a verified Google email claim)
+    expect((await as(await authUser(), { email, provider: "email" }).rpc("ensure_player", none)).error?.message).toMatch(/invalid_username|invite_required/);
+    expect((await as(await authUser(), { email, verified: false }).rpc("ensure_player", none)).error?.message).toMatch(/invalid_username|invite_required/);
+    // verified Google with the same email (any case): linked, no invite, history kept
+    const uid = await authUser(email);
+    const { data, error } = await as(uid, { email: email.toUpperCase() }).rpc("ensure_player", none);
+    expect([error, data]).toEqual([null, v1!.id]);
+    expect((await db`select auth_user_id from public.players where id = ${v1!.id}`)[0]!.auth_user_id).toBe(uid);
+    // a second Google account with the same email can't claim an already-linked player
+    expect((await as(await authUser(), { email }).rpc("ensure_player", none)).error?.message).toMatch(/invalid_username|invite_required/);
+    await db`delete from public.player_private where player_id = ${v1!.id}`; await db`delete from public.players where id = ${v1!.id}`;
   });
   it("players can create invites and see only their own, never the codes", async () => {
     const { data: code, error } = await a.sb.rpc("create_invite");

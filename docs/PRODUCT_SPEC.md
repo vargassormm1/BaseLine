@@ -3,9 +3,9 @@
 The heart of it: a group of friends keeping score. Simple to log a match, fun to compare.
 
 ## Who
-Invite-only. Every existing V1 player keeps their account and history; new players join with a one-time invite link
-from an existing player (expires in 14 days, works once). Sign-in is Clerk (email, password and whatever methods the
-Clerk instance allows).
+Invite-only. Sign-in is **Google** (through Supabase Auth). Every V1 player keeps their history: their first Google
+sign-in with the same email links them automatically. New players join with a one-time invite link from an existing
+player (expires in 14 days, works once).
 
 ## Screens
 | Screen | What it does |

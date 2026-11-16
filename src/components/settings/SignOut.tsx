@@ -1,9 +1,11 @@
-"use client";
-import { SignOutButton } from "@clerk/nextjs";
 import { LogOut } from "lucide-react";
+import { signOut } from "@/app/actions";
 import { buttonClass } from "@/components/ui/Button";
-export function SignOut({ testMode }: { testMode: boolean }) {
-  const inner = <><LogOut size={16} aria-hidden="true" />Sign out</>;
-  if (testMode) return <a href="/e2e/sign-in?u=out" className={buttonClass("secondary")}>{inner}</a>;
-  return <SignOutButton redirectUrl="/"><button type="button" className={buttonClass("secondary")}>{inner}</button></SignOutButton>;
+/** Sign out (a POST to our own server action, so it can't be triggered by a link or prefetch). */
+export function SignOut() {
+  return (
+    <form action={signOut}>
+      <button type="submit" className={buttonClass("secondary")}><LogOut size={16} aria-hidden="true" />Sign out</button>
+    </form>
+  );
 }
