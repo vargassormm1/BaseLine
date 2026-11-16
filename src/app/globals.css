@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+/* ==== Baseline design system (docs/ARCHITECTURE.md → Design) ==========================================================
+   "Night court": near-black court green and chalk white, optic yellow (a tennis ball) for wins and the one primary
+   action, clay orange for losses. Archivo across widths: condensed heavy numerals for scores and ranks, slightly
+   expanded heavy display type for names. Solid surfaces, hairlines, no glass. Every text pair is AA (checked by axe). */
+:root {
+  --bg: #f2f1ea; --surface: #ffffff; --surface-2: #f6f5ef; --surface-3: #e8e7df;
+  --line: rgb(18 20 16 / 0.09); --line-strong: rgb(18 20 16 / 0.16);
+  --text: #121410; --text-2: #52574c; --text-3: #5d6256;
+  --ball: #d6f24a; --on-ball: #11140d; --ball-ink: #456000;       /* fill · text on fill · accent text on light */
+  --clay: #e4683c; --clay-ink: #a63f17;
+  --win: var(--ball-ink); --loss: var(--clay-ink);
+  --warn-bg: #fff2cc; --warn-ink: #6b4b00;
+  --scrim: rgb(10 12 9 / 0.5);
+  --shadow: 0 1px 2px rgb(18 20 16 / 0.06), 0 8px 24px -12px rgb(18 20 16 / 0.18);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d0f0c; --surface: #161914; --surface-2: #1d211a; --surface-3: #262b22;
+    --line: rgb(242 243 236 / 0.08); --line-strong: rgb(242 243 236 / 0.15);
+    --text: #f2f3ec; --text-2: #a9ae9f; --text-3: #8f9586;
+    --ball: #d6f24a; --on-ball: #11140d; --ball-ink: #d6f24a;
+    --clay: #f07a4f; --clay-ink: #f58c64;
+    --warn-bg: #3a2f10; --warn-ink: #f3d27a;
+    --scrim: rgb(0 0 0 / 0.6);
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 10px 30px -14px rgb(0 0 0 / 0.7);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d0f0c; --surface: #161914; --surface-2: #1d211a; --surface-3: #262b22;
+  --line: rgb(242 243 236 / 0.08); --line-strong: rgb(242 243 236 / 0.15);
+  --text: #f2f3ec; --text-2: #a9ae9f; --text-3: #8f9586;
+  --ball: #d6f24a; --on-ball: #11140d; --ball-ink: #d6f24a;
+  --clay: #f07a4f; --clay-ink: #f58c64;
+  --warn-bg: #3a2f10; --warn-ink: #f3d27a;
+  --scrim: rgb(0 0 0 / 0.6);
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 10px 30px -14px rgb(0 0 0 / 0.7);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg); --color-surface: var(--surface); --color-surface-2: var(--surface-2); --color-surface-3: var(--surface-3);
+  --color-line: var(--line); --color-line-strong: var(--line-strong);
+  --color-text: var(--text); --color-text-2: var(--text-2); --color-text-3: var(--text-3);
+  --color-ball: var(--ball); --color-on-ball: var(--on-ball); --color-ball-ink: var(--ball-ink);
+  --color-clay: var(--clay); --color-clay-ink: var(--clay-ink); --color-win: var(--win); --color-loss: var(--loss);
+  --color-warn-bg: var(--warn-bg); --color-warn-ink: var(--warn-ink); --color-scrim: var(--scrim);
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --text-micro: 11px; --text-micro--line-height: 14px;
+  --text-caption: 12px; --text-caption--line-height: 16px;
+  --text-sm: 14px; --text-sm--line-height: 20px;
+  --text-base: 16px; --text-base--line-height: 24px;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --animate-rise: rise 280ms var(--ease-out) both;
+}
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-sans); min-height: 100dvh; overscroll-behavior-y: none; }
+  :focus-visible { outline: 2px solid var(--ball-ink); outline-offset: 2px; border-radius: 8px; }
+  ::selection { background: var(--ball); color: var(--on-ball); }
+  button, a, label, summary, [role="button"] { touch-action: manipulation; }
+  input, button, select, textarea { font: inherit; color: inherit; }
+}
+
+@layer utilities {
+  /* scoreboard numerals: condensed, heavy, tabular */
+  .num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
+  .score { font-stretch: 75%; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; line-height: 0.9; }
+  /* athlete display type: slightly expanded, heavy, tight */
+  .display { font-stretch: 112%; font-weight: 800; letter-spacing: -0.035em; line-height: 0.95; }
+  .eyebrow { font-size: 12px; line-height: 16px; font-weight: 600; color: var(--text-2); }
+  .press { transition: transform 120ms var(--ease-out), background-color 120ms, color 120ms, opacity 120ms, border-color 120ms; }
+  .press:active { transform: scale(0.97); }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; }
+  .pb-tabbar { padding-bottom: calc(env(safe-area-inset-bottom) + 96px); }
+  .pt-safe { padding-top: env(safe-area-inset-top); }
+  .no-scrollbar { scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .skeleton { position: relative; overflow: hidden; background: var(--surface-3); border-radius: 10px; }
+  .skeleton::after { content: ""; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.12), transparent); animation: shimmer 1.4s ease-in-out infinite; }
+}
+
+/* the court lines motif: a baseline + center mark, used once per screen as a quiet signature */
+.court-lines { background-image: linear-gradient(var(--line-strong), var(--line-strong)), linear-gradient(var(--line-strong), var(--line-strong)); background-size: 100% 1px, 1px 10px; background-position: 0 100%, 50% 100%; background-repeat: no-repeat; }
+
+dialog.sheet { margin: auto auto 0; width: 100%; max-width: 560px; max-height: 92dvh; border: 0; padding: 0; border-radius: 24px 24px 0 0; background: var(--surface); color: var(--text); animation: sheet-up 260ms var(--ease-out) both; }
+@media (min-width: 640px) { dialog.sheet { margin: auto; border-radius: 24px; animation: rise 200ms var(--ease-out) both; } }
+dialog.sheet::backdrop { background: var(--scrim); animation: fade 200ms ease-out both; }
+
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes sheet-up { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes shimmer { to { transform: translateX(100%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }
+  .press:active { transform: none; }
+  .skeleton::after { display: none; }
+}
