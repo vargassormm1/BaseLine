@@ -171,6 +171,9 @@ begin
             public.points_for(p_format), p_challenge, p_client_key, nullif(trim(p_note), ''))
     returning id into v_id;
   exception when unique_violation then
+    -- the same submission arrived twice at once: hand back the match the first one created
+    select id into v_id from public.matches where client_key = p_client_key and player_one = v_me;
+    if v_id is not null then return v_id; end if;
     raise exception 'duplicate_match';
   end;
   insert into public.match_sets (match_id, set_number, p1_games, p2_games, p1_tiebreak, p2_tiebreak, is_match_tiebreak)
