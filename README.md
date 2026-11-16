@@ -1,20 +1,39 @@
-# BaseLine
+# Baseline
 
-BaseLine is a web application tailored for tennis players, enabling them to sign up, log games, track points, and compare rankings. It simplifies the process of recording match outcomes and viewing player standings. Leveraging Next.js, Ant Design, Prisma, PostgreSQL, and Clerk for authentication, BaseLine creates a robust platform for the tennis community.
+A tennis competition app for a group of friends: record matches (your opponent confirms the score), earn points
+(5 / 10 / 20 for a one-set / best-of-3 / best-of-5 win), climb the rankings, settle rivalries head to head, and
+challenge each other. Invite-only.
 
-## Features
+**Stack:** Next.js 16 (App Router, TypeScript strict) · React 19 · Tailwind 4 · Clerk (sign-in) · Supabase Postgres
+(RLS, validated SQL write functions) · Vercel. Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-- **Secure User Authentication**: Powered by Clerk, offering a seamless signup and login experience.
-- **Game Logging**: Players can log the details of each game, including the match format and results.
-- **Dynamic Point System**: Earn points based on the match format - 5 points for Best of 1 set, 10 points for Best of 3 sets, and 20 points for Best of 5 sets.
-- **Rankings Page**: View a leaderboard of players ranked by points to see the top competitors.
-- **Head-to-Head Comparison**: Select two players to compare their win-loss record against each other.
-- **Recent Games Display**: The homepage features a list of the most recent games, highlighting active play sessions.
+## Develop
+```bash
+npm install                 # uses .npmrc (legacy-peer-deps) — see docs/DECISIONS.md
+supabase start              # local Supabase on ports 553xx (fictional seed data)
+supabase db reset           # re-apply migrations + seed
+cp .env.example .env.development.local   # point at local Supabase + the TEST Clerk instance
+npm run dev                 # http://localhost:3100
+```
 
-## Technologies Used
+## Test
+```bash
+npm run typecheck
+npm test                    # tennis engine + guard tests
+npm run test:db             # RLS, permissions and every write rule, against local Supabase
+npm run test:e2e            # phone + desktop browser tests (production build, local test sign-in)
+```
 
-- **Frontend**: Next.js, Ant Design (antd)
-- **Backend**: Next.js API Routes
-- **Database**: PostgreSQL
-- **ORM**: Prisma
-- **Authentication and User Management**: Clerk
+## Docs
+| | |
+|---|---|
+| [PRODUCT_SPEC](docs/PRODUCT_SPEC.md) | what the app does, match and ranking rules |
+| [ARCHITECTURE](docs/ARCHITECTURE.md) | structure, data flow, design system |
+| [DATABASE](docs/DATABASE.md) | schema, RLS, write functions |
+| [SECURITY](docs/SECURITY.md) | authorization model, protections, open risks |
+| [MIGRATION](docs/MIGRATION.md) | V1 → V2 data migration, cutover runbook, rollback |
+| [DECISIONS](docs/DECISIONS.md) | why things are the way they are |
+| [CHANGELOG](docs/CHANGELOG.md) | what changed from V1 |
+
+Deploying to production and the production data migration both require the owner's explicit approval
+(see MIGRATION.md).
