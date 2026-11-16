@@ -3,6 +3,7 @@ import { requirePlayer } from "@/lib/server/session";
 import { loadBoard } from "@/lib/server/data";
 import { Rail, TabBar, Wordmark } from "@/components/shell/Nav";
 import { attentionCount } from "@/lib/ui/inbox";
+import { Toaster } from "@/components/ui/Toast";
 
 /** Signed-in frame: rail on desktop, tab bar on phones. Every page inside also calls requirePlayer(). */
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -18,6 +19,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       </aside>
       <main id="main" className="pt-safe pb-tabbar mx-auto w-full max-w-[1040px] px-4 sm:px-6 lg:pb-16 lg:pt-8">{children}</main>
       <TabBar {...nav} />
+      <Toaster />
     </div>
   );
 }

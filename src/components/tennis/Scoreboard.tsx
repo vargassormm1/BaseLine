@@ -20,7 +20,7 @@ export function ScoreRows({ m, byId, size = "md" }: { m: Match; byId: ById; size
         <Avatar player={p} size={lg ? "lg" : "sm"} />
         <span className={`min-w-0 flex-1 truncate ${lg ? "text-lg" : "text-[15px]"} ${won ? "font-bold text-text" : "font-medium text-text-2"}`}>
           {lg ? displayName(p) : shortName(p)}
-          {won ? <span className="ml-2 inline-block size-2 rounded-full bg-ball align-middle" aria-label="winner" /> : null}
+          {won ? <><span className="ml-2 inline-block size-2 rounded-full bg-ball align-middle" aria-hidden="true" /><span className="sr-only"> (winner)</span></> : null}
         </span>
         <span className="flex items-baseline gap-1">
           {m.sets.map((s, i) => {

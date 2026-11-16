@@ -13,9 +13,11 @@ export const recordMatch = z.object({
   sets: z.array(setScore).min(1).max(5),
   challenge: uuid.nullable(),
   note: z.string().trim().max(140).optional(),
+  allowDuplicate: z.boolean().optional(),
 });
 export const username = z.string().trim().regex(/^[A-Za-z0-9_.-]{3,24}$/, "Use 3–24 letters, numbers, dots, dashes or underscores.");
 export const profile = z.object({ username, firstName: z.string().trim().max(40), lastName: z.string().trim().max(40) });
+export const welcome = profile.extend({ invite: z.string().trim().min(6, "Enter the invite code from your friend.").max(40) });
 export const challenge = z.object({
   opponent: uuid, format, message: z.string().trim().max(140).optional(), proposedFor: z.union([z.iso.date(), z.literal("")]).optional(),
 });

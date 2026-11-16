@@ -18,15 +18,15 @@ export default async function Landing() {
     <main className="pt-safe min-h-dvh">
       <header className="mx-auto flex max-w-[1040px] items-center justify-between px-5 py-5">
         <Wordmark />
-        <Link href={signIn} className={buttonClass("ghost", "sm")}>Sign in</Link>
+        <Link href={signIn} prefetch={false} className={buttonClass("ghost", "sm")}>Sign in</Link>
       </header>
 
       <section className="mx-auto max-w-[1040px] px-5 pt-10 pb-16 sm:pt-20">
         <h1 className="display max-w-[11ch] text-[64px] sm:text-[104px]">Every match counts.</h1>
         <p className="mt-6 max-w-[46ch] text-lg text-text-2">Baseline is where your tennis group keeps score: log matches, settle rivalries and see who&apos;s really on top.</p>
         <div className="mt-9 flex flex-wrap gap-3">
-          <Link href={e2eAuthEnabled() ? signIn : "/sign-up"} className={buttonClass("primary", "lg")}>Join your group</Link>
-          <Link href={signIn} className={buttonClass("secondary", "lg")}>I have an account</Link>
+          <Link href={e2eAuthEnabled() ? signIn : "/sign-up"} prefetch={false} className={buttonClass("primary", "lg")}>Join your group</Link>
+          <Link href={signIn} prefetch={false} className={buttonClass("secondary", "lg")}>I have an account</Link>
         </div>
       </section>
 

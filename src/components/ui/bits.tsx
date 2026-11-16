@@ -15,11 +15,11 @@ export function FormDots({ form, size = 8 }: { form: Result[]; size?: number }) 
 
 /** Places gained or lost in the last 7 days. */
 export function Movement({ by }: { by: number | null }) {
-  if (by === null) return <span className="text-micro font-bold text-text-3" aria-label="New this week">NEW</span>;
-  if (by === 0) return <Minus size={12} className="text-text-3" aria-label="No change this week" />;
+  if (by === null) return <span className="text-micro font-bold text-text-3">new<span className="sr-only"> this week</span></span>;
+  if (by === 0) return <span><Minus size={12} className="text-text-3" aria-hidden="true" /><span className="sr-only">no change this week</span></span>;
   return by > 0
-    ? <span className="inline-flex items-center text-micro font-bold text-ball-ink" aria-label={`Up ${by} this week`}><ArrowUp size={12} strokeWidth={3} aria-hidden="true" />{by}</span>
-    : <span className="inline-flex items-center text-micro font-bold text-clay-ink" aria-label={`Down ${-by} this week`}><ArrowDown size={12} strokeWidth={3} aria-hidden="true" />{-by}</span>;
+    ? <span className="inline-flex items-center text-micro font-bold text-ball-ink"><ArrowUp size={12} strokeWidth={3} aria-hidden="true" /><span className="sr-only">up </span>{by}<span className="sr-only"> this week</span></span>
+    : <span className="inline-flex items-center text-micro font-bold text-clay-ink"><ArrowDown size={12} strokeWidth={3} aria-hidden="true" /><span className="sr-only">down </span>{-by}<span className="sr-only"> this week</span></span>;
 }
 
 export function Pill({ tone = "neutral", children }: { tone?: "neutral" | "win" | "loss" | "warn" | "ball"; children: ReactNode }) {

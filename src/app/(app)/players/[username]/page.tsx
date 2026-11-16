@@ -92,7 +92,7 @@ export default async function Profile({ params }: { params: Promise<{ username: 
         <SectionHeader id="badges" title="Achievements" />
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           {badges.map((a) => (
-            <li key={a.key} className={`card p-4 ${a.earned ? "" : "opacity-70"}`}>
+            <li key={a.key} className={`card p-4 ${a.earned ? "" : "border-dashed"}`}>
               <span className={`mb-3 grid size-10 place-items-center rounded-full ${a.earned ? "bg-ball text-on-ball" : "bg-surface-3 text-text-3"}`}>
                 {a.earned ? <Award size={19} aria-hidden="true" /> : <Lock size={16} aria-hidden="true" />}
               </span>

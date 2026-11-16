@@ -36,7 +36,7 @@ async function e2eIdentity(): Promise<Identity | null> {
   if (!secret) return null;
   const b64 = (o: object) => Buffer.from(JSON.stringify(o)).toString("base64url");
   const now = Math.floor(Date.now() / 1000);
-  const body = `${b64({ alg: "HS256", typ: "JWT" })}.${b64({ sub, role: "authenticated", aud: "authenticated", iat: now, exp: now + 300 })}`;
+  const body = `${b64({ alg: "HS256", typ: "JWT" })}.${b64({ iss: "baseline-local-test", sub, role: "authenticated", aud: "authenticated", iat: now, exp: now + 300 })}`;
   const jwt = `${body}.${createHmac("sha256", secret).update(body).digest("base64url")}`;
   return {
     userId: sub,

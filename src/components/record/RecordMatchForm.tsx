@@ -48,6 +48,7 @@ export function RecordMatchForm({ me, opponents, recent, today, initial }: Recor
   const [picks, setPicks] = useState<Pick[]>([emptyPick(), emptyPick(), emptyPick(), emptyPick(), emptyPick()]);
   const [note, setNote] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [duplicate, setDuplicate] = useState(false);
   const [pending, start] = useTransition();
   const opp = opponents.find((o) => o.id === opponent);
   const locked = initial.challenge !== null;
@@ -57,16 +58,16 @@ export function RecordMatchForm({ me, opponents, recent, today, initial }: Recor
   const shown = setsToShow(format, deciding, entered);
   const sets = entered.slice(0, shown);
   const check = checkMatch(format, deciding, sets as SetScore[]);
-  const setPick = (i: number, p: Partial<Pick>) => { setError(null); setPicks((ps) => ps.map((x, j) => (j === i ? { ...x, ...p } : x))); };
+  const setPick = (i: number, p: Partial<Pick>) => { setError(null); setDuplicate(false); setPicks((ps) => ps.map((x, j) => (j === i ? { ...x, ...p } : x))); };
 
   const quick = recent.map((id) => opponents.find((o) => o.id === id)).filter((o): o is Player => !!o).slice(0, 6);
   const filtered = query.trim() ? opponents.filter((o) => `${o.username} ${o.firstName} ${o.lastName}`.toLowerCase().includes(query.trim().toLowerCase())) : [];
 
-  const submit = () => {
+  const submit = (allowDuplicate = false) => {
     if (!opponent || !check.ok) return;
     start(async () => {
-      const r = await recordMatch({ clientKey, opponent, format, deciding, playedOn, sets, challenge: initial.challenge, note: note.trim() || undefined });
-      if (!r.ok) { setError(r.error); return; }
+      const r = await recordMatch({ clientKey, opponent, format, deciding, playedOn, sets, challenge: initial.challenge, note: note.trim() || undefined, allowDuplicate });
+      if (!r.ok) { setError(r.error); setDuplicate(r.duplicate === true); return; }
       router.push(`/matches/${r.id}?recorded=1`);
     });
   };
@@ -153,7 +154,7 @@ export function RecordMatchForm({ me, opponents, recent, today, initial }: Recor
                   const p = picks[i]!, mtb = isMtb(i);
                   const needsTb = mtb ? p.winner !== null : p.score?.[0] === 7 && p.score?.[1] === 6;
                   return (
-                    <motion.li key={`${format}-${deciding}-${i}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.22 }} className="card p-4">
+                    <motion.li key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.22 }} className="card p-4">
                       <p className="mb-3 text-sm font-bold">{mtb ? "Match tiebreak" : `Set ${i + 1}`}</p>
                       <div role="radiogroup" aria-label={`Who won ${mtb ? "the match tiebreak" : `set ${i + 1}`}?`} className="grid grid-cols-2 gap-2">
                         {(["me", "them"] as Side[]).map((sd) => (
@@ -216,7 +217,8 @@ export function RecordMatchForm({ me, opponents, recent, today, initial }: Recor
             </p>
           </div>
           {error ? <p role="alert" className="mt-3 text-sm font-semibold text-clay-ink">{error}</p> : null}
-          <Button full size="lg" className="mt-4" disabled={!opponent || !check.ok} loading={pending} onClick={submit}>
+          {duplicate ? <Button full variant="secondary" className="mt-3" loading={pending} onClick={() => submit(true)}>It&apos;s a different match: record anyway</Button> : null}
+          <Button full size="lg" className="mt-4" disabled={!opponent || !check.ok} loading={pending} onClick={() => submit()}>
             {opp ? `Send to ${shortName(opp)} to confirm` : "Record match"}
           </Button>
           <p className="mt-2 text-center text-caption text-text-3">{opp ? shortName(opp) : "Your opponent"} confirms the score, then it counts.</p>

@@ -3,6 +3,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Check, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { toast } from "@/components/ui/Toast";
 import { cancelChallenge, cancelMatch, respondChallenge, respondMatch, voidMatch, type ActionResult } from "@/app/actions";
 
 function useAct() {
@@ -11,8 +12,8 @@ function useAct() {
   const router = useRouter();
   const run = (fn: () => Promise<ActionResult>, done: string) => start(async () => {
     const r = await fn();
-    setMsg(r.ok ? { ok: true, text: done } : { ok: false, text: r.error });
-    if (r.ok) router.refresh();
+    // success: a toast (the card often disappears once answered); failure: stays next to the buttons
+    if (r.ok) { setMsg(null); toast(done); router.refresh(); } else setMsg({ ok: false, text: r.error });
   });
   const note = msg ? <p role={msg.ok ? "status" : "alert"} className={`mt-2 text-sm font-medium ${msg.ok ? "text-ball-ink" : "text-clay-ink"}`}>{msg.text}</p> : null;
   return { pending, run, note };

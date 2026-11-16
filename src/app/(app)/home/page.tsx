@@ -32,6 +32,7 @@ export default async function Home() {
 
   return (
     <div className="animate-rise space-y-8">
+      <h1 className="sr-only">Home</h1>
       {/* athlete card */}
       <section aria-label="Your standing" className="court-lines relative overflow-hidden rounded-[28px] border border-white/10 bg-[#0d0f0c] px-5 pt-5 pb-6 text-[#f2f3ec] sm:px-7 sm:pt-7">
         <div className="flex items-center gap-3">
@@ -45,7 +46,7 @@ export default async function Home() {
         <div className="mt-6 flex items-end gap-6">
           <div>
             <p className="text-caption font-semibold text-[#a9ae9f]">All-time rank</p>
-            <p className="score text-[96px] text-[#d6f24a]" aria-label={mine.rank ? `Rank ${mine.rank}` : "Not ranked yet"}>{mine.rank ? `#${mine.rank}` : "–"}</p>
+            <p className="score text-[96px] text-[#d6f24a]">{mine.rank ? `#${mine.rank}` : <><span aria-hidden="true">–</span><span className="sr-only">Not ranked yet</span></>}</p>
           </div>
           <div className="pb-2">
             <p className="score text-[44px]">{mine.points}</p>

@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { chooseUsername, updateProfile } from "@/app/actions";
 import { Button } from "@/components/ui/Button";
 
-export function ProfileForm({ initial, mode }: { initial: { username: string; firstName: string; lastName: string }; mode: "edit" | "welcome" }) {
+export function ProfileForm({ initial, mode }: { initial: { username: string; firstName: string; lastName: string; invite?: string }; mode: "edit" | "welcome" }) {
   const [v, setV] = useState(initial);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [pending, start] = useTransition();
@@ -16,8 +16,15 @@ export function ProfileForm({ initial, mode }: { initial: { username: string; fi
       start(async () => {
         const r = await (mode === "welcome" ? chooseUsername(v) : updateProfile(v));
         if (r.ok) { setMsg({ ok: true, text: "Saved." }); router.refresh(); } else setMsg({ ok: false, text: r.error });
+        // (welcome redirects on success, so the message is only seen in Settings)
       });
     }}>
+      {mode === "welcome" ? (
+        <label className="block"><span className="eyebrow">Invite code</span>
+          <input required value={v.invite ?? ""} onChange={(e) => setV({ ...v, invite: e.target.value })} autoCapitalize="characters" autoCorrect="off" spellCheck={false} className={`${field} font-semibold tracking-[0.12em]`} aria-describedby="inv-help" />
+          <span id="inv-help" className="mt-1 block text-caption text-text-3">Baseline is invite-only. Your invite link fills this in.</span>
+        </label>
+      ) : null}
       <label className="block"><span className="eyebrow">Username</span>
         <input required value={v.username} onChange={(e) => setV({ ...v, username: e.target.value })} pattern="[A-Za-z0-9_.\-]{3,24}" autoCapitalize="none" autoCorrect="off" spellCheck={false} className={field} aria-describedby="un-help" />
         <span id="un-help" className="mt-1 block text-caption text-text-3">3–24 letters, numbers, dots, dashes or underscores. It&apos;s your profile link.</span>

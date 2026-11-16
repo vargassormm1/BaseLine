@@ -19,6 +19,10 @@ const MESSAGES: Record<string, string> = {
   invalid_reason: "Add a short reason (3–200 characters).",
   not_confirmed: "Only confirmed matches can be voided.",
   not_found: "That doesn't exist anymore.",
+  invite_required: "Baseline is invite-only. Ask a player for an invite link.",
+  invalid_invite: "That invite code isn't valid (or was already used, or expired).",
+  possible_duplicate: "Looks like this match is already recorded (same opponent, day and score).",
+  too_old_to_confirm: "This result is more than a year old, so it can't be confirmed anymore. It can still be withdrawn.",
 };
 export function friendlyError(raw: string | undefined | null): string {
   const msg = raw ?? "";

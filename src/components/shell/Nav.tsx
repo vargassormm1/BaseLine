@@ -31,7 +31,7 @@ export function TabBar({ meHref, attention }: NavProps) {
               className={`press relative flex h-14 flex-col items-center justify-center gap-0.5 text-micro font-semibold ${isOn(path, t.href) ? "text-text" : "text-text-3"}`}>
               <t.icon size={22} strokeWidth={isOn(path, t.href) ? 2.4 : 1.9} aria-hidden="true" />
               {t.label}
-              {t.dot ? <span className="absolute top-2 right-[calc(50%-16px)] size-2 rounded-full bg-clay ring-2 ring-surface" aria-label={`${attention} waiting for you`} /> : null}
+              {t.dot ? <><span className="absolute top-2 right-[calc(50%-16px)] size-2 rounded-full bg-clay ring-2 ring-surface" aria-hidden="true" /><span className="sr-only">, {attention} waiting for you</span></> : null}
             </Link>
           </li>
         ))}

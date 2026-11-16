@@ -5,6 +5,7 @@ import { Flag, X } from "lucide-react";
 import { createChallenge } from "@/app/actions";
 import { FORMAT_LABEL, type Format, type Player } from "@/lib/tennis/types";
 import { Button } from "@/components/ui/Button";
+import { toast } from "@/components/ui/Toast";
 import { addDays } from "@/lib/tennis/dates";
 
 /** "Challenge someone" in a sheet (bottom sheet on phones, dialog on desktop). */
@@ -23,7 +24,7 @@ export function NewChallenge({ players, today, preset, label = "New challenge" }
     start(async () => {
       const r = await createChallenge({ opponent, format, message: message.trim() || undefined, proposedFor: date });
       if (!r.ok) { setError(r.error); return; }
-      close(); setMessage(""); setDate(""); router.refresh();
+      close(); setMessage(""); setDate(""); toast("Challenge sent."); router.refresh();
     });
   };
   const input = "h-12 w-full rounded-2xl border border-line-strong bg-surface-2 px-4 text-base outline-none focus:border-ball-ink";
