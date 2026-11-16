@@ -21,7 +21,7 @@
   - Points are fixed on each match, and standings are derived, never counters.
 - **Abuse limits:**
   - Rate limits per player: recording 20/hour, answering 120/hour, challenges 15/day, invites 10/day, profile 10/hour.
-  - Sign-in and sign-up abuse is handled by Clerk.
+  - Sign-in abuse is limited by Supabase Auth's built-in rate limits and by Google itself.
 - **Validation:** zod at the app boundary, plus the same rules in SQL (shared tennis-score test vectors). IDs are UUID-checked and usernames regex-checked.
 - **Sign-in flow:**
   - Google OAuth with PKCE. `/auth/google` is a GET link, so the CSP's form-action never blocks it.
