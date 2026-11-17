@@ -3,7 +3,7 @@ import { createServerClient } from "@supabase/ssr";
 
 // Every request: a per-request nonce CSP, a Supabase session refresh (rotated cookies), and a sign-in gate for the
 // app (pages check again with requirePlayer()). Public: landing, sign-in, the Google round trip, invite links.
-const PUBLIC = [/^\/$/, /^\/sign-in$/, /^\/auth\/(google|callback)$/, /^\/join\/[^/]+$/, /^\/e2e\/sign-in$/];
+const PUBLIC = [/^\/$/, /^\/sign-in$/, /^\/auth\/(google|callback|confirm)$/, /^\/join\/[^/]+$/, /^\/e2e\/sign-in$/];
 const COOKIE = { httpOnly: true, sameSite: "lax" as const, path: "/" };
 
 function csp(nonce: string) {
@@ -12,6 +12,8 @@ function csp(nonce: string) {
     "default-src 'self'", `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${dev ? " 'unsafe-eval'" : ""}`, "style-src 'self' 'unsafe-inline'",
     `img-src 'self' data: ${process.env.SUPABASE_URL ? `${process.env.SUPABASE_URL}/storage/v1/object/public/avatars/` : ""}`.trim(), "font-src 'self'", "connect-src 'self'",
     "frame-ancestors 'none'", "object-src 'none'", "base-uri 'self'", "form-action 'self'",
+    // the Turnstile bot check (only when it's configured) runs in Cloudflare's frame
+    ...(process.env.TURNSTILE_SITE_KEY ? ["frame-src https://challenges.cloudflare.com"] : []),
   ].join("; ");
 }
 
@@ -26,8 +28,9 @@ export default async function proxy(req: NextRequest) {
   let res = NextResponse.next({ request: { headers } });
 
   let signedIn = false;
-  if (testMode()) {
-    signedIn = req.cookies.has("baseline_e2e_user");
+  // local tests: the test sign-in cookie, or a real (local) Supabase session from email sign-in
+  if (testMode() && req.cookies.has("baseline_e2e_user")) {
+    signedIn = true;
   } else {
     const url = process.env.SUPABASE_URL, key = process.env.SUPABASE_PUBLISHABLE_KEY;
     if (url && key) {

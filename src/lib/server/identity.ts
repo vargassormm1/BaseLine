@@ -35,7 +35,7 @@ const split = (full: string) => { const [first = "", ...rest] = full.trim().spli
  *  with the project's public keys, so a normal navigation needs no round trip to the Auth server; the database
  *  verifies the same token again on every query. A revoked session stops working when its token expires (≤ 1 hour). */
 export async function identity(): Promise<Identity | null> {
-  if (e2eAuthEnabled()) return e2eIdentity();
+  if (e2eAuthEnabled()) { const t = await e2eIdentity(); if (t) return t; }
   const sb = await supabaseForRequest();
   const { data, error } = await sb.auth.getClaims();
   const c = data?.claims;

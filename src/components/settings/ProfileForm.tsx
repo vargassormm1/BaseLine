@@ -30,7 +30,7 @@ export function ProfileForm({ initial, mode }: { initial: { username: string; fi
         <span id="un-help" className="mt-1 block text-caption text-text-3">3–24 letters, numbers, dots, dashes or underscores. It&apos;s your profile link.</span>
       </label>
       <div className="grid grid-cols-2 gap-3">
-        <label className="block"><span className="eyebrow">First name</span><input value={v.firstName} maxLength={40} onChange={(e) => setV({ ...v, firstName: e.target.value })} className={field} autoComplete="given-name" /></label>
+        <label className="block"><span className="eyebrow">First name</span><input value={v.firstName} required={mode === "welcome"} maxLength={40} onChange={(e) => setV({ ...v, firstName: e.target.value })} className={field} autoComplete="given-name" /></label>
         <label className="block"><span className="eyebrow">Last name</span><input value={v.lastName} maxLength={40} onChange={(e) => setV({ ...v, lastName: e.target.value })} className={field} autoComplete="family-name" /></label>
       </div>
       {msg ? <p role={msg.ok ? "status" : "alert"} className={`text-sm font-semibold ${msg.ok ? "text-accent-ink" : "text-loss-ink"}`}>{msg.text}</p> : null}

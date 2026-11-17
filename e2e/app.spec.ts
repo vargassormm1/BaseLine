@@ -291,3 +291,94 @@ test("phone: settings and the invite link are reachable without the desktop rail
   await expect(page).toHaveURL(/\/settings#invite$/);
   await expect(page.getByRole("button", { name: "Create invite link" })).toBeInViewport();
 });
+
+// ---- email + password accounts (real local Supabase Auth; emails caught by the local Mailpit) ----------------------
+const MAILPIT = "http://127.0.0.1:55324/api/v1";
+async function emailLink(to: string, subject: RegExp): Promise<string> {
+  for (let i = 0; i < 40; i++) {
+    const list = await (await fetch(`${MAILPIT}/search?query=${encodeURIComponent(`to:"${to}"`)}`)).json() as { messages: { ID: string; Subject: string }[] };
+    const m = list.messages.find((x) => subject.test(x.Subject));
+    if (m) {
+      const html = (await (await fetch(`${MAILPIT}/message/${m.ID}`)).json() as { HTML: string }).HTML;
+      const href = /href="([^"]*\/auth\/confirm\?[^"]+)"/.exec(html)?.[1];
+      if (href) return href.replaceAll("&amp;", "&");
+    }
+    await new Promise((r) => setTimeout(r, 250));
+  }
+  throw new Error(`no "${subject}" email for ${to}`);
+}
+
+test("email sign-up: confirm by link, join with an invite, sign back in, reset the password", async ({ page }) => {
+  const { resetEmailAccounts } = await import("./global-setup");
+  await resetEmailAccounts();
+  const addr = `pat-${test.info().project.name}@mail.e2e.test`;
+
+  // the invite link opens "Create account"
+  await page.goto("/join/EMAI-LINV-ITE1");
+  await expect(page.getByRole("tab", { name: "Create account" })).toHaveAttribute("aria-selected", "true");
+  await page.getByLabel("Email").fill(addr);
+  await page.getByLabel("Password").fill("short1");
+  await page.getByRole("button", { name: "Create account" }).click();
+  await expect(page.getByRole("alert").filter({ hasText: /./ })).toHaveText(/at least 10 characters/);
+  await page.getByLabel("Password").fill("rally-point-2026");
+  await page.getByRole("button", { name: "Create account" }).click();
+  await expect(page.getByText("Check your email")).toBeVisible();
+
+  // can't sign in before confirming; the same answer for an address that's already taken (no account probing)
+  await page.getByRole("button", { name: "Back to sign in" }).click();
+  await page.getByLabel("Email").fill(addr);
+  await page.getByLabel("Password").fill("rally-point-2026");
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page.getByRole("alert").filter({ hasText: /./ })).toHaveText(/Confirm your email first/);
+
+  await page.goto(await emailLink(addr, /Confirm your email/));
+  await expect(page).toHaveURL(/\/welcome$/);
+  await expect(page.getByLabel("Invite code")).toHaveValue("EMAILINVITE1");
+  await page.getByLabel("Username").fill(`pat_${test.info().project.name}`);
+  await page.getByLabel("First name").fill("Pat");
+  await page.getByLabel("Last name").fill("Mailer");
+  await page.getByRole("button", { name: "Let's play" }).click();
+  await expect(page).toHaveURL(/\/home$/);
+  await expect(page.getByText("Hi Pat")).toBeVisible();
+
+  // a used confirmation link doesn't work twice
+  await page.context().clearCookies();
+  await page.goto(await emailLink(addr, /Confirm your email/));
+  await expect(page).toHaveURL(/\/sign-in\?error=link$/);
+  await expect(page.getByRole("alert").filter({ hasText: /./ })).toHaveText(/expired or was already used/);
+
+  // wrong password, then forgot password → new password → in
+  await page.getByLabel("Email").fill(addr);
+  await page.getByLabel("Password").fill("not-the-password-1");
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page.locator("#email-form").getByRole("alert")).toHaveText("That email and password don't match.");
+  await page.getByRole("button", { name: "Forgot password?" }).click();
+  await page.getByLabel("Email").fill(addr);
+  await page.getByRole("button", { name: "Send reset link" }).click();
+  await expect(page.getByText("Check your email")).toBeVisible();
+  await page.goto(await emailLink(addr, /Reset your/));
+  await expect(page).toHaveURL(/\/reset-password$/);
+  await page.getByLabel("New password").fill("second-serve-77");
+  await page.getByLabel("Type it again").fill("second-serve-78");
+  await page.getByRole("button", { name: "Save password" }).click();
+  await expect(page.getByRole("alert").filter({ hasText: /./ })).toHaveText("The passwords don't match.");
+  await page.getByLabel("New password").fill("second-serve-77");
+  await page.getByLabel("Type it again").fill("second-serve-77");
+  await page.getByRole("button", { name: "Save password" }).click();
+  await expect(page).toHaveURL(/\/home$/);
+
+  await page.context().clearCookies();
+  await page.goto("/sign-in");
+  await page.getByLabel("Email").fill(addr);
+  await page.getByLabel("Password").fill("second-serve-77");
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page).toHaveURL(/\/home$/);
+});
+
+test("an unknown email gets the same 'check your email' answer for sign-up and reset", async ({ page }) => {
+  await page.goto("/sign-in");
+  await page.getByRole("button", { name: "Forgot password?" }).click();
+  await page.getByLabel("Email").fill("nobody@mail.e2e.test");
+  await page.getByRole("button", { name: "Send reset link" }).click();
+  await expect(page.getByText("Check your email")).toBeVisible();
+});

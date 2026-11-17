@@ -20,3 +20,14 @@ export async function resetFixtures() {
 }
 
 export default resetFixtures;
+
+/** Email + password test accounts (fictional addresses on a reserved test domain): remove them and renew their invite. */
+export async function resetEmailAccounts() {
+  const db = postgres("postgresql://postgres:postgres@127.0.0.1:55322/postgres", { max: 1, onnotice: () => {} });
+  try {
+    await db`delete from public.players where auth_user_id in (select id from auth.users where email like '%@mail.e2e.test')`;
+    await db`delete from auth.users where email like '%@mail.e2e.test'`;
+    await db`delete from public.invites where code_hash = encode(extensions.digest('EMAILINVITE1', 'sha256'), 'hex')`;
+    await db`insert into public.invites (code_hash, created_by) values (encode(extensions.digest('EMAILINVITE1', 'sha256'), 'hex'), ${ANA})`;
+  } finally { await db.end(); }
+}

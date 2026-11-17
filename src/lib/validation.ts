@@ -21,3 +21,11 @@ export const welcome = profile.extend({ invite: z.string().trim().min(6, "Enter 
 export const challenge = z.object({
   opponent: uuid, format, message: z.string().trim().max(140).optional(), proposedFor: z.union([z.iso.date(), z.literal("")]).optional(),
 });
+
+// email + password accounts (Supabase Auth enforces the same password rules server-side)
+export const email = z.string().trim().toLowerCase().email("Enter a valid email address.").max(254);
+export const password = z.string().min(10, "Use at least 10 characters.").max(72, "Use 72 characters or fewer.")
+  .regex(/[A-Za-z]/, "Include at least one letter.").regex(/[0-9]/, "Include at least one number.");
+export const emailSignIn = z.object({ email, password: z.string().min(1, "Enter your password.").max(72) });
+export const emailSignUp = z.object({ email, password });
+export const newPassword = z.object({ password, confirm: z.string() }).refine((v) => v.password === v.confirm, { message: "The passwords don't match.", path: ["confirm"] });
