@@ -38,7 +38,7 @@ per request (`react.cache`). At this group's scale (hundreds of matches) this is
 if it ever reaches thousands, page match history and move standings into a SQL view.
 
 ## Design system (sport-neutral)
-- **Tokens:** `src/app/globals.css`. Midnight navy and off-white surfaces; **electric blue** (`--accent`) for the one primary action, selection and wins; **victory gold** (`--gold`) only for first place; a restrained red (`--loss`) for losses and errors. No sport in any token name.
+- **Tokens:** `src/app/globals.css`. Charcoal and warm off-white surfaces; **forest green** (`--panel`, #163D32) for the brand panels and the icon; **sport green** (`--accent`, #22A06B, always with dark text on it) for the one primary action, selection and wins; a restrained red (`--loss`) for losses and errors. No sport in any token name.
 - **Type:** Archivo across widths. `.score` (condensed 75%, heavy, tabular) for scoreboard numerals; `.display` (112% wide, heavy) for names and headings.
 - **Surfaces:** solid only, no glass. The dark "athlete card" and the H2H matchup stay dark in both themes, as signature moments.
 - **Contrast:** every text pair is AA (axe runs in e2e, light and dark).

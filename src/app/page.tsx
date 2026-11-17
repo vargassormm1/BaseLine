@@ -18,7 +18,7 @@ const LAST_FIVE: ("A" | "J")[] = ["A", "J", "A", "A", "J"]; // newest first; con
 
 function Disc({ name, dark = false, size = 40 }: { name: string; dark?: boolean; size?: number }) {
   return (
-    <span aria-hidden="true" className={`inline-grid shrink-0 place-items-center rounded-full font-bold ${dark ? "bg-white/10 text-[#f8fafc]" : "bg-surface-3 text-text-2"}`}
+    <span aria-hidden="true" className={`inline-grid shrink-0 place-items-center rounded-full font-bold ${dark ? "bg-white/10 text-[#f7f8f4]" : "bg-surface-3 text-text-2"}`}
       style={{ width: size, height: size, fontSize: Math.round(size * 0.4) }}>{name[0]}</span>
   );
 }
@@ -49,24 +49,24 @@ export default async function Landing() {
 
         {/* match result → what it does to the table */}
         <div className="relative" role="img" aria-label="Example: Alex beats Jordan 6–4, 6–3 in a best of three, earns 10 points and takes the top spot from Jordan.">
-          <div aria-hidden="true" className="rounded-[28px] border border-white/10 bg-[#111827] p-6 text-[#f8fafc] sm:p-7">
-            <div className="flex items-center justify-between text-caption font-semibold text-[#94a3b8]"><span>Match complete</span><span>Best of 3</span></div>
+          <div aria-hidden="true" className="rounded-[28px] border border-white/10 bg-[#163d32] p-6 text-[#f7f8f4] sm:p-7">
+            <div className="flex items-center justify-between text-caption font-semibold text-[#a9bdb5]"><span>Match complete</span><span>Best of 3</span></div>
             {[{ n: "Alex", s: [6, 6], won: true }, { n: "Jordan", s: [4, 3], won: false }].map((p) => (
               <div key={p.n} className="mt-4 flex items-center gap-3">
                 <Disc name={p.n} dark size={44} />
-                <span className={`flex-1 text-xl font-bold ${p.won ? "" : "text-[#94a3b8]"}`}>{p.n}{p.won ? <span className="ml-2 inline-block size-2.5 rounded-full bg-[#8ea2ff] align-middle" /> : null}</span>
-                {p.s.map((g, i) => <span key={i} className={`score num w-9 text-center text-[40px] sm:w-11 sm:text-[46px] ${p.won ? "" : "text-[#94a3b8]"}`}>{g}</span>)}
+                <span className={`flex-1 text-xl font-bold ${p.won ? "" : "text-[#a9bdb5]"}`}>{p.n}{p.won ? <span className="ml-2 inline-block size-2.5 rounded-full bg-[#6fd3a0] align-middle" /> : null}</span>
+                {p.s.map((g, i) => <span key={i} className={`score num w-9 text-center text-[40px] sm:w-11 sm:text-[46px] ${p.won ? "" : "text-[#a9bdb5]"}`}>{g}</span>)}
               </div>
             ))}
             <div className="mt-6 flex items-end justify-between border-t border-white/10 pt-4">
               <p className="text-lg font-bold">Alex wins</p>
-              <p className="score text-[40px] text-[#8ea2ff]">+10 <span className="text-base font-semibold text-[#94a3b8]">points</span></p>
+              <p className="score text-[40px] text-[#6fd3a0]">+10 <span className="text-base font-semibold text-[#a9bdb5]">points</span></p>
             </div>
           </div>
           <div aria-hidden="true" className="card relative -mt-5 ml-auto w-[86%] overflow-hidden shadow-[var(--shadow)] sm:w-[72%]">
             {TABLE.slice(0, 2).map((r) => (
               <div key={r.name} className={`flex items-center gap-3 px-4 py-2.5 ${r.rank === 1 ? "bg-surface" : "border-t border-line bg-surface-2"}`}>
-                <span className={`score w-6 text-[24px] ${r.rank === 1 ? "text-gold-ink" : ""}`}>{r.rank}</span>
+                <span className={`score w-6 text-[24px] ${r.rank === 1 ? "text-accent-ink" : ""}`}>{r.rank}</span>
                 {r.move > 0 ? <ArrowUp size={14} strokeWidth={3} className="text-accent-ink" /> : <ArrowDown size={14} strokeWidth={3} className="text-loss-ink" />}
                 <span className="flex-1 font-bold">{r.name}</span>
                 <span className="score num text-[22px]">{r.pts}</span><span className="text-micro font-semibold text-text-3">pts</span>
@@ -94,27 +94,27 @@ export default async function Landing() {
       </section>
 
       {/* ---- the rivalry: the reason Baseline exists ---- */}
-      <section className="bg-[#111827] text-[#f8fafc]" aria-labelledby="rivalry-title">
+      <section className="bg-[#163d32] text-[#f7f8f4]" aria-labelledby="rivalry-title">
         <div className="mx-auto grid max-w-[1080px] gap-10 px-5 py-16 lg:grid-cols-2 lg:items-center lg:py-24">
           <div>
-            <p className="text-sm font-semibold text-[#8ea2ff]">The rivalry</p>
+            <p className="text-sm font-semibold text-[#6fd3a0]">The rivalry</p>
             <h2 id="rivalry-title" className="display mt-3 text-[38px] sm:text-[52px]">Who&apos;s actually better?</h2>
-            <p className="mt-4 max-w-[40ch] text-lg text-[#94a3b8]">Your friends can talk all they want. The record speaks for itself: every match you&apos;ve ever played against each other, kept for good.</p>
+            <p className="mt-4 max-w-[40ch] text-lg text-[#a9bdb5]">Your friends can talk all they want. The record speaks for itself: every match you&apos;ve ever played against each other, kept for good.</p>
           </div>
           <div className="reveal" role="img" aria-label="Example head to head: Alex leads Jordan 7 to 5 after 12 matches. Alex won the last one.">
             <div aria-hidden="true">
               <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-                <div className="flex flex-col items-center gap-2"><span className="rounded-full ring-2 ring-[#f5b841] ring-offset-4 ring-offset-[#111827]"><Disc name="Alex" dark size={60} /></span><span className="display text-xl sm:text-2xl">Alex</span></div>
+                <div className="flex flex-col items-center gap-2"><span className="rounded-full ring-2 ring-[#6fd3a0] ring-offset-4 ring-offset-[#163d32]"><Disc name="Alex" dark size={60} /></span><span className="display text-xl sm:text-2xl">Alex</span></div>
                 <div className="text-center">
-                  <p className="text-caption font-bold text-[#94a3b8]">VS</p>
-                  <p className="score num text-[clamp(56px,20vw,88px)] sm:text-[112px]"><span className="text-[#8ea2ff]">7</span><span className="px-2 font-light text-[#94a3b8]">-</span>5</p>
+                  <p className="text-caption font-bold text-[#a9bdb5]">VS</p>
+                  <p className="score num text-[clamp(56px,20vw,88px)] sm:text-[112px]"><span className="text-[#6fd3a0]">7</span><span className="px-2 font-light text-[#a9bdb5]">-</span>5</p>
                 </div>
                 <div className="flex flex-col items-center gap-2"><Disc name="Jordan" dark size={60} /><span className="display text-xl sm:text-2xl">Jordan</span></div>
               </div>
-              <div className="mt-6 flex h-2.5 overflow-hidden rounded-full"><span className="h-full bg-[#8ea2ff]" style={{ width: `${(7 / 12) * 100}%` }} /><span className="h-full flex-1 bg-[#475569]" /></div>
-              <div className="mt-4 flex items-center justify-between text-sm text-[#94a3b8]">
+              <div className="mt-6 flex h-2.5 overflow-hidden rounded-full"><span className="h-full bg-[#6fd3a0]" style={{ width: `${(7 / 12) * 100}%` }} /><span className="h-full flex-1 bg-white/25" /></div>
+              <div className="mt-4 flex items-center justify-between text-sm text-[#a9bdb5]">
                 <span>12 matches played</span>
-                <span className="flex items-center gap-2">Last five{LAST_FIVE.map((w, i) => <span key={i} className={`size-2.5 rounded-full ${w === "A" ? "bg-[#8ea2ff]" : "bg-[#475569]"}`} />)}</span>
+                <span className="flex items-center gap-2">Last five{LAST_FIVE.map((w, i) => <span key={i} className={`size-2.5 rounded-full ${w === "A" ? "bg-[#6fd3a0]" : "border-[1.5px] border-[#a9bdb5]"}`} />)}</span>
               </div>
               <p className="mt-5 text-center text-sm font-semibold">Alex leads. Jordan wants a rematch.</p>
             </div>
@@ -130,7 +130,7 @@ export default async function Landing() {
           <ol className="reveal mt-7 border-y border-line-strong" aria-label="Example leaderboard">
             {TABLE.map((r) => (
               <li key={r.name} className="flex items-center gap-4 border-b border-line py-3 last:border-b-0">
-                <span className={`score w-8 text-[32px] ${r.rank === 1 ? "text-gold-ink" : ""}`}>{r.rank}</span>
+                <span className={`score w-8 text-[32px] ${r.rank === 1 ? "text-accent-ink" : ""}`}>{r.rank}</span>
                 <Disc name={r.name} />
                 <span className="flex-1 text-lg font-bold">{r.name}</span>
                 <span className="score num text-[28px]">{r.pts}</span><span className="w-6 text-micro font-semibold text-text-3">pts</span>
@@ -157,8 +157,8 @@ export default async function Landing() {
       <section className="px-5 pb-16" aria-labelledby="join-title">
         <div className="mx-auto max-w-[1080px] rounded-[32px] bg-panel px-6 py-14 text-center text-white sm:py-20">
           <h2 id="join-title" className="display mx-auto max-w-[14ch] text-[40px] sm:text-[60px]">Your next rivalry starts here.</h2>
-          <p className="mx-auto mt-4 max-w-[38ch] text-lg text-[#94a3b8]">Get your invite. Play your next match. Add another chapter.</p>
-          <Link href={SIGN_IN} prefetch={false} className="press mt-8 inline-flex h-14 items-center justify-center rounded-full bg-accent px-7 text-base font-bold text-on-accent hover:brightness-110">Join with an invite</Link>
+          <p className="mx-auto mt-4 max-w-[38ch] text-lg text-[#a9bdb5]">Get your invite. Play your next match. Add another chapter.</p>
+          <Link href={SIGN_IN} prefetch={false} className="press mt-8 inline-flex h-14 items-center justify-center rounded-full bg-[#22a06b] px-7 text-base font-bold text-[#0b1a14] hover:brightness-110">Join with an invite</Link>
           <p className="mx-auto mt-5 max-w-[44ch] text-sm">No invite yet? Ask a friend who plays on Baseline. They can create a link for you in their Settings. Already playing? <Link href="/sign-in" prefetch={false} className="font-bold underline underline-offset-2">Sign in</Link>.</p>
         </div>
       </section>

@@ -19,10 +19,11 @@ decision · alternatives · why.
 9. **Messaging dropped.** V1 had already removed it from the UI; its 2 empty threads stay in `legacy.*`.
 10. **Admin can void, not delete or edit.** Nothing is ever deleted; a void keeps the match visible with its reason. There's no score editing: reject and re-record instead.
 11. **One-page score entry, tap-first.** It's the fastest flow on a phone: pick the set winner, tap a common score, and only type tiebreak points.
-12. **Design: sport-neutral competition brand** (Matt's rebrand, 2026-11-17; replaces the tennis-ball lime "night court").
-    - **Colors:** midnight navy #111827, electric blue #4263EB for the primary action, selection and wins, off-white #F8FAFC, slate text, victory gold #F5B841 only for first place.
-    - **Mark:** a bold B standing on a blue line (the baseline); no ball, racket or court lines. Tokens carry no sport in their names.
-    - **Type:** Archivo widths (condensed scoreboard numerals, expanded names). Solid surfaces. Wins are a filled dot, losses a hollow ring (never color alone).
+12. **Design: a refined green sports brand** (Matt, 2026-11-17; after a lime "night court" and a navy/blue/gold pass).
+    - **Colors:** forest green #163D32 (brand panels, icon), sport green #22A06B (primary action, selection, wins), charcoal #171C1B, off-white #F7F8F4, slate text. No neon, no gold.
+    - **Contrast rule:** sport green carries near-black text (5.4:1); white on it fails (3.3:1). Green text on light surfaces is darkened to #1A7550.
+    - **Mark:** an off-white B standing on a sport-green line, on forest green. No ball, racket or court lines; tokens carry no sport in their names.
+    - **Type:** Archivo widths. Solid surfaces. Wins are a filled dot, losses a hollow ring (never color alone).
     - **Positioning:** "Your friends. Your league. Your legacy." Tennis is the first and currently only sport; nothing else is advertised.
 13. **Tailwind and a few hand-made components, no component library.** A small app doesn't need shadcn or Radix; native `<dialog>`, links-as-tabs and buttons cover it accessibly. `motion` is used only where movement explains something.
 14. **No ESLint.** ESLint's TypeScript plugin doesn't support TypeScript 7 yet. Strict `tsc` plus tests is the check (same as Guap).

@@ -1,32 +1,31 @@
 @import "tailwindcss";
 
 /* ==== Baseline design system (docs/ARCHITECTURE.md → Design) ==========================================================
-   Sport-neutral competition brand. Midnight navy and off-white surfaces; electric blue for the one primary action,
-   selection and wins; victory gold only for first place; a restrained red for losses and errors. Archivo across
-   widths: condensed heavy numerals for scores and ranks, slightly expanded heavy display type for names.
-   Semantic tokens only (no sport in a token name). Every text pair is AA (checked by axe in the browser tests). */
+   A green sports brand with room to grow beyond tennis. Forest green (#163D32) is the brand: the hero panels and the
+   app icon. Sport green (#22A06B) is the one primary action, selection and wins (always with dark text on it: white
+   fails contrast). Charcoal and warm off-white surfaces, slate supporting text, a restrained red for losses and
+   errors. No neon, no sport in a token name. Archivo across widths: condensed heavy numerals for scores and ranks,
+   slightly expanded heavy display type for names. Every text pair is AA (checked by axe in the browser tests). */
 :root {
-  --bg: #f8fafc; --surface: #ffffff; --surface-2: #f1f5f9; --surface-3: #e2e8f0;
-  --line: rgb(17 24 39 / 0.09); --line-strong: rgb(17 24 39 / 0.17);
-  --text: #111827; --text-2: #475569; --text-3: #5b6779;
-  --accent: #4263eb; --on-accent: #ffffff; --accent-ink: #3451d1;   /* fill · text on fill · accent text */
-  --gold: #f5b841; --on-gold: #111827; --gold-ink: #8a5a00;         /* first place only */
+  --bg: #f7f8f4; --surface: #ffffff; --surface-2: #f0f2ec; --surface-3: #e3e7df;
+  --line: rgb(23 28 27 / 0.09); --line-strong: rgb(23 28 27 / 0.17);
+  --text: #171c1b; --text-2: #4f5b56; --text-3: #5d6964;
+  --accent: #22a06b; --on-accent: #0b1a14; --accent-ink: #1a7550;   /* fill · text on fill · accent text */
   --loss: #dc4a51; --loss-ink: #b42b32;
-  --panel: #111827; --panel-line: rgb(255 255 255 / 0.10);          /* the dark hero panels (both themes) */
+  --panel: #163d32; --panel-line: rgb(255 255 255 / 0.10);          /* the forest hero panels (both themes) */
   --warn-bg: #fef3c7; --warn-ink: #7a4a00;
-  --scrim: rgb(11 17 32 / 0.5);
-  --shadow: 0 1px 2px rgb(17 24 39 / 0.06), 0 8px 24px -12px rgb(17 24 39 / 0.18);
+  --scrim: rgb(17 21 20 / 0.5);
+  --shadow: 0 1px 2px rgb(23 28 27 / 0.06), 0 8px 24px -12px rgb(23 28 27 / 0.18);
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0b1120; --surface: #111827; --surface-2: #172033; --surface-3: #1f2a40;
-    --line: rgb(226 232 240 / 0.09); --line-strong: rgb(226 232 240 / 0.17);
-    --text: #f8fafc; --text-2: #a3b1c6; --text-3: #8a98ae;
-    --accent: #4263eb; --on-accent: #ffffff; --accent-ink: #8ea2ff;
-    --gold: #f5b841; --on-gold: #111827; --gold-ink: #f5b841;
+    --bg: #111514; --surface: #171c1b; --surface-2: #1e2523; --surface-3: #283230;
+    --line: rgb(241 244 239 / 0.09); --line-strong: rgb(241 244 239 / 0.17);
+    --text: #f1f4ef; --text-2: #a7b3ad; --text-3: #93a099;
+    --accent: #22a06b; --on-accent: #0b1a14; --accent-ink: #4cc38a;
     --loss: #ff8589; --loss-ink: #ff8589;
-    --panel: #111827; --panel-line: rgb(226 232 240 / 0.12);
+    --panel: #163d32; --panel-line: rgb(241 244 239 / 0.12);
     --warn-bg: #3b2f12; --warn-ink: #f8d67a;
     --scrim: rgb(0 0 0 / 0.6);
     --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 10px 30px -14px rgb(0 0 0 / 0.7);
@@ -34,13 +33,12 @@
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0b1120; --surface: #111827; --surface-2: #172033; --surface-3: #1f2a40;
-  --line: rgb(226 232 240 / 0.09); --line-strong: rgb(226 232 240 / 0.17);
-  --text: #f8fafc; --text-2: #a3b1c6; --text-3: #8a98ae;
-  --accent: #4263eb; --on-accent: #ffffff; --accent-ink: #8ea2ff;
-  --gold: #f5b841; --on-gold: #111827; --gold-ink: #f5b841;
+  --bg: #111514; --surface: #171c1b; --surface-2: #1e2523; --surface-3: #283230;
+  --line: rgb(241 244 239 / 0.09); --line-strong: rgb(241 244 239 / 0.17);
+  --text: #f1f4ef; --text-2: #a7b3ad; --text-3: #93a099;
+  --accent: #22a06b; --on-accent: #0b1a14; --accent-ink: #4cc38a;
   --loss: #ff8589; --loss-ink: #ff8589;
-  --panel: #111827; --panel-line: rgb(226 232 240 / 0.12);
+  --panel: #163d32; --panel-line: rgb(241 244 239 / 0.12);
   --warn-bg: #3b2f12; --warn-ink: #f8d67a;
   --scrim: rgb(0 0 0 / 0.6);
   --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 10px 30px -14px rgb(0 0 0 / 0.7);
@@ -52,7 +50,6 @@
   --color-line: var(--line); --color-line-strong: var(--line-strong);
   --color-text: var(--text); --color-text-2: var(--text-2); --color-text-3: var(--text-3);
   --color-accent: var(--accent); --color-on-accent: var(--on-accent); --color-accent-ink: var(--accent-ink);
-  --color-gold: var(--gold); --color-on-gold: var(--on-gold); --color-gold-ink: var(--gold-ink);
   --color-loss: var(--loss); --color-loss-ink: var(--loss-ink); --color-panel: var(--panel); --color-panel-line: var(--panel-line);
   --color-warn-bg: var(--warn-bg); --color-warn-ink: var(--warn-ink); --color-scrim: var(--scrim);
   --font-sans: var(--font-archivo), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;

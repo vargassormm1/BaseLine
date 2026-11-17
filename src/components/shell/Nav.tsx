@@ -25,7 +25,7 @@ export function TabBar({ meHref, attention }: NavProps) {
       <ul className="mx-auto grid h-16 max-w-lg grid-cols-5 items-center">
         {tabs.map((t, i) => t === null ? (
           <li key="record" className="flex justify-center">
-            <Link href="/record" aria-label="Record a match" className="press -mt-7 grid size-14 place-items-center rounded-full bg-accent text-on-accent shadow-[0_8px_20px_-6px_rgb(66_99_235/0.65)] ring-4 ring-bg">
+            <Link href="/record" aria-label="Record a match" className="press -mt-7 grid size-14 place-items-center rounded-full bg-accent text-on-accent shadow-[0_8px_20px_-6px_rgb(22_61_50/0.45)] ring-4 ring-bg">
               <Plus size={26} strokeWidth={2.75} aria-hidden="true" />
             </Link>
           </li>
@@ -80,9 +80,9 @@ export function Rail({ meHref, attention }: NavProps) {
 export function Mark({ size = 28 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true">
-      <rect width="64" height="64" rx="15" fill="#111827" />
-      <path fillRule="evenodd" fill="#fff" d="M19 12h17.5c6.4 0 11 4.3 11 10 0 3.4-1.6 6.2-4.2 7.9 3.6 1.6 6 5 6 9.1 0 6.3-5 10-11.8 10H19zm8.5 7.2v7.6h7.8c2.5 0 4-1.5 4-3.8s-1.5-3.8-4-3.8zm0 14.4v8.2h9.3c2.7 0 4.3-1.6 4.3-4.1s-1.6-4.1-4.3-4.1z" />
-      <rect x="19" y="52.5" width="30" height="4" rx="2" fill="#4263eb" />
+      <rect width="64" height="64" rx="15" fill="#163d32" />
+      <path fillRule="evenodd" fill="#f7f8f4" d="M19 12h17.5c6.4 0 11 4.3 11 10 0 3.4-1.6 6.2-4.2 7.9 3.6 1.6 6 5 6 9.1 0 6.3-5 10-11.8 10H19zm8.5 7.2v7.6h7.8c2.5 0 4-1.5 4-3.8s-1.5-3.8-4-3.8zm0 14.4v8.2h9.3c2.7 0 4.3-1.6 4.3-4.1s-1.6-4.1-4.3-4.1z" />
+      <rect x="19" y="52.5" width="30" height="4" rx="2" fill="#22a06b" />
     </svg>
   );
 }
