@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Swords } from "lucide-react";
+import { Check, Swords } from "lucide-react";
 import { requirePlayer } from "@/lib/server/session";
 import { loadBoard } from "@/lib/server/data";
 import { shortDate } from "@/lib/tennis/dates";
@@ -14,8 +14,9 @@ import { buttonClass } from "@/components/ui/Button";
 
 export const metadata = { title: "Match" };
 
-export default async function MatchPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function MatchPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ recorded?: string }> }) {
   const { id } = await params;
+  const justRecorded = (await searchParams).recorded === "1";
   if (!uuid.safeParse(id).success) notFound();
   const s = await requirePlayer();
   const b = await loadBoard(s.sb);
@@ -33,6 +34,12 @@ export default async function MatchPage({ params }: { params: Promise<{ id: stri
 
   return (
     <div className="animate-rise mx-auto max-w-[640px]">
+      {justRecorded && m.status === "pending" && m.p1 === s.me ? (
+        <div role="status" className="mb-5 flex items-center gap-3 rounded-2xl bg-ball px-4 py-3 text-on-ball">
+          <span className="grid size-8 shrink-0 place-items-center rounded-full bg-on-ball text-ball"><Check size={18} strokeWidth={3} aria-hidden="true" /></span>
+          <p className="text-sm font-bold">Match recorded. {m.winner === s.me ? `+${m.points} points` : "It counts"} once {shortName(p2)} confirms.</p>
+        </div>
+      ) : null}
       <p className="pt-2 text-sm text-text-2">{shortDate(m.playedOn, b.today)} · {FORMAT_LABEL[m.format]}{m.deciding === "match_tiebreak" ? " · match tiebreak decider" : ""}{m.legacy ? " · from the original Baseline" : ""}</p>
       <h1 className="display mt-2 text-[30px] sm:text-[36px]">{displayName(w)} <span className="text-text-3">def.</span> {displayName(m.winner === m.p1 ? p2 : p1)}</h1>
       <div className="mt-4">{status}</div>
@@ -49,7 +56,10 @@ export default async function MatchPage({ params }: { params: Promise<{ id: stri
           </div>
         ) : null}
         {m.status === "confirmed" && me?.isAdmin ? <div className="card p-4"><VoidMatch id={m.id} /></div> : null}
-        <Link href={`/h2h?a=${p1?.username ?? ""}&b=${p2?.username ?? ""}`} className={buttonClass("secondary", "md")}><Swords size={18} aria-hidden="true" />{shortName(p1)} vs {shortName(p2)}: head to head</Link>
+        <div className="flex flex-wrap gap-2">
+          <Link href={`/h2h?a=${p1?.username ?? ""}&b=${p2?.username ?? ""}`} className={buttonClass("secondary", "md")}><Swords size={18} aria-hidden="true" />Head to head</Link>
+          <Link href="/rankings" className={buttonClass("ghost", "md")}>Rankings</Link>
+        </div>
       </div>
     </div>
   );

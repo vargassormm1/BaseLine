@@ -11,14 +11,15 @@ player (expires in 14 days, works once).
 | Screen | What it does |
 |---|---|
 | Landing `/` | Public. What Baseline is, how points work. Signed-in players go straight to Home. |
-| Home `/home` | Athlete card (all-time rank, points, record, win rate, season rank, form, streak) · **Your move** (results to confirm, challenges to answer, accepted challenges to record) · rivals with head-to-head records · recent matches · top of the table. |
+| Home `/home` | Greeting · spotlight (rank as the hero, record, points, last 5, **Record match**) · **Your move** only when something waits (results to confirm, challenges to answer or record) · last match · the table around you. |
+| Matches `/matches` | Scorecards by month: mine or everyone's. |
 | Rankings `/rankings` | All-time and per season (calendar year). Rank, 7-day movement, record, win %, form, points. |
 | Record `/record` | Opponent (recent first, search) · format · when (today/yesterday/date) · score by tapping: who won each set, then the score; tiebreak loser's points (winner's follow). Sets appear only as needed. Live scoreboard and validation. Sends to the opponent to confirm. |
 | Match `/matches/[id]` | Scoreboard, status. Opponent: confirm / not right. Recorder: withdraw while pending. Admin: void (kept, marked void). |
 | Challenges `/challenges` | Send (opponent, format, optional message, suggested date) · accept/decline · call off · record the result (opponent and format locked). |
 | Players `/players` | Directory with search. |
-| Profile `/players/[username]` | Athlete page: ranks, record, win/set/game %, tiebreaks, streaks, last 10, by format, achievements, rivals, history. |
-| Head to head `/h2h` | Any two players: overall record, split bar, matches/sets/games/tiebreaks won, by format, biggest wins, every meeting; rematch. |
+| Profile `/players/[username]` | Athlete page: rank, points, three key stats (record, win rate, streak), last 10, "More stats" on demand, top rivals, recent matches. |
+| Head to head `/h2h` | Any two players: the rivalry record as the hero (VS), split bar, sets and games, every meeting; rematch. |
 | Settings `/settings` | Profile (username, names), invite a friend, appearance (system/light/dark), rules, sign out. |
 
 ## Rules
@@ -43,8 +44,7 @@ Movement: places gained/lost compared with the table 7 days ago.
 the challenge (format must match) → completed when the result is confirmed. Either player can call off an accepted
 challenge (unless a result is waiting).
 
-**Achievements.** Derived, never stored: first win, 10/25/50 wins, bagel (a 6–0 set), hot streak (5 wins in a row),
-clutch (5 tiebreaks), comeback (won after losing the first set), rivalry (10 matches vs one opponent).
+**Achievements.** Not shown (the redesign brief asks for no badges). The derivation in `src/lib/tennis/achievements.ts` is kept, tested and unused.
 
 ## Not included (on purpose)
 Messaging (V1's was removed; its two empty threads are kept in the legacy copy), Elo/skill ratings, leagues or

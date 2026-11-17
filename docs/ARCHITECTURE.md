@@ -43,7 +43,8 @@ if it ever reaches thousands, page match history and move standings into a SQL v
 - **Surfaces:** solid only, no glass. The dark "athlete card" and the H2H matchup stay dark in both themes, as signature moments.
 - **Contrast:** every text pair is AA (axe runs in e2e, light and dark).
 - **Motion:** `motion` only where it explains something: set cards appearing, the H2H split bar, toasts. CSS `rise` on page entry. Reduced motion is honored.
-- **Navigation:** phones get five tabs with the Record ball in the center; desktop gets a left rail. Challenges and Players are reached from Home, Rankings and the rail.
+- **Navigation:** phones get Home · Matches · Record (the ball) · Rankings · Me; Challenges is the flag on Home; head to head opens from profiles, matches and rivals. Desktop gets a left rail with everything.
+- **Hierarchy rule:** one hero per screen, at most three supporting numbers, extra stats behind a disclosure. Lists use hairlines instead of a card per item where possible.
 
 ## Rendering & caching
 All signed-in pages are dynamic (per-player data, RLS); Supabase fetches use `cache: "no-store"`; nothing personal is

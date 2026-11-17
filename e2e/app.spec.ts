@@ -35,7 +35,8 @@ test("home: athlete card, what needs me, confirm a result Ben recorded", async (
   const problems = watch(page);
   await signIn(page, "ana");
   const card = page.getByRole("region", { name: "Your standing" });
-  await expect(card).toContainText("All-time rank");
+  await expect(card).toContainText("Rank");
+  await expect(card.getByRole("link", { name: "Record match" })).toBeVisible();
   await expect(page.getByText("Ben recorded a result. Is it right?")).toBeVisible();
   await axe(page);
   await noSidewaysScroll(page);
@@ -122,7 +123,7 @@ test("challenges: accept Cy's challenge, then it's on", async ({ page }) => {
 test("every screen loads cleanly, accessibly and without sideways scrolling", async ({ page }) => {
   const problems = watch(page);
   await signIn(page, "ana");
-  for (const path of ["/home", "/rankings", "/rankings?season=2026", "/players", "/players/ana_e2e", "/players/cy_e2e", "/h2h", "/h2h?a=ana_e2e&b=cy_e2e", "/challenges", "/settings"]) {
+  for (const path of ["/home", "/matches", "/matches?who=all", "/rankings", "/rankings?season=2026", "/players", "/players/ana_e2e", "/players/cy_e2e", "/h2h", "/h2h?a=ana_e2e&b=cy_e2e", "/challenges", "/settings"]) {
     await page.goto(path);
     await expect(page.locator("main h1").first(), path).toBeAttached();
     await axe(page);
@@ -153,7 +154,7 @@ test("a new player picks a username first", async ({ page }) => {
   await page.getByLabel("Username").fill("newbie_e2e");
   await page.getByRole("button", { name: "Let's play" }).click();
   await expect(page).toHaveURL(/\/home$/);
-  await expect(page.getByText("Your first match is waiting")).toBeVisible();
+  await expect(page.getByText("No matches yet").first()).toBeVisible();
 });
 
 test("theme: switching to light sticks across pages", async ({ page }) => {
@@ -188,11 +189,22 @@ test("someone else's pending result, an unknown match and a bad id all show not 
 test("a V1 player's first Google sign-in links their history (no invite, no welcome)", async ({ page }) => {
   await page.goto("/e2e/sign-in?u=claimer"); // claimer@e2e.test = the email on file for Fay, who isn't linked yet
   await expect(page).toHaveURL(/\/home$/);
-  await expect(page.getByRole("region", { name: "Your standing" })).toContainText("Hey, Fay");
+  await expect(page.getByRole("region", { name: "Your standing" })).toBeVisible();
+  await expect(page.getByText("Hi Fay")).toBeVisible();
   await page.goto("/settings");
   await expect(page.getByText("claimer@e2e.test")).toBeVisible();
   await page.getByRole("button", { name: "Sign out" }).click();
   await expect(page).toHaveURL(/\/$/);
   await page.goto("/home");
   await expect(page).toHaveURL(/\/sign-in/);
+});
+
+test("matches: my scorecards by month, everyone's results, and the recorded confirmation", async ({ page }) => {
+  await signIn(page, "ana");
+  await page.goto("/matches");
+  await expect(page.getByRole("link", { name: "Mine" })).toHaveAttribute("aria-current", "page");
+  await expect(page.locator("main section h2").first()).toHaveText(/^[A-Z][a-z]+ 20\d\d$/);
+  await page.getByRole("link", { name: "Everyone" }).click();
+  await expect(page).toHaveURL(/who=all/);
+  await expect(page.getByRole("link", { name: "Show more" })).toBeVisible();
 });

@@ -1,11 +1,9 @@
 import { Swords } from "lucide-react";
 import { requirePlayer } from "@/lib/server/session";
 import { loadBoard } from "@/lib/server/data";
-import { headToHead, playerStats, setsFor } from "@/lib/tennis/stats";
+import { headToHead, playerStats } from "@/lib/tennis/stats";
 import { standings } from "@/lib/tennis/standings";
-import { scoreline } from "@/lib/tennis/score";
 import { shortDate } from "@/lib/tennis/dates";
-import { FORMAT_LABEL, type Match } from "@/lib/tennis/types";
 import { Avatar, displayName, shortName } from "@/components/ui/Avatar";
 import { ButtonLink } from "@/components/ui/Button";
 import { Empty } from "@/components/ui/bits";
@@ -48,7 +46,6 @@ export default async function H2H({ searchParams }: { searchParams: Promise<{ a?
     return <div className="animate-rise space-y-6"><h1 className="display pt-2 text-[34px]">Head to head</h1>{picker}<Empty title="Pick two different players" /></div>;
   }
   const h = headToHead(pa.id, pb.id, b.matches);
-  const big = (m: Match | null, id: string) => (m ? `${scoreline(m.sets, m.p1 === id ? 1 : 2)} (${shortDate(m.playedOn, b.today)})` : "–");
   const rows: [string, string | number, string | number][] = [
     ["Matches won", h.a.wins, h.b.wins],
     ["Sets won", h.a.setsWon, h.b.setsWon],
@@ -73,7 +70,8 @@ export default async function H2H({ searchParams }: { searchParams: Promise<{ a?
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
           {side(pa, h.a.wins >= h.b.wins && h.played > 0)}
           <div className="text-center">
-            <p className="score num text-[72px] sm:text-[104px]"><span className={h.a.wins >= h.b.wins ? "text-[#d6f24a]" : ""}>{h.a.wins}</span><span className="px-2 font-light text-[#8f9586]">-</span><span className={h.b.wins > h.a.wins ? "text-[#f58c64]" : ""}>{h.b.wins}</span></p>
+            <p className="text-caption font-bold text-[#8f9586]" aria-hidden="true">VS</p>
+            <p className="score num mt-1 text-[72px] sm:text-[104px]"><span className={h.a.wins >= h.b.wins ? "text-[#d6f24a]" : ""}>{h.a.wins}</span><span className="px-2 font-light text-[#8f9586]">-</span><span className={h.b.wins > h.a.wins ? "text-[#f58c64]" : ""}>{h.b.wins}</span></p>
             <p className="text-caption font-semibold text-[#a9ae9f]">{h.played ? lead : "Never played"}</p>
           </div>
           {side(pb, h.b.wins > h.a.wins)}
@@ -89,36 +87,25 @@ export default async function H2H({ searchParams }: { searchParams: Promise<{ a?
         </Empty>
       ) : (
         <>
-          <section aria-labelledby="compare" className="card overflow-hidden">
+          <section aria-labelledby="compare">
             <h2 id="compare" className="sr-only">Comparison</h2>
-            <ul className="divide-y divide-line">
-              {rows.map(([label, x, y]) => (
-                <li key={label} className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 px-5 py-3.5">
-                  <span className={`score num text-[28px] ${Number(x) > Number(y) ? "text-ball-ink" : ""}`}>{x}</span>
-                  <span className="text-center text-caption font-semibold text-text-2">{label}</span>
-                  <span className={`score num text-right text-[28px] ${Number(y) > Number(x) ? "text-ball-ink" : ""}`}>{y}</span>
+            <ul className="divide-y divide-line border-y border-line-strong">
+              {rows.slice(1, 3).map(([label, x, y]) => (
+                <li key={label} className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 py-3.5">
+                  <span className={`score num text-[30px] ${Number(x) > Number(y) ? "text-ball-ink" : ""}`}>{x}</span>
+                  <span className="text-center text-sm font-semibold text-text-2">{label}</span>
+                  <span className={`score num text-right text-[30px] ${Number(y) > Number(x) ? "text-ball-ink" : ""}`}>{y}</span>
                 </li>
               ))}
-              {h.byFormat.map((f) => (
-                <li key={f.format} className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 px-5 py-3.5">
-                  <span className="score num text-[22px]">{f.a}</span><span className="text-center text-caption font-semibold text-text-2">{FORMAT_LABEL[f.format]} wins</span><span className="score num text-right text-[22px]">{f.b}</span>
-                </li>
-              ))}
-              <li className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 px-5 py-3.5 text-sm">
-                <span>{big(h.biggestWin.a, pa.id)}</span><span className="text-center text-caption font-semibold text-text-2">Biggest win</span><span className="text-right">{big(h.biggestWin.b, pb.id)}</span>
-              </li>
             </ul>
-            <p className="border-t border-line px-5 py-3 text-caption text-text-3">
-              First met {h.firstMeeting ? shortDate(h.firstMeeting.playedOn, b.today) : "–"} · last met {h.lastMeeting ? shortDate(h.lastMeeting.playedOn, b.today) : "–"} · {h.played} matches
-              {h.meetings.some((m) => setsFor(m, pa.id).some((x) => x.isMatchTiebreak)) ? " · games exclude match tiebreaks" : ""}
-            </p>
+            <p className="mt-3 text-caption text-text-3">First met {h.firstMeeting ? shortDate(h.firstMeeting.playedOn, b.today) : "–"} · last met {h.lastMeeting ? shortDate(h.lastMeeting.playedOn, b.today) : "–"}</p>
           </section>
           <div className="flex flex-wrap gap-2">
             {pa.id === s.me || pb.id === s.me ? <NewChallenge players={[pa.id === s.me ? pb : pa]} today={b.today} preset={(pa.id === s.me ? pb : pa).id} label="Rematch" /> : null}
             {pa.id === s.me ? <ButtonLink href={`/record?opponent=${pb.id}`} variant="secondary">Record a match</ButtonLink> : null}
           </div>
           <section aria-labelledby="meetings">
-            <h2 id="meetings" className="mb-3 text-lg font-bold">Every meeting</h2>
+            <h2 id="meetings" className="mb-3 text-lg font-bold">Every meeting <span className="font-normal text-text-3">({h.played})</span></h2>
             <div className="grid gap-3 lg:grid-cols-2">{h.meetings.map((m) => <MatchCard key={m.id} m={m} byId={b.byId} today={b.today} />)}</div>
           </section>
         </>

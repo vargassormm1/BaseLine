@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { House, Trophy, Plus, Swords, UserRound, Flag, Users, Settings } from "lucide-react";
+import { House, ListOrdered, Trophy, Plus, Swords, UserRound, Flag, Users, Settings } from "lucide-react";
 
 export interface NavProps { meHref: string; attention: number }
 /** Exactly one nav item is active: your own profile lights "Me", other players light "Players". */
@@ -15,13 +15,13 @@ export function TabBar({ meHref, attention }: NavProps) {
   const path = usePathname();
   const tabs = [
     { href: "/home", label: "Home", icon: House, dot: attention > 0 },
-    { href: "/rankings", label: "Rankings", icon: Trophy },
+    { href: "/matches", label: "Matches", icon: ListOrdered },
     null,
-    { href: "/h2h", label: "H2H", icon: Swords },
+    { href: "/rankings", label: "Rankings", icon: Trophy },
     { href: meHref, label: "Me", icon: UserRound },
   ];
   return (
-    <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] lg:hidden">
+    <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] lg:hidden">
       <ul className="mx-auto grid h-16 max-w-lg grid-cols-5 items-center">
         {tabs.map((t, i) => t === null ? (
           <li key="record" className="flex justify-center">
@@ -49,6 +49,7 @@ export function Rail({ meHref, attention }: NavProps) {
   const path = usePathname();
   const items = [
     { href: "/home", label: "Home", icon: House, count: attention },
+    { href: "/matches", label: "Matches", icon: ListOrdered },
     { href: "/rankings", label: "Rankings", icon: Trophy },
     { href: "/h2h", label: "Head to head", icon: Swords },
     { href: "/challenges", label: "Challenges", icon: Flag },

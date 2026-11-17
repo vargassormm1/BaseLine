@@ -1,12 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Award, Lock, Pencil, Swords } from "lucide-react";
+import { ChevronDown, ChevronRight, Pencil, Swords } from "lucide-react";
 import { requirePlayer } from "@/lib/server/session";
 import { loadBoard } from "@/lib/server/data";
 import { standings } from "@/lib/tennis/standings";
 import { playerStats } from "@/lib/tennis/stats";
-import { achievements } from "@/lib/tennis/achievements";
-import { yearOf } from "@/lib/tennis/dates";
 import { FORMAT_LABEL, type Format } from "@/lib/tennis/types";
 import { Avatar, displayName, shortName } from "@/components/ui/Avatar";
 import { ButtonLink } from "@/components/ui/Button";
@@ -27,10 +25,7 @@ export default async function Profile({ params }: { params: Promise<{ username: 
   if (!p) notFound();
   const isMe = p.id === s.me;
   const all = standings(b.players, b.matches, b.adjustments, { today: b.today }).find((r) => r.player.id === p.id)!;
-  const year = yearOf(b.today);
-  const season = standings(b.players, b.matches, b.adjustments, { today: b.today, season: year }).find((r) => r.player.id === p.id)!;
   const st = playerStats(p.id, b.matches);
-  const badges = achievements(p.id, st, b.matches);
   const visible = b.matches.filter((m) => (m.p1 === p.id || m.p2 === p.id) && m.status !== "canceled");
 
   return (
@@ -41,9 +36,8 @@ export default async function Profile({ params }: { params: Promise<{ username: 
           <p className="text-sm font-semibold text-text-2">@{p.username}{p.isAdmin ? " · admin" : ""}</p>
           <h1 className="display mt-1 text-[44px] sm:text-[56px]">{displayName(p)}</h1>
           <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-text-2">
-            <span><span className="score num text-[22px] text-text">{all.rank ? `#${all.rank}` : "–"}</span> all-time</span>
+            <span><span className="score num text-[22px] text-text">{all.rank ? `#${all.rank}` : "–"}</span> rank</span>
             <span><span className="score num text-[22px] text-text">{all.points}</span> pts</span>
-            <span><span className="score num text-[22px] text-text">{season.rank ? `#${season.rank}` : "–"}</span> in {year}</span>
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -59,64 +53,39 @@ export default async function Profile({ params }: { params: Promise<{ username: 
       {st.played === 0 && all.wins + all.losses === 0 ? (
         <Empty title={isMe ? "No matches yet" : `${shortName(p)} hasn't played yet`}>Stats show up after the first confirmed match.</Empty>
       ) : (
-        <>
-          <section aria-label="Statistics" className="card grid grid-cols-2 gap-x-4 gap-y-6 p-5 sm:grid-cols-4 sm:p-6">
-            <Stat label="Record" value={<span className="num">{all.wins}–{all.losses}</span>} sub={all.wins + all.losses !== st.played ? "incl. carry-over" : undefined} />
+        <section aria-label="Statistics">
+          <div className="grid grid-cols-3 gap-4 border-y border-line-strong py-6">
+            <Stat label="Record" value={<span className="num">{all.wins}–{all.losses}</span>} />
             <Stat label="Win rate" value={all.winPct === null ? "–" : `${Math.round(all.winPct)}%`} />
-            <Stat label="Sets won" value={st.setPct === null ? "–" : `${Math.round(st.setPct)}%`} sub={`${st.setsWon}–${st.setsLost}`} />
-            <Stat label="Games won" value={st.gamePct === null ? "–" : `${Math.round(st.gamePct)}%`} sub={`${st.gamesWon}–${st.gamesLost}`} />
-            <Stat label="Tiebreaks" value={<span className="num">{st.tiebreaksWon}–{st.tiebreaksLost}</span>} />
-            <Stat label="Best win streak" value={st.longestWinStreak} />
-            <Stat label="Current streak" value={st.currentStreak ? `${st.currentStreak.result}${st.currentStreak.length}` : "–"} />
-            <div><p className="mb-3 text-caption font-semibold text-text-2">Last 10</p><FormDots form={st.form} size={10} /></div>
-          </section>
-
-          <section aria-labelledby="formats">
-            <SectionHeader id="formats" title="By format" />
-            <ul className="grid gap-3 sm:grid-cols-3">
-              {([1, 3, 5] as Format[]).map((f) => {
-                const r = st.byFormat[f];
-                return (
-                  <li key={f} className="card flex items-center justify-between p-4">
-                    <span className="font-semibold">{FORMAT_LABEL[f]}</span>
-                    <span className="score num text-[26px]">{r.wins}<span className="text-text-3">–</span>{r.losses}</span>
-                  </li>
-                );
-              })}
-            </ul>
-          </section>
-        </>
+            <Stat label={st.currentStreak?.result === "L" ? "Losing streak" : "Win streak"} value={st.currentStreak ? st.currentStreak.length : "–"} />
+          </div>
+          <div className="mt-4 flex items-center gap-3 text-sm text-text-2"><span>Last {st.form.length || 0}</span><FormDots form={st.form} size={10} /></div>
+          <details className="group mt-4">
+            <summary className="press inline-flex min-h-11 cursor-pointer list-none items-center gap-1 text-sm font-semibold text-ball-ink [&::-webkit-details-marker]:hidden">More stats<ChevronDown size={16} className="transition-transform group-open:rotate-180" aria-hidden="true" /></summary>
+            <dl className="mt-2 grid grid-cols-2 gap-x-6 gap-y-3 text-sm sm:grid-cols-3">
+              {[
+                ["Sets", `${st.setsWon}–${st.setsLost}`], ["Games", `${st.gamesWon}–${st.gamesLost}`], ["Tiebreaks", `${st.tiebreaksWon}–${st.tiebreaksLost}`],
+                ["Best win streak", String(st.longestWinStreak)],
+                ...([1, 3, 5] as Format[]).filter((f) => st.byFormat[f].wins + st.byFormat[f].losses > 0).map((f) => [FORMAT_LABEL[f], `${st.byFormat[f].wins}–${st.byFormat[f].losses}`]),
+              ].map(([k, v]) => <div key={k} className="flex items-baseline justify-between border-b border-line py-2"><dt className="text-text-2">{k}</dt><dd className="num font-bold">{v}</dd></div>)}
+            </dl>
+            {all.wins + all.losses !== st.played ? <p className="mt-3 text-caption text-text-3">The record includes results carried over from the original Baseline.</p> : null}
+          </details>
+        </section>
       )}
-
-      <section aria-labelledby="badges">
-        <SectionHeader id="badges" title="Achievements" />
-        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-          {badges.map((a) => (
-            <li key={a.key} className={`card p-4 ${a.earned ? "" : "border-dashed"}`}>
-              <span className={`mb-3 grid size-10 place-items-center rounded-full ${a.earned ? "bg-ball text-on-ball" : "bg-surface-3 text-text-3"}`}>
-                {a.earned ? <Award size={19} aria-hidden="true" /> : <Lock size={16} aria-hidden="true" />}
-              </span>
-              <p className="font-bold">{a.title}</p>
-              <p className="mt-0.5 text-caption text-text-2">{a.description}</p>
-              {!a.earned && a.progress ? <p className="num mt-2 text-caption font-semibold text-text-3">{a.progress[0]} / {a.progress[1]}</p> : null}
-              <span className="sr-only">{a.earned ? "Earned" : "Not earned yet"}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
 
       {st.rivals.length ? (
         <section aria-labelledby="rivals">
           <SectionHeader id="rivals" title="Rivals" />
-          <ul className="card divide-y divide-line overflow-hidden">
-            {st.rivals.slice(0, 6).map((r) => {
+          <ul className="divide-y divide-line border-y border-line">
+            {st.rivals.slice(0, 3).map((r) => {
               const o = b.byId.get(r.opponentId);
               return (
                 <li key={r.opponentId}>
-                  <Link href={`/h2h?a=${p.username}&b=${o?.username ?? ""}`} className="press flex items-center gap-3 px-4 py-3 hover:bg-surface-2">
+                  <Link href={`/h2h?a=${p.username}&b=${o?.username ?? ""}`} className="press flex min-h-14 items-center gap-3 py-2 hover:bg-surface-2">
                     <Avatar player={o} size="sm" /><span className="min-w-0 flex-1 truncate font-semibold">{displayName(o)}</span>
-                    <span className="text-caption text-text-3">{r.played} played</span>
-                    <span className="score num w-16 text-right text-[22px]">{r.wins}–{r.losses}</span>
+                    <span className="score num text-[24px]">{r.wins}–{r.losses}</span>
+                    <ChevronRight size={16} className="text-text-3" aria-hidden="true" />
                   </Link>
                 </li>
               );
@@ -127,9 +96,9 @@ export default async function Profile({ params }: { params: Promise<{ username: 
 
       {visible.length ? (
         <section aria-labelledby="history">
-          <SectionHeader id="history" title="Match history" />
-          <div className="grid gap-3 lg:grid-cols-2">{visible.slice(0, 30).map((m) => <MatchCard key={m.id} m={m} byId={b.byId} today={b.today} />)}</div>
-          {visible.length > 30 ? <p className="mt-3 text-caption text-text-3">Showing the latest 30 of {visible.length}.</p> : null}
+          <SectionHeader id="history" title="Recent matches" {...(isMe ? { href: "/matches", linkLabel: "All matches" } : {})} />
+          <div className="grid gap-3 lg:grid-cols-2">{visible.slice(0, 6).map((m) => <MatchCard key={m.id} m={m} byId={b.byId} today={b.today} />)}</div>
+          {visible.length > 6 ? <p className="mt-3 text-caption text-text-3">Latest 6 of {visible.length}.{isMe ? " See them all under Matches." : ""}</p> : null}
         </section>
       ) : null}
     </div>

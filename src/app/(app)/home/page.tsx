@@ -1,10 +1,9 @@
 import Link from "next/link";
-import { ArrowRight, Flag, Plus } from "lucide-react";
+import { Flag, Plus } from "lucide-react";
 import { requirePlayer } from "@/lib/server/session";
 import { loadBoard } from "@/lib/server/data";
 import { standings } from "@/lib/tennis/standings";
 import { playerStats } from "@/lib/tennis/stats";
-import { yearOf } from "@/lib/tennis/dates";
 import { inbox } from "@/lib/ui/inbox";
 import { Avatar, shortName } from "@/components/ui/Avatar";
 import { ButtonLink } from "@/components/ui/Button";
@@ -20,54 +19,53 @@ export default async function Home() {
   const s = await requirePlayer();
   const b = await loadBoard(s.sb);
   const me = b.byId.get(s.me)!;
-  const year = yearOf(b.today);
   const all = standings(b.players, b.matches, b.adjustments, { today: b.today });
-  const season = standings(b.players, b.matches, b.adjustments, { today: b.today, season: year });
   const mine = all.find((r) => r.player.id === me.id)!;
-  const mySeason = season.find((r) => r.player.id === me.id)!;
   const st = playerStats(me.id, b.matches);
   const box = inbox(b, me.id);
-  const myMatches = b.matches.filter((m) => (m.p1 === me.id || m.p2 === me.id) && m.status !== "canceled").slice(0, 3);
-  const greeting = `Hey, ${shortName(me)}`;
+  const last = b.matches.find((m) => (m.p1 === me.id || m.p2 === me.id) && m.status === "confirmed");
+  // the table around me: one above, me, one below (or the top three when I'm not ranked yet)
+  const ranked = all.filter((r) => r.rank !== null);
+  const at = ranked.findIndex((r) => r.player.id === me.id);
+  const around = at === -1 ? ranked.slice(0, 3) : ranked.slice(Math.max(0, Math.min(at - 1, ranked.length - 3)), Math.max(0, Math.min(at - 1, ranked.length - 3)) + 3);
+  const openChallenges = box.toAnswer.length + box.toPlay.length + box.sent.length;
 
   return (
-    <div className="animate-rise space-y-8">
+    <div className="animate-rise space-y-9">
       <h1 className="sr-only">Home</h1>
-      {/* athlete card */}
-      <section aria-label="Your standing" className="court-lines relative overflow-hidden rounded-[28px] border border-white/10 bg-[#0d0f0c] px-5 pt-5 pb-6 text-[#f2f3ec] sm:px-7 sm:pt-7">
-        <div className="flex items-center gap-3">
-          <Avatar player={me} size="md" ring />
-          <div className="min-w-0">
-            <p className="text-sm font-semibold text-[#a9ae9f]">{greeting}</p>
-            <p className="truncate text-sm text-[#a9ae9f]">@{me.username}</p>
-          </div>
-          <ButtonLink href="/record" size="sm" className="ml-auto"><Plus size={16} strokeWidth={3} aria-hidden="true" />Record</ButtonLink>
+      <header className="flex items-center gap-3 pt-2">
+        <Avatar player={me} size="md" />
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm text-text-2">Hi {shortName(me)}</p>
+          <p className="text-lg leading-tight font-bold tracking-[-0.02em]">Ready for your next match?</p>
         </div>
-        <div className="mt-6 flex items-end gap-6">
-          <div>
-            <p className="text-caption font-semibold text-[#a9ae9f]">All-time rank</p>
-            <p className="score text-[96px] text-[#d6f24a]">{mine.rank ? `#${mine.rank}` : <><span aria-hidden="true">–</span><span className="sr-only">Not ranked yet</span></>}</p>
-          </div>
-          <div className="pb-2">
-            <p className="score text-[44px]">{mine.points}</p>
-            <p className="text-caption font-semibold text-[#a9ae9f]">points <span className="ml-1 inline-block align-middle"><Movement by={mine.rank ? mine.movement : null} /></span></p>
-          </div>
+        <Link href="/challenges" aria-label={`Challenges${openChallenges ? `, ${openChallenges} open` : ""}`} className="press relative grid size-11 shrink-0 place-items-center rounded-full bg-surface-3 lg:hidden">
+          <Flag size={19} aria-hidden="true" />
+          {box.toAnswer.length ? <span className="absolute top-1.5 right-1.5 size-2.5 rounded-full bg-clay ring-2 ring-bg" aria-hidden="true" /> : null}
+        </Link>
+      </header>
+
+      {/* player spotlight: rank is the hero; record and points support it */}
+      <section aria-label="Your standing" className="court-lines relative overflow-hidden rounded-[28px] border border-white/10 bg-[#0d0f0c] px-6 pt-6 pb-7 text-[#f2f3ec] sm:px-8">
+        <p className="text-sm font-semibold text-[#a9ae9f]">Rank</p>
+        <div className="flex items-end justify-between gap-4">
+          <p className="score text-[120px] leading-[0.8] text-[#d6f24a]">{mine.rank ? `#${mine.rank}` : <><span aria-hidden="true">–</span><span className="sr-only">Not ranked yet</span></>}</p>
+          <dl className="grid shrink-0 grid-cols-2 gap-x-6 pb-1 text-right">
+            <div><dd className="score num text-[34px]">{mine.wins}–{mine.losses}</dd><dt className="mt-1 text-caption font-semibold text-[#a9ae9f]">Record</dt></div>
+            <div><dd className="score num text-[34px]">{mine.points}</dd><dt className="mt-1 text-caption font-semibold text-[#a9ae9f]">Points</dt></div>
+          </dl>
         </div>
-        <dl className="mt-6 grid grid-cols-3 gap-3 border-t border-white/10 pt-4">
-          <div><dt className="text-caption text-[#a9ae9f]">Record</dt><dd className="score num mt-1 text-[26px]">{mine.wins}–{mine.losses}</dd></div>
-          <div><dt className="text-caption text-[#a9ae9f]">Win rate</dt><dd className="score num mt-1 text-[26px]">{mine.winPct === null ? "–" : `${Math.round(mine.winPct)}%`}</dd></div>
-          <div><dt className="text-caption text-[#a9ae9f]">{year} rank</dt><dd className="score num mt-1 text-[26px]">{mySeason.rank ? `#${mySeason.rank}` : "–"}</dd></div>
-        </dl>
-        <div className="mt-4 flex items-center gap-3 text-caption text-[#a9ae9f]">
-          <span>Form</span><FormDots form={st.form.slice(0, 10)} />
-          {st.currentStreak && st.currentStreak.length > 1 ? <span className="ml-auto font-semibold text-[#f2f3ec]">{st.currentStreak.length} {st.currentStreak.result === "W" ? "wins" : "losses"} in a row</span> : null}
+        <div className="mt-6 flex items-center gap-3 text-caption text-[#a9ae9f]">
+          {st.form.length ? <><span>Last {Math.min(5, st.form.length)}</span><FormDots form={st.form.slice(0, 5)} /></> : <span>No matches yet</span>}
+          {mine.rank && mine.movement ? <span className="ml-auto inline-flex items-center gap-1"><Movement by={mine.movement} /> this week</span> : null}
         </div>
+        <ButtonLink href="/record" size="lg" full className="mt-6"><Plus size={20} strokeWidth={3} aria-hidden="true" />Record match</ButtonLink>
       </section>
 
-      {/* what needs me */}
+      {/* only when something is waiting for me */}
       {box.toConfirm.length + box.toAnswer.length + box.toPlay.length > 0 ? (
         <section aria-labelledby="your-move">
-          <SectionHeader id="your-move" title="Your move" href="/challenges" linkLabel="Challenges" />
+          <SectionHeader id="your-move" title="Your move" />
           <ul className="space-y-3">
             {box.toConfirm.map((m) => (
               <li key={m.id} className="card px-4 pt-3 pb-4">
@@ -87,7 +85,7 @@ export default async function Home() {
               const opp = c.challenger === me.id ? c.opponent : c.challenger;
               return (
                 <li key={c.id} className="card flex items-center gap-3 px-4 py-3.5">
-                  <span className="grid size-10 place-items-center rounded-full bg-surface-3"><Flag size={18} aria-hidden="true" /></span>
+                  <Avatar player={b.byId.get(opp)} />
                   <p className="min-w-0 flex-1 text-sm">Challenge on with <span className="font-bold">{shortName(b.byId.get(opp))}</span>. Played it?</p>
                   <ButtonLink href={`/record?opponent=${opp}&challenge=${c.id}`} size="sm" variant="secondary">Record result</ButtonLink>
                 </li>
@@ -97,46 +95,19 @@ export default async function Home() {
         </section>
       ) : null}
 
-      {st.played === 0 ? (
-        <Empty icon={<Plus size={22} aria-hidden="true" />} title="Your first match is waiting"
-          action={<div className="flex flex-wrap justify-center gap-2"><ButtonLink href="/record">Record a match</ButtonLink><ButtonLink href="/challenges" variant="secondary">Challenge someone</ButtonLink></div>}>
-          Record a match you played, or challenge someone. Your opponent confirms the score, then the points count.
-        </Empty>
-      ) : null}
-
-      {/* rivals */}
-      {st.rivals.length ? (
-        <section aria-labelledby="rivals">
-          <SectionHeader id="rivals" title="Rivals" href="/h2h" linkLabel="Head to head" />
-          <ul className="no-scrollbar -mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-3 sm:px-0">
-            {st.rivals.slice(0, 6).map((r) => {
-              const p = b.byId.get(r.opponentId);
-              const lead = r.wins > r.losses ? "You lead" : r.wins < r.losses ? `${shortName(p)} leads` : "All square";
-              return (
-                <li key={r.opponentId} className="w-[44%] shrink-0 snap-start sm:w-auto">
-                  <Link href={`/h2h?a=${me.username}&b=${p?.username ?? ""}`} className="press card flex h-full flex-col gap-3 p-4 hover:border-line-strong">
-                    <div className="flex items-center gap-2"><Avatar player={p} size="sm" /><span className="truncate font-bold">{shortName(p)}</span></div>
-                    <p className="score num text-[34px]"><span className={r.wins >= r.losses ? "text-ball-ink" : ""}>{r.wins}</span><span className="text-text-3">–</span><span className={r.losses > r.wins ? "text-clay-ink" : ""}>{r.losses}</span></p>
-                    <p className="text-caption text-text-2">{lead} · {r.played} played</p>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+      <div className="grid gap-9 lg:grid-cols-2">
+        <section aria-labelledby="last-match">
+          <SectionHeader id="last-match" title="Last match" href="/matches" linkLabel="All matches" />
+          {last ? <MatchCard m={last} byId={b.byId} today={b.today} /> : (
+            <Empty title="No matches yet" action={<ButtonLink href="/challenges" variant="secondary">Challenge someone</ButtonLink>}>
+              Record a match you played, or call someone out. Your opponent confirms the score, then it counts.
+            </Empty>
+          )}
         </section>
-      ) : null}
-
-      <div className="grid gap-8 lg:grid-cols-2">
-        {myMatches.length ? (
-          <section aria-labelledby="recent">
-            <SectionHeader id="recent" title="Your recent matches" href={`/players/${me.username}`} linkLabel="All" />
-            <div className="space-y-3">{myMatches.map((m) => <MatchCard key={m.id} m={m} byId={b.byId} today={b.today} />)}</div>
-          </section>
-        ) : null}
         <section aria-labelledby="table">
-          <SectionHeader id="table" title="Top of the table" href="/rankings" linkLabel="Full rankings" />
-          <ol className="card divide-y divide-line overflow-hidden">{all.filter((r) => r.rank !== null).slice(0, 5).map((r) => <LeaderboardRow key={r.player.id} r={r} me={me.id} compact />)}</ol>
-          <Link href="/players" className="press mt-3 inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-text-2 hover:text-text">Find a player<ArrowRight size={15} aria-hidden="true" /></Link>
+          <SectionHeader id="table" title={at === -1 ? "Top of the table" : "Around you"} href="/rankings" linkLabel="Rankings" />
+          {around.length ? <ol className="card divide-y divide-line overflow-hidden">{around.map((r) => <LeaderboardRow key={r.player.id} r={r} me={me.id} compact />)}</ol>
+            : <p className="card px-5 py-6 text-sm text-text-2">The table fills in after the first confirmed match.</p>}
         </section>
       </div>
     </div>
