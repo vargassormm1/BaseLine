@@ -10,7 +10,7 @@ function csp(nonce: string) {
   const dev = process.env.NODE_ENV === "development";
   return [
     "default-src 'self'", `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${dev ? " 'unsafe-eval'" : ""}`, "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: https://lh3.googleusercontent.com https://img.clerk.com", "font-src 'self'", "connect-src 'self'",
+    `img-src 'self' data: ${process.env.SUPABASE_URL ? `${process.env.SUPABASE_URL}/storage/v1/object/public/avatars/` : ""}`.trim(), "font-src 'self'", "connect-src 'self'",
     "frame-ancestors 'none'", "object-src 'none'", "base-uri 'self'", "form-action 'self'",
   ].join("; ");
 }
@@ -68,5 +68,5 @@ export default async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: [{ source: "/((?!_next/static|_next/image|favicon.ico|icon.svg|manifest.webmanifest).*)", missing: [{ type: "header", key: "next-router-prefetch" }, { type: "header", key: "purpose", value: "prefetch" }] }],
+  matcher: [{ source: "/((?!_next/static|_next/image|favicon.ico|icon.svg|apple-icon.png|icons/|manifest.webmanifest).*)", missing: [{ type: "header", key: "next-router-prefetch" }, { type: "header", key: "purpose", value: "prefetch" }] }],
 };

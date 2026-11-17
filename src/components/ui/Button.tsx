@@ -3,12 +3,12 @@ import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 type Variant = "primary" | "secondary" | "ghost" | "danger";
 const V: Record<Variant, string> = {
-  primary: "bg-ball text-on-ball font-bold hover:brightness-95",
+  primary: "bg-accent text-on-accent font-bold hover:brightness-95",
   secondary: "bg-surface-3 text-text font-semibold hover:bg-line-strong",
   ghost: "text-text-2 font-semibold hover:bg-surface-3 hover:text-text",
-  danger: "border border-line-strong text-clay-ink font-semibold hover:bg-surface-3",
+  danger: "border border-line-strong text-loss-ink font-semibold hover:bg-surface-3",
 };
-const S = { sm: "h-9 px-3.5 text-sm rounded-full", md: "h-12 px-5 text-base rounded-full", lg: "h-14 px-6 text-base rounded-full" };
+const S = { sm: "h-11 px-4 text-sm rounded-full", md: "h-12 px-5 text-base rounded-full", lg: "h-14 px-6 text-base rounded-full" };
 export const buttonClass = (v: Variant = "primary", s: keyof typeof S = "md", full = false) =>
   `press inline-flex shrink-0 select-none items-center justify-center gap-2 whitespace-nowrap disabled:pointer-events-none disabled:opacity-45 ${V[v]} ${S[s]} ${full ? "w-full" : ""}`;
 

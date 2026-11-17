@@ -32,16 +32,16 @@ export default async function Profile({ params }: { params: Promise<{ username: 
     <div className="animate-rise space-y-9">
       <header className="flex flex-col items-start gap-5 pt-2 sm:flex-row sm:items-end">
         <Avatar player={p} size="hero" ring={all.rank === 1} />
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-text-2">@{p.username}{p.isAdmin ? " · admin" : ""}</p>
-          <h1 className="display mt-1 text-[44px] sm:text-[56px]">{displayName(p)}</h1>
+        <div className="w-full min-w-0 flex-1">
+          <p className="truncate text-sm font-semibold text-text-2">@{p.username}{p.isAdmin ? " · admin" : ""}</p>
+          <h1 className="display mt-1 text-[clamp(30px,10vw,44px)] sm:text-[56px]">{displayName(p)}</h1>
           <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-text-2">
             <span><span className="score num text-[22px] text-text">{all.rank ? `#${all.rank}` : "–"}</span> rank</span>
             <span><span className="score num text-[22px] text-text">{all.points}</span> pts</span>
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          {isMe ? <ButtonLink href="/settings" variant="secondary"><Pencil size={16} aria-hidden="true" />Edit profile</ButtonLink> : (
+          {isMe ? <ButtonLink href="/settings" variant="secondary"><Pencil size={16} aria-hidden="true" />{p.avatarUrl ? "Edit profile" : "Add a photo"}</ButtonLink> : (
             <>
               <NewChallenge players={[p]} today={b.today} preset={p.id} label="Challenge" />
               <ButtonLink href={`/h2h?a=${b.byId.get(s.me)?.username ?? ""}&b=${p.username}`} variant="secondary"><Swords size={16} aria-hidden="true" />Head to head</ButtonLink>
@@ -61,7 +61,7 @@ export default async function Profile({ params }: { params: Promise<{ username: 
           </div>
           <div className="mt-4 flex items-center gap-3 text-sm text-text-2"><span>Last {st.form.length || 0}</span><FormDots form={st.form} size={10} /></div>
           <details className="group mt-4">
-            <summary className="press inline-flex min-h-11 cursor-pointer list-none items-center gap-1 text-sm font-semibold text-ball-ink [&::-webkit-details-marker]:hidden">More stats<ChevronDown size={16} className="transition-transform group-open:rotate-180" aria-hidden="true" /></summary>
+            <summary className="press inline-flex min-h-11 cursor-pointer list-none items-center gap-1 text-sm font-semibold text-accent-ink [&::-webkit-details-marker]:hidden">More stats<ChevronDown size={16} className="transition-transform group-open:rotate-180" aria-hidden="true" /></summary>
             <dl className="mt-2 grid grid-cols-2 gap-x-6 gap-y-3 text-sm sm:grid-cols-3">
               {[
                 ["Sets", `${st.setsWon}–${st.setsLost}`], ["Games", `${st.gamesWon}–${st.gamesLost}`], ["Tiebreaks", `${st.tiebreaksWon}–${st.tiebreaksLost}`],

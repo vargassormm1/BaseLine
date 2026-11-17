@@ -15,7 +15,7 @@ function useAct() {
     // success: a toast (the card often disappears once answered); failure: stays next to the buttons
     if (r.ok) { setMsg(null); toast(done); router.refresh(); } else setMsg({ ok: false, text: r.error });
   });
-  const note = msg ? <p role={msg.ok ? "status" : "alert"} className={`mt-2 text-sm font-medium ${msg.ok ? "text-ball-ink" : "text-clay-ink"}`}>{msg.text}</p> : null;
+  const note = msg ? <p role={msg.ok ? "status" : "alert"} className={`mt-2 text-sm font-medium ${msg.ok ? "text-accent-ink" : "text-loss-ink"}`}>{msg.text}</p> : null;
   return { pending, run, note };
 }
 
@@ -46,7 +46,7 @@ export function VoidMatch({ id }: { id: string }) {
       <label className="min-w-0 flex-1">
         <span className="eyebrow">Admin: void this result</span>
         <input value={reason} onChange={(e) => setReason(e.target.value)} maxLength={200} required minLength={3} placeholder="Reason (kept with the match)"
-          className="mt-1 h-11 w-full rounded-xl border border-line-strong bg-surface-2 px-3 text-base outline-none focus:border-ball-ink" />
+          className="mt-1 h-11 w-full rounded-xl border border-line-strong bg-surface-2 px-3 text-base outline-none focus:border-accent-ink" />
       </label>
       <Button type="submit" variant="danger" size="md" loading={a.pending}>Void</Button>
       <div className="basis-full">{a.note}</div>

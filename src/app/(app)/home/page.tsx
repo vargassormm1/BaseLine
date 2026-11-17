@@ -41,21 +41,21 @@ export default async function Home() {
         </div>
         <Link href="/challenges" aria-label={`Challenges${openChallenges ? `, ${openChallenges} open` : ""}`} className="press relative grid size-11 shrink-0 place-items-center rounded-full bg-surface-3 lg:hidden">
           <Flag size={19} aria-hidden="true" />
-          {box.toAnswer.length ? <span className="absolute top-1.5 right-1.5 size-2.5 rounded-full bg-clay ring-2 ring-bg" aria-hidden="true" /> : null}
+          {box.toAnswer.length ? <span className="absolute top-1.5 right-1.5 size-2.5 rounded-full bg-loss ring-2 ring-bg" aria-hidden="true" /> : null}
         </Link>
       </header>
 
       {/* player spotlight: rank is the hero; record and points support it */}
-      <section aria-label="Your standing" className="court-lines relative overflow-hidden rounded-[28px] border border-white/10 bg-[#0d0f0c] px-6 pt-6 pb-7 text-[#f2f3ec] sm:px-8">
-        <p className="text-sm font-semibold text-[#a9ae9f]">Rank</p>
-        <div className="flex items-end justify-between gap-4">
-          <p className="score text-[120px] leading-[0.8] text-[#d6f24a]">{mine.rank ? `#${mine.rank}` : <><span aria-hidden="true">–</span><span className="sr-only">Not ranked yet</span></>}</p>
-          <dl className="grid shrink-0 grid-cols-2 gap-x-6 pb-1 text-right">
-            <div><dd className="score num text-[34px]">{mine.wins}–{mine.losses}</dd><dt className="mt-1 text-caption font-semibold text-[#a9ae9f]">Record</dt></div>
-            <div><dd className="score num text-[34px]">{mine.points}</dd><dt className="mt-1 text-caption font-semibold text-[#a9ae9f]">Points</dt></div>
+      <section aria-label="Your standing" className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[#111827] px-6 pt-6 pb-7 text-[#f8fafc] sm:px-8">
+        <p className="text-sm font-semibold text-[#94a3b8]">Rank</p>
+        <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-5">
+          <p className={`score text-[clamp(84px,27vw,120px)] leading-[0.8] ${mine.rank === 1 ? "text-[#f5b841]" : "text-white"}`}>{mine.rank ? `#${mine.rank}` : <><span aria-hidden="true">–</span><span className="sr-only">Not ranked yet</span></>}</p>
+          <dl className="grid shrink-0 grid-cols-2 gap-x-5 pb-1 text-right">
+            <div><dd className="score num text-[30px] sm:text-[34px]">{mine.wins}–{mine.losses}</dd><dt className="mt-1 text-caption font-semibold text-[#94a3b8]">Record</dt></div>
+            <div><dd className="score num text-[30px] sm:text-[34px]">{mine.points}</dd><dt className="mt-1 text-caption font-semibold text-[#94a3b8]">Points</dt></div>
           </dl>
         </div>
-        <div className="mt-6 flex items-center gap-3 text-caption text-[#a9ae9f]">
+        <div className="mt-6 flex items-center gap-3 text-caption text-[#94a3b8]">
           {st.form.length ? <><span>Last {Math.min(5, st.form.length)}</span><FormDots form={st.form.slice(0, 5)} /></> : <span>No matches yet</span>}
           {mine.rank && mine.movement ? <span className="ml-auto inline-flex items-center gap-1"><Movement by={mine.movement} /> this week</span> : null}
         </div>

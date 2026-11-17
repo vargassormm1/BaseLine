@@ -3,8 +3,11 @@ import { cache } from "react";
 import type { Adjustment, Format, Match, Player } from "@/lib/tennis/types";
 import { todayET } from "@/lib/tennis/dates";
 import type { DB } from "./session";
+import { env } from "./env";
 
 export interface PlayerRow extends Player { isAdmin: boolean }
+/** Public URL of a player's uploaded photo (null = show initials). */
+export const avatarUrl = (path: string | null) => (path ? `${env.supabaseUrl()}/storage/v1/object/public/avatars/${path}` : null);
 export interface ChallengeRow {
   id: string; challenger: string; opponent: string; format: Format; message: string | null; proposedFor: string | null;
   status: "pending" | "accepted" | "declined" | "canceled" | "expired" | "completed"; createdAt: string; expiresAt: string;
@@ -17,14 +20,14 @@ const MATCH_COLUMNS = "id, format, deciding_set, player_one, player_two, winner_
  *  faster and simpler than many small queries; RLS decides what the player can see. */
 export const loadBoard = cache(async (sb: DB): Promise<Board> => {
   const [players, matches, adjustments, challenges] = await Promise.all([
-    sb.from("players").select("id, username, first_name, last_name, avatar_url, is_admin").order("username"),
+    sb.from("players").select("id, username, first_name, last_name, avatar_path, is_admin").order("username"),
     sb.from("matches").select(MATCH_COLUMNS).order("played_on", { ascending: false }).order("created_at", { ascending: false }),
     sb.from("standing_adjustments").select("player_id, points, wins, losses, reason"),
     sb.from("challenges").select("id, challenger, opponent, format, message, proposed_for, status, created_at, expires_at").order("created_at", { ascending: false }),
   ]);
   for (const r of [players, matches, adjustments, challenges]) if (r.error) throw new Error("Couldn't load data.");
   const ps: PlayerRow[] = (players.data ?? []).map((p) => ({
-    id: p.id, username: p.username, firstName: p.first_name, lastName: p.last_name, avatarUrl: p.avatar_url, isAdmin: p.is_admin,
+    id: p.id, username: p.username, firstName: p.first_name, lastName: p.last_name, avatarUrl: avatarUrl(p.avatar_path), isAdmin: p.is_admin,
   }));
   const ms: Match[] = (matches.data ?? []).map((m) => ({
     id: m.id, format: m.format as Format, deciding: m.deciding_set as Match["deciding"], p1: m.player_one, p2: m.player_two,

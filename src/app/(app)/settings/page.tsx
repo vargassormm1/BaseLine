@@ -7,6 +7,7 @@ import { ProfileForm } from "@/components/settings/ProfileForm";
 import { ThemeControl } from "@/components/settings/ThemeControl";
 import { SignOut } from "@/components/settings/SignOut";
 import { InviteFriend } from "@/components/settings/InviteFriend";
+import { PhotoForm } from "@/components/settings/PhotoForm";
 
 export const metadata = { title: "Settings" };
 
@@ -19,6 +20,9 @@ export default async function Settings() {
   return (
     <div className="animate-rise mx-auto max-w-[620px] space-y-6">
       <PageHeader title="Settings" />
+      <section className={card} aria-labelledby="s-photo"><h2 id="s-photo" className="text-lg font-bold">Profile photo</h2>
+        <PhotoForm current={me.avatarUrl} initials={((me.firstName[0] ?? "") + (me.lastName[0] ?? "")).toUpperCase() || me.username[0]!.toUpperCase()} />
+      </section>
       <section className={card} aria-labelledby="s-profile"><h2 id="s-profile" className="text-lg font-bold">Profile</h2>
         <ProfileForm mode="edit" initial={{ username: me.username, firstName: me.firstName, lastName: me.lastName }} />
       </section>

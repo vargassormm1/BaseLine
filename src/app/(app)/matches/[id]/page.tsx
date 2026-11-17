@@ -35,8 +35,8 @@ export default async function MatchPage({ params, searchParams }: { params: Prom
   return (
     <div className="animate-rise mx-auto max-w-[640px]">
       {justRecorded && m.status === "pending" && m.p1 === s.me ? (
-        <div role="status" className="mb-5 flex items-center gap-3 rounded-2xl bg-ball px-4 py-3 text-on-ball">
-          <span className="grid size-8 shrink-0 place-items-center rounded-full bg-on-ball text-ball"><Check size={18} strokeWidth={3} aria-hidden="true" /></span>
+        <div role="status" className="mb-5 flex items-center gap-3 rounded-2xl bg-accent px-4 py-3 text-on-accent">
+          <span className="grid size-8 shrink-0 place-items-center rounded-full bg-on-accent text-accent"><Check size={18} strokeWidth={3} aria-hidden="true" /></span>
           <p className="text-sm font-bold">Match recorded. {m.winner === s.me ? `+${m.points} points` : "It counts"} once {shortName(p2)} confirms.</p>
         </div>
       ) : null}

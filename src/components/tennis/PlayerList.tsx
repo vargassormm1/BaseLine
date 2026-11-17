@@ -10,7 +10,7 @@ export function PlayerList({ rows, me }: { rows: Row[]; me: string }) {
   const shown = q.trim() ? rows.filter((r) => `${r.username} ${r.firstName} ${r.lastName}`.toLowerCase().includes(q.trim().toLowerCase())) : rows;
   return (
     <div className="space-y-4">
-      <label className="flex h-12 items-center gap-2 rounded-2xl border border-line-strong bg-surface px-4 focus-within:border-ball-ink">
+      <label className="flex h-12 items-center gap-2 rounded-2xl border border-line-strong bg-surface px-4 focus-within:border-accent-ink">
         <Search size={18} className="text-text-3" aria-hidden="true" /><span className="sr-only">Search players</span>
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by name or username" className="h-full min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-text-3" />
       </label>

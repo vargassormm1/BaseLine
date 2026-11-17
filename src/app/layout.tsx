@@ -8,13 +8,13 @@ const archivo = Archivo({ subsets: ["latin"], axes: ["wdth"], variable: "--font-
 
 export const metadata: Metadata = {
   title: { default: "Baseline", template: "%s · Baseline" },
-  description: "Log your tennis matches, climb the rankings, settle the rivalry.",
+  description: "Your friends. Your league. Your legacy. Track every match, climb your own rankings. Starting with tennis.",
   applicationName: "Baseline",
   appleWebApp: { capable: true, title: "Baseline", statusBarStyle: "black-translucent" },
 };
 export const viewport: Viewport = {
   width: "device-width", initialScale: 1, viewportFit: "cover",
-  themeColor: [{ media: "(prefers-color-scheme: light)", color: "#f2f1ea" }, { media: "(prefers-color-scheme: dark)", color: "#0d0f0c" }],
+  themeColor: [{ media: "(prefers-color-scheme: light)", color: "#f8fafc" }, { media: "(prefers-color-scheme: dark)", color: "#0b1120" }],
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { requirePlayer } from "@/lib/server/session";
 import { loadBoard } from "@/lib/server/data";
 import { ButtonLink } from "@/components/ui/Button";
@@ -9,14 +9,19 @@ import { MatchCard } from "@/components/tennis/Scoreboard";
 export const metadata = { title: "Matches" };
 const PAGE = 20;
 
-export default async function Matches({ searchParams }: { searchParams: Promise<{ who?: string; show?: string }> }) {
+export default async function Matches({ searchParams }: { searchParams: Promise<{ who?: string; show?: string; q?: string }> }) {
   const s = await requirePlayer();
   const b = await loadBoard(s.sb);
   const q = await searchParams;
   const everyone = q.who === "all";
-  const list = b.matches.filter((m) => (everyone ? m.status === "confirmed" : (m.p1 === s.me || m.p2 === s.me) && m.status !== "canceled"));
+  // (query params can arrive as arrays: only plain strings are used)
+  // search by player name or username, or a year ("2024")
+  const query = (typeof q.q === "string" ? q.q : "").trim().toLowerCase().slice(0, 40);
+  const hay = (id: string) => { const p = b.byId.get(id); return p ? `${p.firstName} ${p.lastName} ${p.username}`.toLowerCase() : ""; };
+  const hit = (m: (typeof b.matches)[number]) => !query || m.playedOn.startsWith(query) || hay(m.p1).includes(query) || hay(m.p2).includes(query);
+  const list = b.matches.filter((m) => (everyone ? m.status === "confirmed" : (m.p1 === s.me || m.p2 === s.me) && m.status !== "canceled") && hit(m));
   const show = Math.min(list.length, Math.max(PAGE, Number(q.show) || PAGE));
-  const base = everyone ? "/matches?who=all" : "/matches";
+  const qs = (o: Record<string, string | number | undefined>) => { const u = new URLSearchParams(); for (const [k, v] of Object.entries(o)) if (v) u.set(k, String(v)); const t = u.toString(); return t ? `/matches?${t}` : "/matches"; };
   // group by month, newest first ("November 2026")
   const month = (d: string) => new Date(`${d}T12:00:00Z`).toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
   const groups: { label: string; items: typeof list }[] = [];
@@ -28,11 +33,22 @@ export default async function Matches({ searchParams }: { searchParams: Promise<
   return (
     <div className="animate-rise mx-auto max-w-[720px]">
       <PageHeader title="Matches" />
-      <div className="mb-6"><Segmented label="Whose matches" items={[{ href: "/matches", label: "Mine", on: !everyone }, { href: "/matches?who=all", label: "Everyone", on: everyone }]} /></div>
+      <div className="mb-6 flex flex-wrap items-center gap-3">
+        <Segmented label="Whose matches" items={[{ href: qs({ q: query }), label: "Mine", on: !everyone }, { href: qs({ who: "all", q: query }), label: "Everyone", on: everyone }]} />
+        <form action="/matches" role="search" className="flex h-12 min-w-0 flex-1 basis-56 items-center gap-2 rounded-full border border-line-strong bg-surface px-4 focus-within:border-accent-ink">
+          {everyone ? <input type="hidden" name="who" value="all" /> : null}
+          <Search size={17} className="shrink-0 text-text-3" aria-hidden="true" />
+          <label htmlFor="mq" className="sr-only">Search matches by player or year</label>
+          <input id="mq" name="q" type="search" defaultValue={query} placeholder="Player or year" enterKeyHint="search" autoComplete="off" className="h-full min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-text-3" />
+        </form>
+      </div>
+      <p className="mb-4 text-sm text-text-2" role="status">{list.length} {list.length === 1 ? "match" : "matches"}{query ? <> for “{query}” · <a href={qs({ who: everyone ? "all" : undefined })} className="font-semibold text-accent-ink">Clear</a></> : null}</p>
       {list.length === 0 ? (
-        <Empty icon={<Plus size={22} aria-hidden="true" />} title={everyone ? "No matches yet" : "You haven't played yet"} action={<ButtonLink href="/record">Record a match</ButtonLink>}>
-          Results show up here once your opponent confirms them.
-        </Empty>
+        query ? <Empty title="No matches found">Try a different name, or a year like 2024.</Empty> : (
+          <Empty icon={<Plus size={22} aria-hidden="true" />} title={everyone ? "No matches yet" : "You haven't played yet"} action={<ButtonLink href="/record">Record a match</ButtonLink>}>
+            Results show up here once your opponent confirms them.
+          </Empty>
+        )
       ) : (
         <div className="space-y-8">
           {groups.map((g) => (
@@ -41,7 +57,7 @@ export default async function Matches({ searchParams }: { searchParams: Promise<
               <div className="space-y-3">{g.items.map((m) => <MatchCard key={m.id} m={m} byId={b.byId} today={b.today} />)}</div>
             </section>
           ))}
-          {show < list.length ? <div className="text-center"><ButtonLink href={`${base}${everyone ? "&" : "?"}show=${show + PAGE}`} variant="secondary">Show more</ButtonLink></div> : null}
+          {show < list.length ? <div className="text-center"><ButtonLink href={qs({ who: everyone ? "all" : undefined, q: query, show: show + PAGE })} variant="secondary">Show more</ButtonLink></div> : null}
         </div>
       )}
     </div>

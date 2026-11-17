@@ -27,7 +27,7 @@ export function NewChallenge({ players, today, preset, label = "New challenge" }
       close(); setMessage(""); setDate(""); toast("Challenge sent."); router.refresh();
     });
   };
-  const input = "h-12 w-full rounded-2xl border border-line-strong bg-surface-2 px-4 text-base outline-none focus:border-ball-ink";
+  const input = "h-12 w-full rounded-2xl border border-line-strong bg-surface-2 px-4 text-base outline-none focus:border-accent-ink";
   return (
     <>
       <Button onClick={() => { setError(null); ref.current?.showModal(); }}><Flag size={17} aria-hidden="true" />{label}</Button>
@@ -57,7 +57,7 @@ export function NewChallenge({ players, today, preset, label = "New challenge" }
           <label className="block"><span className="eyebrow">Suggested date (optional)</span>
             <input type="date" value={date} min={today} max={addDays(today, 90)} onChange={(e) => setDate(e.target.value)} className={`${input} mt-1.5`} />
           </label>
-          {error ? <p role="alert" className="text-sm font-semibold text-clay-ink">{error}</p> : null}
+          {error ? <p role="alert" className="text-sm font-semibold text-loss-ink">{error}</p> : null}
           <Button type="submit" full size="lg" loading={pending} disabled={!opponent}>Send challenge</Button>
           <p className="text-center text-caption text-text-3">They have 14 days to answer.</p>
         </form>

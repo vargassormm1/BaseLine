@@ -21,7 +21,7 @@ export const getSession = cache(async (): Promise<Session | null> => {
   const p = id.profile;
   const invite = (await cookies()).get(INVITE_COOKIE)?.value;
   const { data: linked, error: e2 } = await id.sb.rpc("ensure_player", {
-    p_username: "", p_first_name: p.firstName, p_last_name: p.lastName, p_avatar_url: p.avatarUrl ?? "", ...(invite ? { p_invite: invite } : {}),
+    p_username: "", p_first_name: p.firstName, p_last_name: p.lastName, ...(invite ? { p_invite: invite } : {}),
   });
   return { id, sb: id.sb, me: e2 ? null : linked };
 });

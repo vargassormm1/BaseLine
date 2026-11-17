@@ -1,7 +1,6 @@
 "use client";
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { AnimatePresence, motion, MotionConfig } from "motion/react";
 import { Check, Minus, Plus, Search } from "lucide-react";
 import { recordMatch } from "@/app/actions";
 import { checkMatch, setsToShow } from "@/lib/tennis/score";
@@ -75,7 +74,7 @@ export function RecordMatchForm({ me, opponents, recent, today, initial }: Recor
   const chip = (on: boolean) => `press inline-flex h-11 items-center justify-center rounded-full px-4 text-sm font-semibold ${on ? "bg-text text-bg" : "bg-surface-3 text-text hover:bg-line-strong"}`;
 
   return (
-    <MotionConfig reducedMotion="user">
+    <>
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
         <div className="space-y-7">
           {/* opponent */}
@@ -98,7 +97,7 @@ export function RecordMatchForm({ me, opponents, recent, today, initial }: Recor
                     ))}
                   </div>
                 ) : null}
-                <label className="flex h-12 items-center gap-2 rounded-2xl border border-line-strong bg-surface px-4 focus-within:border-ball-ink">
+                <label className="flex h-12 items-center gap-2 rounded-2xl border border-line-strong bg-surface px-4 focus-within:border-accent-ink">
                   <Search size={18} className="text-text-3" aria-hidden="true" />
                   <span className="sr-only">Search players</span>
                   <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search players" className="h-full min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-text-3" />
@@ -122,12 +121,12 @@ export function RecordMatchForm({ me, opponents, recent, today, initial }: Recor
             <div role="radiogroup" aria-label="Format" className="flex flex-wrap gap-2">
               {([1, 3, 5] as Format[]).map((f) => (
                 <button key={f} type="button" role="radio" aria-checked={format === f} disabled={locked && format !== f}
-                  onClick={() => { setFormat(f); setError(null); }} className={chip(format === f)}>{FORMAT_LABEL[f]}<span className="ml-1.5 opacity-60">{pointsFor(f)} pts</span></button>
+                  onClick={() => { setFormat(f); setError(null); }} className={chip(format === f)}>{FORMAT_LABEL[f]}<span className="ml-1.5 font-normal">{pointsFor(f)} pts</span></button>
               ))}
             </div>
             {format > 1 ? (
               <label className="mt-3 flex min-h-11 cursor-pointer items-center gap-3 text-sm">
-                <input type="checkbox" checked={deciding === "match_tiebreak"} onChange={(e) => setDeciding(e.target.checked ? "match_tiebreak" : "set")} className="size-5 accent-[var(--ball-ink)]" />
+                <input type="checkbox" checked={deciding === "match_tiebreak"} onChange={(e) => setDeciding(e.target.checked ? "match_tiebreak" : "set")} className="size-5 accent-[var(--accent)]" />
                 Deciding set played as a match tiebreak (first to 10)
               </label>
             ) : null}
@@ -140,7 +139,7 @@ export function RecordMatchForm({ me, opponents, recent, today, initial }: Recor
               <button type="button" className={chip(playedOn === addDays(today, -1))} aria-pressed={playedOn === addDays(today, -1)} onClick={() => setPlayedOn(addDays(today, -1))}>Yesterday</button>
               <label className={`${chip(playedOn < addDays(today, -1))} relative`}>
                 <span className="sr-only">Pick a date</span>
-                <input type="date" value={playedOn} min={addDays(today, -365)} max={today} onChange={(e) => e.target.value && setPlayedOn(e.target.value)} className="bg-transparent outline-none" />
+                <input type="date" value={playedOn} min={addDays(today, -365)} max={today} onChange={(e) => e.target.value && setPlayedOn(e.target.value)} className="h-11 bg-transparent outline-none" />
               </label>
             </div>
           </fieldset>
@@ -149,17 +148,16 @@ export function RecordMatchForm({ me, opponents, recent, today, initial }: Recor
           <fieldset>
             <legend className="mb-3 text-lg font-bold">Score</legend>
             <ol className="space-y-3">
-              <AnimatePresence initial={false}>
                 {Array.from({ length: shown }, (_, i) => {
                   const p = picks[i]!, mtb = isMtb(i);
                   const needsTb = mtb ? p.winner !== null : p.score?.[0] === 7 && p.score?.[1] === 6;
                   return (
-                    <motion.li key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.22 }} className="card p-4">
+                    <li key={i} className="animate-rise card p-4">
                       <p className="mb-3 text-sm font-bold">{mtb ? "Match tiebreak" : `Set ${i + 1}`}</p>
                       <div role="radiogroup" aria-label={`Who won ${mtb ? "the match tiebreak" : `set ${i + 1}`}?`} className="grid grid-cols-2 gap-2">
                         {(["me", "them"] as Side[]).map((sd) => (
                           <button key={sd} type="button" role="radio" aria-checked={p.winner === sd} onClick={() => setPick(i, { winner: sd })}
-                            className={`press flex h-12 items-center justify-center gap-2 rounded-2xl text-sm font-bold ${p.winner === sd ? "bg-ball text-on-ball" : "bg-surface-3 text-text"}`}>
+                            className={`press flex h-12 items-center justify-center gap-2 rounded-2xl text-sm font-bold ${p.winner === sd ? "bg-accent text-on-accent" : "bg-surface-3 text-text"}`}>
                             {p.winner === sd ? <Check size={16} strokeWidth={3} aria-hidden="true" /> : null}{sd === "me" ? "I won it" : `${opp ? shortName(opp) : "They"} won it`}
                           </button>
                         ))}
@@ -183,40 +181,39 @@ export function RecordMatchForm({ me, opponents, recent, today, initial }: Recor
                           </span>
                         </div>
                       ) : null}
-                    </motion.li>
+                    </li>
                   );
                 })}
-              </AnimatePresence>
             </ol>
           </fieldset>
 
           <label className="block">
             <span className="mb-2 block text-lg font-bold">Note <span className="text-sm font-normal text-text-3">(optional)</span></span>
             <input value={note} onChange={(e) => setNote(e.target.value)} maxLength={140} placeholder="Where, conditions, bragging rights…"
-              className="h-12 w-full rounded-2xl border border-line-strong bg-surface px-4 text-base outline-none placeholder:text-text-3 focus:border-ball-ink" />
+              className="h-12 w-full rounded-2xl border border-line-strong bg-surface px-4 text-base outline-none placeholder:text-text-3 focus:border-accent-ink" />
           </label>
         </div>
 
         {/* live result + submit (sticky on desktop) */}
         <aside className="lg:sticky lg:top-8" aria-label="Result">
-          <div className="overflow-hidden rounded-[24px] border border-white/10 bg-[#0d0f0c] p-5 text-[#f2f3ec]">
-            <p className="text-caption font-semibold text-[#a9ae9f]">{FORMAT_LABEL[format]}{locked ? " · challenge" : ""}</p>
+          <div className="overflow-hidden rounded-[24px] border border-white/10 bg-[#111827] p-5 text-[#f8fafc]">
+            <p className="text-caption font-semibold text-[#94a3b8]">{FORMAT_LABEL[format]}{locked ? " · challenge" : ""}</p>
             {[{ who: me, side: 1 as const }, { who: opp, side: 2 as const }].map(({ who, side }) => (
               <div key={side} className="mt-3 flex items-center gap-3">
                 <Avatar player={who} size="sm" />
-                <span className={`min-w-0 flex-1 truncate font-bold ${check.ok && check.winner === side ? "text-[#d6f24a]" : ""}`}>{who ? shortName(who) : "Opponent"}</span>
+                <span className={`min-w-0 flex-1 truncate font-bold ${check.ok && check.winner === side ? "text-[#8ea2ff]" : ""}`}>{who ? shortName(who) : "Opponent"}</span>
                 <span className="flex gap-1">
                   {sets.map((x, i) => <span key={i} className="score num w-7 text-center text-[24px]">{(side === 1 ? x.p1 : x.p2) ?? "·"}</span>)}
                 </span>
               </div>
             ))}
             <p className="mt-4 min-h-6 text-sm" aria-live="polite">
-              {check.ok ? (check.winner === 1 ? <span className="font-semibold text-[#d6f24a]">You win · +{pointsFor(format)} pts once {opp ? shortName(opp) : "they"} confirm{opp ? "s" : ""}</span>
-                : <span className="text-[#f2f3ec]">{opp ? shortName(opp) : "They"} win{opp ? "s" : ""} this one</span>)
-                : <span className="text-[#a9ae9f]">{opponent ? "Pick the score of each set." : "Pick your opponent."}</span>}
+              {check.ok ? (check.winner === 1 ? <span className="font-semibold text-[#8ea2ff]">You win · +{pointsFor(format)} pts once {opp ? shortName(opp) : "they"} confirm{opp ? "s" : ""}</span>
+                : <span className="text-[#f8fafc]">{opp ? shortName(opp) : "They"} win{opp ? "s" : ""} this one</span>)
+                : <span className="text-[#94a3b8]">{opponent ? "Pick the score of each set." : "Pick your opponent."}</span>}
             </p>
           </div>
-          {error ? <p role="alert" className="mt-3 text-sm font-semibold text-clay-ink">{error}</p> : null}
+          {error ? <p role="alert" className="mt-3 text-sm font-semibold text-loss-ink">{error}</p> : null}
           {duplicate ? <Button full variant="secondary" className="mt-3" loading={pending} onClick={() => submit(true)}>It&apos;s a different match: record anyway</Button> : null}
           <Button full size="lg" className="mt-4" disabled={!opponent || !check.ok} loading={pending} onClick={() => submit()}>
             {opp ? `Send to ${shortName(opp)} to confirm` : "Record match"}
@@ -224,6 +221,6 @@ export function RecordMatchForm({ me, opponents, recent, today, initial }: Recor
           <p className="mt-2 text-center text-caption text-text-3">{opp ? shortName(opp) : "Your opponent"} confirms the score, then it counts.</p>
         </aside>
       </div>
-    </MotionConfig>
+    </>
   );
 }

@@ -16,7 +16,7 @@ export function ThemeControl({ initial }: { initial: ThemePref }) {
     <div role="radiogroup" aria-label="Appearance" className="grid grid-cols-3 gap-1 rounded-full bg-surface-3 p-1">
       {OPTIONS.map((o) => (
         <button key={o.value} type="button" role="radio" aria-checked={pref === o.value} onClick={() => choose(o.value)}
-          className={`press inline-flex h-10 items-center justify-center gap-1.5 rounded-full text-sm font-semibold ${pref === o.value ? "bg-surface text-text shadow-sm" : "text-text-2"}`}>
+          className={`press inline-flex h-11 items-center justify-center gap-1.5 rounded-full text-sm font-semibold ${pref === o.value ? "bg-surface text-text shadow-sm" : "text-text-2"}`}>
           <o.icon size={16} aria-hidden="true" />{o.label}
         </button>
       ))}

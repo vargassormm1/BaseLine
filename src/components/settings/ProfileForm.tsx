@@ -9,7 +9,7 @@ export function ProfileForm({ initial, mode }: { initial: { username: string; fi
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [pending, start] = useTransition();
   const router = useRouter();
-  const field = "mt-1.5 h-12 w-full rounded-2xl border border-line-strong bg-surface-2 px-4 text-base outline-none focus:border-ball-ink";
+  const field = "mt-1.5 h-12 w-full rounded-2xl border border-line-strong bg-surface-2 px-4 text-base outline-none focus:border-accent-ink";
   return (
     <form className="space-y-4" onSubmit={(e) => {
       e.preventDefault();
@@ -33,7 +33,7 @@ export function ProfileForm({ initial, mode }: { initial: { username: string; fi
         <label className="block"><span className="eyebrow">First name</span><input value={v.firstName} maxLength={40} onChange={(e) => setV({ ...v, firstName: e.target.value })} className={field} autoComplete="given-name" /></label>
         <label className="block"><span className="eyebrow">Last name</span><input value={v.lastName} maxLength={40} onChange={(e) => setV({ ...v, lastName: e.target.value })} className={field} autoComplete="family-name" /></label>
       </div>
-      {msg ? <p role={msg.ok ? "status" : "alert"} className={`text-sm font-semibold ${msg.ok ? "text-ball-ink" : "text-clay-ink"}`}>{msg.text}</p> : null}
+      {msg ? <p role={msg.ok ? "status" : "alert"} className={`text-sm font-semibold ${msg.ok ? "text-accent-ink" : "text-loss-ink"}`}>{msg.text}</p> : null}
       <Button type="submit" loading={pending} full={mode === "welcome"} size={mode === "welcome" ? "lg" : "md"}>{mode === "welcome" ? "Let's play" : "Save"}</Button>
     </form>
   );

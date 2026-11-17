@@ -12,7 +12,7 @@ export interface Identity { userId: string; sb: DB; profile: Profile }
 
 export const E2E_COOKIE = "baseline_e2e_user";
 /** Auth cookies: httpOnly, lax (the Google redirect back is a top-level GET), secure on https. */
-export const AUTH_COOKIE_OPTIONS = { httpOnly: true, sameSite: "lax" as const, path: "/" };
+export const AUTH_COOKIE_OPTIONS = { httpOnly: true, sameSite: "lax" as const, path: "/", secure: process.env.NODE_ENV === "production" };
 
 /** Supabase client for this request, signed in as the cookie's user (RLS applies). Never a service key. */
 export async function supabaseForRequest(): Promise<DB> {

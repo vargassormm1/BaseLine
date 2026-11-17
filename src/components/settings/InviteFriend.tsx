@@ -19,7 +19,7 @@ export function InviteFriend() {
           <Button size="sm" variant="secondary" onClick={async () => { try { await navigator.clipboard.writeText(link); toast("Invite link copied."); } catch { setError("Couldn't copy. Select the link and copy it."); } }}><Copy size={15} aria-hidden="true" />Copy</Button>
         </div>
       ) : null}
-      {error ? <p role="alert" className="text-sm font-semibold text-clay-ink">{error}</p> : null}
+      {error ? <p role="alert" className="text-sm font-semibold text-loss-ink">{error}</p> : null}
       <Button variant={link ? "ghost" : "primary"} size="md" loading={pending} onClick={() => start(async () => {
         const r = await createInvite();
         if (!r.ok || !r.code) { setError(r.ok ? "Couldn't create an invite." : r.error); return; }

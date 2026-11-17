@@ -14,8 +14,8 @@ export default async function SignIn({ searchParams }: { searchParams: Promise<{
   const href = e2eAuthEnabled() ? "/e2e/sign-in?u=ana" : `/auth/google?next=${encodeURIComponent(next)}`;
   return (
     <main className="pt-safe mx-auto flex min-h-dvh max-w-sm flex-col justify-center px-5 py-10">
-      <Link href="/" aria-label="Baseline home" prefetch={false}><Wordmark /></Link>
-      <h1 className="display mt-10 text-[44px]">Step on court.</h1>
+      <Link href="/" aria-label="Baseline home" prefetch={false} className="inline-flex min-h-11 items-center self-start"><Wordmark /></Link>
+      <h1 className="display mt-10 text-[44px]">Game on.</h1>
       <p className="mt-3 text-text-2">Sign in with the Google account you play under. New here? You&apos;ll need an invite link from a player.</p>
       {q.error ? <p role="alert" className="mt-5 rounded-2xl bg-warn-bg px-4 py-3 text-sm font-semibold text-warn-ink">Google sign-in didn&apos;t finish. Please try again.</p> : null}
       <a href={href} className="press mt-8 flex h-14 items-center justify-center gap-3 rounded-full bg-text text-base font-bold text-bg hover:opacity-90">

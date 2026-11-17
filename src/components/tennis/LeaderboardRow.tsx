@@ -6,13 +6,12 @@ import type { StandingRow } from "@/lib/tennis/standings";
 /** One leaderboard row: position, movement, player, form, record, points. Top three get the optic rank. */
 export function LeaderboardRow({ r, me, compact = false }: { r: StandingRow; me: string; compact?: boolean }) {
   const isMe = r.player.id === me;
-  const top = r.rank !== null && r.rank <= 3;
   return (
     <li>
       <Link href={`/players/${r.player.username}`} aria-current={isMe ? "true" : undefined}
         className={`press flex items-center gap-3 px-4 ${compact ? "py-2.5" : "py-3.5"} ${isMe ? "bg-surface-3" : "hover:bg-surface-2"}`}>
         <span className="flex w-9 shrink-0 flex-col items-center">
-          <span className={`score text-[26px] ${r.rank === null ? "text-text-3" : top ? "text-ball-ink" : "text-text"}`}>{r.rank ?? "–"}</span>
+          <span className={`score text-[26px] ${r.rank === null ? "text-text-3" : r.rank === 1 ? "text-gold-ink" : "text-text"}`}>{r.rank ?? "–"}</span>
           {r.rank !== null ? <Movement by={r.movement} /> : null}
         </span>
         <Avatar player={r.player} size={compact ? "sm" : "md"} ring={r.rank === 1} />
