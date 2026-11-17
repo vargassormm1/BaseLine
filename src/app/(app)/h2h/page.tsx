@@ -56,7 +56,7 @@ export default async function H2H({ searchParams }: { searchParams: Promise<{ a?
     <div className="flex min-w-0 flex-col items-center text-center">
       <Avatar player={p} size={"lg"} ring={leading} />
       <p className="display mt-3 w-full truncate text-[20px] sm:text-[28px]">{shortName(p)}</p>
-      <p className="w-full truncate text-caption text-[#a9bdb5]">{rankOf(p.id) ? `#${rankOf(p.id)}` : "Unranked"} · @{p.username}</p>
+      <p className="w-full truncate text-caption text-[#a9c4b9]">{rankOf(p.id) ? `#${rankOf(p.id)}` : "Unranked"} · @{p.username}</p>
     </div>
   );
   const lead = h.a.wins === h.b.wins ? "All square" : `${shortName(h.a.wins > h.b.wins ? pa : pb)} leads`;
@@ -66,18 +66,18 @@ export default async function H2H({ searchParams }: { searchParams: Promise<{ a?
       <div className="space-y-4 pt-2"><h1 className="display text-[34px] sm:text-[40px]">Head to head</h1>{picker}</div>
 
       {/* the matchup */}
-      <section aria-label={`${displayName(pa)} versus ${displayName(pb)}: ${h.a.wins} to ${h.b.wins}`} className="overflow-hidden rounded-[28px] border border-white/10 bg-[#163d32] px-3 pt-6 pb-7 text-[#f7f8f4] sm:px-8">
+      <section aria-label={`${displayName(pa)} versus ${displayName(pb)}: ${h.a.wins} to ${h.b.wins}`} className="overflow-hidden rounded-[28px] border border-white/10 bg-[#123f35] px-3 pt-6 pb-7 text-[#fafaf6] sm:px-8">
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
           {side(pa, h.a.wins >= h.b.wins && h.played > 0)}
           <div className="text-center">
-            <p className="text-caption font-bold text-[#a9bdb5]" aria-hidden="true">VS</p>
-            <p className="score num mt-1 text-[clamp(52px,17vw,72px)] sm:text-[104px]"><span className={h.a.wins >= h.b.wins ? "text-[#6fd3a0]" : ""}>{h.a.wins}</span><span className="px-2 font-light text-[#a9bdb5]">-</span><span className={h.b.wins > h.a.wins ? "text-[#6fd3a0]" : ""}>{h.b.wins}</span></p>
-            <p className="text-caption font-semibold text-[#a9bdb5]">{h.played ? lead : "Never played"}</p>
+            <p className="text-caption font-bold text-[#a9c4b9]" aria-hidden="true">VS</p>
+            <p className="score num mt-1 text-[clamp(52px,17vw,72px)] sm:text-[104px]"><span className={h.a.wins >= h.b.wins ? "text-[#7be5b3]" : ""}>{h.a.wins}</span><span className="px-2 font-light text-[#a9c4b9]">-</span><span className={h.b.wins > h.a.wins ? "text-[#7be5b3]" : ""}>{h.b.wins}</span></p>
+            <p className="text-caption font-semibold text-[#a9c4b9]">{h.played ? lead : "Never played"}</p>
           </div>
           {side(pb, h.b.wins > h.a.wins)}
         </div>
         {h.played ? <div className="mt-6"><SplitBar a={h.a.wins} b={h.b.wins} /></div> : null}
-        {h.streak && h.streak.length > 1 ? <p className="mt-4 text-center text-sm text-[#a9bdb5]">{shortName(b.byId.get(h.streak.playerId))} has won the last {h.streak.length}</p> : null}
+        {h.streak && h.streak.length > 1 ? <p className="mt-4 text-center text-sm text-[#a9c4b9]">{shortName(b.byId.get(h.streak.playerId))} has won the last {h.streak.length}</p> : null}
       </section>
 
       {h.played === 0 ? (

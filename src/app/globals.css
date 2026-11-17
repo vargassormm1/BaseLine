@@ -1,31 +1,35 @@
 @import "tailwindcss";
 
 /* ==== Baseline design system (docs/ARCHITECTURE.md → Design) ==========================================================
-   A green sports brand with room to grow beyond tennis. Forest green (#163D32) is the brand: the hero panels and the
-   app icon. Sport green (#22A06B) is the one primary action, selection and wins (always with dark text on it: white
-   fails contrast). Charcoal and warm off-white surfaces, slate supporting text, a restrained red for losses and
-   errors. No neon, no sport in a token name. Archivo across widths: condensed heavy numerals for scores and ranks,
-   slightly expanded heavy display type for names. Every text pair is AA (checked by axe in the browser tests). */
+   Fresh, energetic, still grown-up. Warm ivory and white surfaces carry the app; deep evergreen (#123F35) is the big
+   brand moment (hero panels, icon); rally green (#19B779) is the one action color and marks wins (always with ink
+   text on it: white fails contrast); fresh mint (#B8F2D4) softens selected and highlighted areas; coral (#F27A5E) is
+   used only in small touches of warmth. No sport in a token name. Archivo across widths: condensed heavy numerals for
+   scores and ranks, slightly expanded heavy display type. Every text pair is AA (checked by axe in the browser tests). */
 :root {
-  --bg: #f7f8f4; --surface: #ffffff; --surface-2: #f0f2ec; --surface-3: #e3e7df;
-  --line: rgb(23 28 27 / 0.09); --line-strong: rgb(23 28 27 / 0.17);
-  --text: #171c1b; --text-2: #4f5b56; --text-3: #5d6964;
-  --accent: #22a06b; --on-accent: #0b1a14; --accent-ink: #1a7550;   /* fill · text on fill · accent text */
+  --bg: #fafaf6; --surface: #ffffff; --surface-2: #f2f4ed; --surface-3: #e6e9e0;
+  --line: rgb(21 31 26 / 0.09); --line-strong: rgb(21 31 26 / 0.17);
+  --text: #151f1a; --text-2: #4c5a53; --text-3: #5a6861;
+  --accent: #19b779; --on-accent: #0c1f17; --accent-ink: #0c6b46;   /* fill · text on fill · accent text */
+  --mint: #b8f2d4; --on-mint: #123f35;                              /* soft highlight */
+  --coral: #f27a5e; --coral-ink: #b8452b;                           /* sparing warmth */
   --loss: #dc4a51; --loss-ink: #b42b32;
-  --panel: #163d32; --panel-line: rgb(255 255 255 / 0.10);          /* the forest hero panels (both themes) */
+  --panel: #123f35; --panel-line: rgb(255 255 255 / 0.10);          /* the evergreen hero panels (both themes) */
   --warn-bg: #fef3c7; --warn-ink: #7a4a00;
-  --scrim: rgb(17 21 20 / 0.5);
-  --shadow: 0 1px 2px rgb(23 28 27 / 0.06), 0 8px 24px -12px rgb(23 28 27 / 0.18);
+  --scrim: rgb(16 23 19 / 0.5);
+  --shadow: 0 1px 2px rgb(21 31 26 / 0.06), 0 10px 28px -14px rgb(21 31 26 / 0.20);
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #111514; --surface: #171c1b; --surface-2: #1e2523; --surface-3: #283230;
-    --line: rgb(241 244 239 / 0.09); --line-strong: rgb(241 244 239 / 0.17);
-    --text: #f1f4ef; --text-2: #a7b3ad; --text-3: #93a099;
-    --accent: #22a06b; --on-accent: #0b1a14; --accent-ink: #4cc38a;
+    --bg: #101713; --surface: #151f1a; --surface-2: #1b2721; --surface-3: #26312c;
+    --line: rgb(240 245 238 / 0.09); --line-strong: rgb(240 245 238 / 0.17);
+    --text: #f2f5ef; --text-2: #a8b5ad; --text-3: #93a099;
+    --accent: #19b779; --on-accent: #0c1f17; --accent-ink: #3fd197;
+    --mint: #1b3a30; --on-mint: #b8f2d4;
+    --coral: #ff9c85; --coral-ink: #ff9c85;
     --loss: #ff8589; --loss-ink: #ff8589;
-    --panel: #163d32; --panel-line: rgb(241 244 239 / 0.12);
+    --panel: #123f35; --panel-line: rgb(240 245 238 / 0.12);
     --warn-bg: #3b2f12; --warn-ink: #f8d67a;
     --scrim: rgb(0 0 0 / 0.6);
     --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 10px 30px -14px rgb(0 0 0 / 0.7);
@@ -33,12 +37,14 @@
   }
 }
 :root[data-theme="dark"] {
-  --bg: #111514; --surface: #171c1b; --surface-2: #1e2523; --surface-3: #283230;
-  --line: rgb(241 244 239 / 0.09); --line-strong: rgb(241 244 239 / 0.17);
-  --text: #f1f4ef; --text-2: #a7b3ad; --text-3: #93a099;
-  --accent: #22a06b; --on-accent: #0b1a14; --accent-ink: #4cc38a;
+  --bg: #101713; --surface: #151f1a; --surface-2: #1b2721; --surface-3: #26312c;
+  --line: rgb(240 245 238 / 0.09); --line-strong: rgb(240 245 238 / 0.17);
+  --text: #f2f5ef; --text-2: #a8b5ad; --text-3: #93a099;
+  --accent: #19b779; --on-accent: #0c1f17; --accent-ink: #3fd197;
+  --mint: #1b3a30; --on-mint: #b8f2d4;
+  --coral: #ff9c85; --coral-ink: #ff9c85;
   --loss: #ff8589; --loss-ink: #ff8589;
-  --panel: #163d32; --panel-line: rgb(241 244 239 / 0.12);
+  --panel: #123f35; --panel-line: rgb(240 245 238 / 0.12);
   --warn-bg: #3b2f12; --warn-ink: #f8d67a;
   --scrim: rgb(0 0 0 / 0.6);
   --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 10px 30px -14px rgb(0 0 0 / 0.7);
@@ -50,6 +56,7 @@
   --color-line: var(--line); --color-line-strong: var(--line-strong);
   --color-text: var(--text); --color-text-2: var(--text-2); --color-text-3: var(--text-3);
   --color-accent: var(--accent); --color-on-accent: var(--on-accent); --color-accent-ink: var(--accent-ink);
+  --color-mint: var(--mint); --color-on-mint: var(--on-mint); --color-coral: var(--coral); --color-coral-ink: var(--coral-ink);
   --color-loss: var(--loss); --color-loss-ink: var(--loss-ink); --color-panel: var(--panel); --color-panel-line: var(--panel-line);
   --color-warn-bg: var(--warn-bg); --color-warn-ink: var(--warn-ink); --color-scrim: var(--scrim);
   --font-sans: var(--font-archivo), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -84,6 +91,7 @@
   .eyebrow { font-size: 12px; line-height: 16px; font-weight: 600; color: var(--text-2); }
   .press { transition: transform 120ms var(--ease-out), background-color 120ms, color 120ms, opacity 120ms, border-color 120ms; }
   .press:active { transform: scale(0.97); }
+  @media (hover: hover) { .lift { transition: transform 160ms var(--ease-out), box-shadow 160ms var(--ease-out); } .lift:hover { transform: translateY(-2px); box-shadow: 0 10px 24px -10px rgb(25 183 121 / 0.55); } }
   .card { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; }
   .pb-tabbar { padding-bottom: calc(env(safe-area-inset-bottom) + 96px); }
   .pt-safe { padding-top: env(safe-area-inset-top); }
@@ -103,6 +111,14 @@ dialog.sheet::backdrop { background: var(--scrim); animation: fade 200ms ease-ou
     .reveal { animation: rise linear both; animation-timeline: view(); animation-range: entry 0% entry 40%; }
   }
 }
+/* landing hero: one short sequence (scores → winner → points → the table changes), played once */
+.seq { animation: rise 420ms var(--ease-out) both; animation-delay: var(--d, 0ms); }
+.seq-pop { animation: pop 480ms var(--ease-out) both; animation-delay: var(--d, 0ms); }
+.seq-up { animation: swap-up 620ms var(--ease-out) both; animation-delay: var(--d, 0ms); }
+.seq-down { animation: swap-down 620ms var(--ease-out) both; animation-delay: var(--d, 0ms); }
+@keyframes pop { 0% { opacity: 0; transform: scale(0.6); } 70% { opacity: 1; transform: scale(1.08); } 100% { opacity: 1; transform: none; } }
+@keyframes swap-up { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes swap-down { from { transform: translateY(-100%); } to { transform: none; } }
 .split-grow { animation: grow 700ms var(--ease-out) both; }
 @keyframes grow { from { transform: scaleX(0.5); } to { transform: none; } }
 @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }

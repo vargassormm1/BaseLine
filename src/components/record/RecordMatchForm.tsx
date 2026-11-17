@@ -196,21 +196,21 @@ export function RecordMatchForm({ me, opponents, recent, today, initial }: Recor
 
         {/* live result + submit (sticky on desktop) */}
         <aside className="lg:sticky lg:top-8" aria-label="Result">
-          <div className="overflow-hidden rounded-[24px] border border-white/10 bg-[#163d32] p-5 text-[#f7f8f4]">
-            <p className="text-caption font-semibold text-[#a9bdb5]">{FORMAT_LABEL[format]}{locked ? " · challenge" : ""}</p>
+          <div className="overflow-hidden rounded-[24px] border border-white/10 bg-[#123f35] p-5 text-[#fafaf6]">
+            <p className="text-caption font-semibold text-[#a9c4b9]">{FORMAT_LABEL[format]}{locked ? " · challenge" : ""}</p>
             {[{ who: me, side: 1 as const }, { who: opp, side: 2 as const }].map(({ who, side }) => (
               <div key={side} className="mt-3 flex items-center gap-3">
                 <Avatar player={who} size="sm" />
-                <span className={`min-w-0 flex-1 truncate font-bold ${check.ok && check.winner === side ? "text-[#6fd3a0]" : ""}`}>{who ? shortName(who) : "Opponent"}</span>
+                <span className={`min-w-0 flex-1 truncate font-bold ${check.ok && check.winner === side ? "text-[#7be5b3]" : ""}`}>{who ? shortName(who) : "Opponent"}</span>
                 <span className="flex gap-1">
                   {sets.map((x, i) => <span key={i} className="score num w-7 text-center text-[24px]">{(side === 1 ? x.p1 : x.p2) ?? "·"}</span>)}
                 </span>
               </div>
             ))}
             <p className="mt-4 min-h-6 text-sm" aria-live="polite">
-              {check.ok ? (check.winner === 1 ? <span className="font-semibold text-[#6fd3a0]">You win · +{pointsFor(format)} pts once {opp ? shortName(opp) : "they"} confirm{opp ? "s" : ""}</span>
-                : <span className="text-[#f7f8f4]">{opp ? shortName(opp) : "They"} win{opp ? "s" : ""} this one</span>)
-                : <span className="text-[#a9bdb5]">{opponent ? "Pick the score of each set." : "Pick your opponent."}</span>}
+              {check.ok ? (check.winner === 1 ? <span className="font-semibold text-[#7be5b3]">You win · +{pointsFor(format)} pts once {opp ? shortName(opp) : "they"} confirm{opp ? "s" : ""}</span>
+                : <span className="text-[#fafaf6]">{opp ? shortName(opp) : "They"} win{opp ? "s" : ""} this one</span>)
+                : <span className="text-[#a9c4b9]">{opponent ? "Pick the score of each set." : "Pick your opponent."}</span>}
             </p>
           </div>
           {error ? <p role="alert" className="mt-3 text-sm font-semibold text-loss-ink">{error}</p> : null}
