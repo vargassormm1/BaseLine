@@ -91,6 +91,12 @@ dialog.sheet { margin: auto auto 0; width: 100%; max-width: 560px; max-height: 9
 @media (min-width: 640px) { dialog.sheet { margin: auto; border-radius: 24px; animation: rise 200ms var(--ease-out) both; } }
 dialog.sheet::backdrop { background: var(--scrim); animation: fade 200ms ease-out both; }
 
+/* scroll reveal, where the browser supports scroll-driven animation (content is simply visible everywhere else) */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal { animation: rise linear both; animation-timeline: view(); animation-range: entry 0% entry 40%; }
+  }
+}
 @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @keyframes sheet-up { from { transform: translateY(100%); } to { transform: none; } }
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }

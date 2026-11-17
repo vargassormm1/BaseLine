@@ -9,8 +9,12 @@ test.beforeAll(async () => { await resetFixtures(); });
 test("signed out: the landing page is public, everything else is closed", async ({ page }) => {
   const problems = watch(page);
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Every match counts." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Settle it on the court." })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Join with an invite" }).first()).toHaveAttribute("href", "/sign-in?next=/welcome");
+  await expect(page.getByText("Baseline is invite-only.")).toBeVisible();
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
   await axe(page);
+  await noSidewaysScroll(page);
   for (const path of ["/home", "/rankings", "/players/ana_e2e", "/h2h", "/record", "/matches/00000000-0000-4000-8000-0000000000f1"]) {
     await page.goto(path);
     await expect(page, path).toHaveURL(/\/sign-in(\?next=.*)?$/);
