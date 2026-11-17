@@ -136,11 +136,10 @@ describe("profiles and limits", () => {
     expect((await a.sb.rpc("update_profile", { p_username: "a b<script>", p_first_name: "A", p_last_name: "B" })).error?.message).toMatch(/invalid_username/);
   });
   it("signing in again keeps the same player (identity is the auth user id)", async () => {
-    const { data } = await a.sb.rpc("ensure_player", { p_username: "different", p_first_name: "x", p_last_name: "y", p_avatar_url: "https://evil.example/x.png" });
+    const { data } = await a.sb.rpc("ensure_player", { p_username: "different", p_first_name: "x", p_last_name: "y" });
     expect(data).toBe(a.id);
-    const [p] = await db`select username, avatar_url from public.players where id = ${a.id}`;
+    const [p] = await db`select username from public.players where id = ${a.id}`;
     expect(p!.username).toBe(a.username);
-    expect(p!.avatar_url).toBeNull(); // only Clerk image hosts are accepted
   });
   it("recording is rate limited", async () => {
     await db`insert into public.rate_limits (player_id, bucket, window_start, hits) values (${c.id}, 'record_match', now(), 20)
@@ -154,7 +153,7 @@ describe("hardening (independent review)", () => {
     const ghost = as(a.sub, { email: a.email, anonymous: true });
     expect((await ghost.rpc("me")).data).toBeNull();
     expect((await ghost.from("players").select("id")).data).toEqual([]);
-    expect((await ghost.rpc("ensure_player", { p_username: "ghost", p_first_name: "", p_last_name: "", p_avatar_url: "", p_invite: await invite() })).error?.code).toBe("42501");
+    expect((await ghost.rpc("ensure_player", { p_username: "ghost", p_first_name: "", p_last_name: "", p_invite: await invite() })).error?.code).toBe("42501");
   });
   it("internal helpers can't be called by anyone through the API", async () => {
     const rows = await db`select p.proname, has_function_privilege('anon', p.oid, 'execute') a, has_function_privilege('authenticated', p.oid, 'execute') u
@@ -171,34 +170,50 @@ describe("hardening (independent review)", () => {
   it("new players need a valid, unused invite; existing players never do", async () => {
     const email = `s${randomUUID().slice(0, 8)}@example.test`;
     const stranger = as(await authUser(email), { email });
-    const args = { p_username: `s${randomUUID().slice(0, 8)}`, p_first_name: "S", p_last_name: "T", p_avatar_url: "" };
+    const args = { p_username: `s${randomUUID().slice(0, 8)}`, p_first_name: "S", p_last_name: "T" };
     expect((await stranger.rpc("ensure_player", args)).error?.message).toMatch(/invite_required/);
-    expect((await stranger.rpc("ensure_player", { ...args, p_invite: "NOTAREALCODE" })).error?.message).toMatch(/invalid_invite/);
+    expect((await stranger.rpc("ensure_player", { ...args, p_invite: "NOTAREALCODE" })).data).toBeNull(); // wrong code: no player
     const code = await invite();
-    expect((await stranger.rpc("ensure_player", { ...args, p_invite: code.toLowerCase().replace(/(.{4})/g, "$1-") })).error).toBeNull();
+    const joined = await stranger.rpc("ensure_player", { ...args, p_invite: code.toLowerCase().replace(/(.{4})/g, "$1-") });
+    expect([joined.error, typeof joined.data]).toEqual([null, "string"]);
     const e2 = `o${randomUUID().slice(0, 8)}@example.test`;
     const other = as(await authUser(e2), { email: e2 });
-    expect((await other.rpc("ensure_player", { ...args, p_username: `o${randomUUID().slice(0, 8)}`, p_invite: code })).error?.message).toMatch(/invalid_invite/); // used
+    expect((await other.rpc("ensure_player", { ...args, p_username: `o${randomUUID().slice(0, 8)}`, p_invite: code })).data).toBeNull(); // already used
     expect((await a.sb.rpc("ensure_player", { ...args })).data).toBe(a.id); // existing: no invite needed
   });
-  it("a V1 player links by their verified Google email on first sign-in, and only once", async () => {
+  it("joining is limited to 10 invite attempts an hour per account, even with a valid code afterwards", async () => {
+    const e = `g${randomUUID().slice(0, 8)}@example.test`;
+    const guesser = as(await authUser(e), { email: e });
+    const args = { p_username: `g${randomUUID().slice(0, 8)}`, p_first_name: "", p_last_name: "" };
+    for (let i = 0; i < 10; i++) expect((await guesser.rpc("ensure_player", { ...args, p_invite: `WRONGCODE${i}XX` })).data).toBeNull();
+    expect((await guesser.rpc("ensure_player", { ...args, p_invite: await invite() })).data).toBeNull(); // 11th try: refused
+    expect((await guesser.rpc("me")).data).toBeNull();
+  });
+  it("a V1 player links only through a Google identity whose email Google verified, and only once", async () => {
     const email = `v1${randomUUID().slice(0, 6)}@example.test`;
     await db`delete from public.players where clerk_user_id like 'user_v1_test%'`;
     const [v1] = await db`insert into public.players (clerk_user_id, username, first_name, last_name)
                           values (${`user_v1_test_${randomUUID().slice(0, 6)}`}, ${`v1${randomUUID().slice(0, 6)}`}, 'Old', 'Timer') returning id`;
     await db`insert into public.player_private (player_id, email) values (${v1!.id}, ${email})`;
-    const none = { p_username: "", p_first_name: "", p_last_name: "", p_avatar_url: "" };
-    // not Google, or not verified: no link (would need an invite instead)
-    // (Supabase Auth keeps one account per email; the database still only trusts a verified Google email claim)
-    expect((await as(await authUser(), { email, provider: "email" }).rpc("ensure_player", none)).error?.message).toMatch(/invalid_username|invite_required/);
-    expect((await as(await authUser(), { email, verified: false }).rpc("ensure_player", none)).error?.message).toMatch(/invalid_username|invite_required/);
-    // verified Google with the same email (any case): linked, no invite, history kept
-    const uid = await authUser(email);
-    const { data, error } = await as(uid, { email: email.toUpperCase() }).rpc("ensure_player", none);
+    const none = { p_username: "", p_first_name: "", p_last_name: "" };
+    const linked = async () => (await db`select auth_user_id from public.players where id = ${v1!.id}`)[0]!.auth_user_id;
+    // an account that merely CLAIMS the email in its token (changed account email, forged user_metadata): no Google identity for it
+    const forged = as(await authUser(null, { google: false }), { email, verified: true, provider: "google" });
+    expect((await forged.rpc("ensure_player", none)).error?.message).toMatch(/invite_required/);
+    // a Google identity for a different email, with the account email switched to the victim's
+    const switched = as(await authUser(null, { identityEmail: "someone-else@example.test" }), { email });
+    expect((await switched.rpc("ensure_player", none)).error?.message).toMatch(/invite_required/);
+    // a Google identity whose email Google did not verify
+    const unverified = as(await authUser(null, { identityEmail: email, verified: false }), { email });
+    expect((await unverified.rpc("ensure_player", none)).error?.message).toMatch(/invite_required/);
+    expect(await linked()).toBeNull();
+    // the real one: Google identity with this email, verified (case-insensitive): linked, no invite, history kept
+    const uid = await authUser(null, { identityEmail: email.toUpperCase() });
+    const { data, error } = await as(uid).rpc("ensure_player", none);
     expect([error, data]).toEqual([null, v1!.id]);
-    expect((await db`select auth_user_id from public.players where id = ${v1!.id}`)[0]!.auth_user_id).toBe(uid);
-    // a second Google account with the same email can't claim an already-linked player
-    expect((await as(await authUser(), { email }).rpc("ensure_player", none)).error?.message).toMatch(/invalid_username|invite_required/);
+    expect(await linked()).toBe(uid);
+    // a second account with the same Google email can't take an already-linked player
+    expect((await as(await authUser(null, { identityEmail: email })).rpc("ensure_player", none)).error?.message).toMatch(/invite_required/);
     await db`delete from public.player_private where player_id = ${v1!.id}`; await db`delete from public.players where id = ${v1!.id}`;
   });
   it("players can create invites and see only their own, never the codes", async () => {
@@ -224,5 +239,34 @@ describe("hardening (independent review)", () => {
   it("players can't read idempotency keys or who voided a match", async () => {
     expect((await a.sb.from("matches").select("client_key")).error).not.toBeNull();
     expect((await a.sb.from("matches").select("voided_by")).error).not.toBeNull();
+  });
+});
+
+describe("profile photos (storage)", () => {
+  const webp = new Uint8Array([82, 73, 70, 70, 26, 0, 0, 0, 87, 69, 66, 80, 86, 80, 56, 76, 13, 0, 0, 0, 47, 255, 192, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  const name = (owner: TestPlayer) => `${owner.id}/${randomUUID()}.webp`;
+  const up = (who: TestPlayer, path: string) => who.sb.storage.from("avatars").upload(path, webp, { contentType: "image/webp" });
+  it("a player can upload into their own folder only, with a proper name, a few files at most", async () => {
+    expect((await up(a, name(b))).error).not.toBeNull();                       // someone else's folder
+    expect((await up(a, `${a.id}/evil.html`)).error).not.toBeNull();           // not <uuid>.webp
+    expect((await up(a, `${a.id}/x/${randomUUID()}.webp`)).error).not.toBeNull(); // nested
+    const mine = [name(a), name(a), name(a)];
+    for (const p of mine) expect((await up(a, p)).error).toBeNull();
+    expect((await up(a, name(a))).error).not.toBeNull();                       // 4th file refused
+    expect((await a.sb.storage.from("avatars").upload(mine[0]!, webp, { contentType: "image/webp", upsert: true })).error).not.toBeNull(); // never overwritten
+    // set my photo: only a file of mine that exists
+    expect((await a.sb.rpc("set_avatar", { p_path: name(a) })).error?.code).toBe("42501");
+    expect((await b.sb.rpc("set_avatar", { p_path: mine[0] })).error?.code).toBe("42501");
+    expect((await a.sb.rpc("set_avatar", { p_path: mine[0] })).error).toBeNull();
+    expect((await c.sb.from("players").select("avatar_path").eq("id", a.id).single()).data?.avatar_path).toBe(mine[0]);
+    // others can neither see nor delete my files; I can delete them (and they are really gone)
+    expect(((await b.sb.storage.from("avatars").remove(mine)).data ?? []).length).toBe(0);
+    expect(((await b.sb.storage.from("avatars").list(a.id)).data ?? []).length).toBe(0);
+    expect(((await a.sb.storage.from("avatars").remove(mine)).data ?? []).length).toBe(3);
+    expect((await db`select count(*)::int n from storage.objects where bucket_id = 'avatars' and name like ${a.id + "/%"}`)[0]!.n).toBe(0);
+    await a.sb.rpc("set_avatar", {});
+  });
+  it("anonymous visitors can't upload", async () => {
+    expect((await anon().storage.from("avatars").upload(`${a.id}/${randomUUID()}.webp`, webp, { contentType: "image/webp" })).error).not.toBeNull();
   });
 });

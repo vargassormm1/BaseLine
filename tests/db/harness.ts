@@ -18,11 +18,17 @@ export function token(sub: string, c: Claims = {}) {
   const body = `${b64({ alg: "HS256", typ: "JWT" })}.${b64(claims)}`;
   return `${body}.${createHmac("sha256", SECRET).update(body).digest("base64url")}`;
 }
-/** A fresh auth user (as Supabase Auth would create on a first Google sign-in). */
-export async function authUser(email: string | null = null): Promise<string> {
+/** A fresh auth user, as Supabase Auth creates on a first sign-in. By default it has a Google identity with a
+ *  verified email; pass google: false (no Google identity) or verified: false to model other cases. */
+export async function authUser(email: string | null = null, o: { google?: boolean; verified?: boolean; identityEmail?: string } = {}): Promise<string> {
   const id = randomUUID();
   await db`insert into auth.users (instance_id, id, aud, role, email, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
            values ('00000000-0000-0000-0000-000000000000', ${id}, 'authenticated', 'authenticated', ${email}, now(), '{"provider":"google"}', '{}', now(), now())`;
+  if (o.google !== false) {
+    const data = { sub: `g-${id}`, email: o.identityEmail ?? email, email_verified: o.verified ?? true };
+    await db`insert into auth.identities (id, user_id, provider_id, provider, identity_data, last_sign_in_at, created_at, updated_at)
+             values (gen_random_uuid(), ${id}, ${`g-${id}`}, 'google', ${db.json(data)}, now(), now(), now())`;
+  }
   createdAuth.push(id);
   return id;
 }
@@ -44,8 +50,8 @@ export async function player(name: string, admin = false): Promise<TestPlayer> {
   const email = `${username}@example.test`;
   const sub = await authUser(email);
   const sb = as(sub, { email });
-  const { data, error } = await sb.rpc("ensure_player", { p_username: username, p_first_name: name, p_last_name: "Test", p_avatar_url: "", p_invite: await invite() });
-  if (error) throw new Error(error.message);
+  const { data, error } = await sb.rpc("ensure_player", { p_username: username, p_first_name: name, p_last_name: "Test", p_invite: await invite() });
+  if (error || !data) throw new Error(error?.message ?? "player not created");
   if (admin) await db`update public.players set is_admin = true where id = ${data}`;
   return { sub, id: data as string, sb, username, email };
 }

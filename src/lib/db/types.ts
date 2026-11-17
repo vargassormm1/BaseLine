@@ -5,7 +5,21 @@ export type Database = {
   
   "public": {
           Tables: {
-            "challenges": {
+            "auth_rate_limits": {
+                  Row: {
+                    "bucket": string,"hits": number,"user_id": string,"window_start": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "bucket": string,"hits": number,"user_id": string,"window_start": string
+                  }
+                  Update: {
+                    "bucket"?: string,"hits"?: number,"user_id"?: string,"window_start"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"challenges": {
                   Row: {
                     "challenger": string,"closed_at": string | null,"created_at": string,"expires_at": string,"format": number,"id": string,"message": string | null,"opponent": string,"proposed_for": string | null,"responded_at": string | null,"status": Database["public"]['Enums']["challenge_status"]
                   }
@@ -143,14 +157,14 @@ isOneToOne: true
                   ]
                 },"players": {
                   Row: {
-                    "auth_user_id": string | null,"avatar_url": string | null,"clerk_user_id": string | null,"created_at": string,"first_name": string,"id": string,"is_admin": boolean,"last_name": string,"legacy_user_id": number | null,"updated_at": string,"username": string
+                    "auth_user_id": string | null,"avatar_path": string | null,"avatar_url": string | null,"clerk_user_id": string | null,"created_at": string,"first_name": string,"id": string,"is_admin": boolean,"last_name": string,"legacy_user_id": number | null,"updated_at": string,"username": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "auth_user_id"?: string | null,"avatar_url"?: string | null,"clerk_user_id"?: string | null,"created_at"?: string,"first_name"?: string,"id"?: string,"is_admin"?: boolean,"last_name"?: string,"legacy_user_id"?: number | null,"updated_at"?: string,"username": string
+                    "auth_user_id"?: string | null,"avatar_path"?: string | null,"avatar_url"?: string | null,"clerk_user_id"?: string | null,"created_at"?: string,"first_name"?: string,"id"?: string,"is_admin"?: boolean,"last_name"?: string,"legacy_user_id"?: number | null,"updated_at"?: string,"username": string
                   }
                   Update: {
-                    "auth_user_id"?: string | null,"avatar_url"?: string | null,"clerk_user_id"?: string | null,"created_at"?: string,"first_name"?: string,"id"?: string,"is_admin"?: boolean,"last_name"?: string,"legacy_user_id"?: number | null,"updated_at"?: string,"username"?: string
+                    "auth_user_id"?: string | null,"avatar_path"?: string | null,"avatar_url"?: string | null,"clerk_user_id"?: string | null,"created_at"?: string,"first_name"?: string,"id"?: string,"is_admin"?: boolean,"last_name"?: string,"legacy_user_id"?: number | null,"updated_at"?: string,"username"?: string
                   }
                   Relationships: [
                     
@@ -204,6 +218,9 @@ isOneToOne: false
             "app_today":
 { Args: Record<PropertyKey, never>; Returns: string
                            },
+"avatar_upload_ticket":
+{ Args: Record<PropertyKey, never>; Returns: undefined
+                           },
 "cancel_challenge":
 { Args: { "p_challenge": string }; Returns: undefined
                            },
@@ -217,7 +234,7 @@ isOneToOne: false
 { Args: Record<PropertyKey, never>; Returns: string
                            },
 "ensure_player":
-{ Args: { "p_avatar_url": string,"p_first_name": string,"p_invite"?: string,"p_last_name": string,"p_username": string }; Returns: string
+{ Args: { "p_first_name": string,"p_invite"?: string,"p_last_name": string,"p_username": string }; Returns: string
                            },
 "expire_challenges":
 { Args: { "p_a": string,"p_b": string }; Returns: undefined
@@ -227,6 +244,9 @@ isOneToOne: false
                            },
 "me":
 { Args: Record<PropertyKey, never>; Returns: string
+                           },
+"my_avatar_count":
+{ Args: Record<PropertyKey, never>; Returns: number
                            },
 "points_for":
 { Args: { "p_format": number }; Returns: number
@@ -242,6 +262,9 @@ isOneToOne: false
                            },
 "respond_match":
 { Args: { "p_accept": boolean,"p_match": string }; Returns: undefined
+                           },
+"set_avatar":
+{ Args: { "p_path"?: string }; Returns: string
                            },
 "take_rate_limit":
 { Args: { "p_bucket": string,"p_max": number,"p_player": string,"p_window": string }; Returns: undefined

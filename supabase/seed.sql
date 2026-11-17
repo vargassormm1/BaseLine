@@ -8,6 +8,9 @@ insert into auth.users (instance_id, id, aud, role, email, email_confirmed_at, r
 select '00000000-0000-0000-0000-000000000000', ('10000000-0000-4000-8000-0000000000' || k)::uuid, 'authenticated', 'authenticated',
        name || '@e2e.test', now(), '{"provider":"google","providers":["google"]}', jsonb_build_object('email_verified', true, 'full_name', initcap(name) || ' Tester'), now(), now()
 from (values ('0a', 'ana'), ('0b', 'ben'), ('0c', 'cy'), ('0d', 'dee'), ('ff', 'newbie'), ('fe', 'claimer')) as t(k, name);
+insert into auth.identities (id, user_id, provider_id, provider, identity_data, last_sign_in_at, created_at, updated_at)
+select gen_random_uuid(), u.id, 'g-' || u.id, 'google', jsonb_build_object('sub', 'g-' || u.id, 'email', u.email, 'email_verified', true), now(), now(), now()
+from auth.users u where u.email like '%@e2e.test';
 
 insert into public.players (id, auth_user_id, username, first_name, last_name, is_admin) values
   ('00000000-0000-4000-8000-00000000000a', '10000000-0000-4000-8000-00000000000a', 'ana_e2e',  'Ana', 'Reyes',     true),
