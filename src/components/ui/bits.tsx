@@ -4,10 +4,10 @@ import { ArrowDown, ArrowUp, Minus } from "lucide-react";
 import type { Result } from "@/lib/tennis/standings";
 
 /** Recent results (most recent first): a filled dot for a win, a hollow ring for a loss, so it never relies on color. */
-export function FormDots({ form, size = 8 }: { form: Result[]; size?: number }) {
+export function FormDots({ form, size = 8, onDark = false }: { form: Result[]; size?: number; onDark?: boolean }) {
   if (!form.length) return <span className="text-caption text-text-3">No matches yet</span>;
   return (
-    <span className="inline-flex items-center gap-1 text-accent-ink" role="img" aria-label={`Recent form, newest first: ${form.map((r) => (r === "W" ? "win" : "loss")).join(", ")}`}>
+    <span className={`inline-flex items-center gap-1 ${onDark ? "text-[#8ea2ff]" : "text-accent-ink"}`} role="img" aria-label={`Recent form, newest first: ${form.map((r) => (r === "W" ? "win" : "loss")).join(", ")}`}>
       {form.map((r, i) => <span key={i} className={`rounded-full ${r === "W" ? "bg-current" : "border-[1.5px] border-current opacity-60"}`} style={{ width: size, height: size }} />)}
     </span>
   );

@@ -56,7 +56,7 @@ export default async function Home() {
           </dl>
         </div>
         <div className="mt-6 flex items-center gap-3 text-caption text-[#94a3b8]">
-          {st.form.length ? <><span>Last {Math.min(5, st.form.length)}</span><FormDots form={st.form.slice(0, 5)} /></> : <span>No matches yet</span>}
+          {st.form.length ? <><span>Last {Math.min(5, st.form.length)}</span><FormDots form={st.form.slice(0, 5)} onDark /></> : <span>No matches yet</span>}
           {mine.rank && mine.movement ? <span className="ml-auto inline-flex items-center gap-1"><Movement by={mine.movement} /> this week</span> : null}
         </div>
         <ButtonLink href="/record" size="lg" full className="mt-6"><Plus size={20} strokeWidth={3} aria-hidden="true" />Record match</ButtonLink>
