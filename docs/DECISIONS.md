@@ -19,12 +19,11 @@ decision · alternatives · why.
 9. **Messaging dropped.** V1 had already removed it from the UI; its 2 empty threads stay in `legacy.*`.
 10. **Admin can void, not delete or edit.** Nothing is ever deleted; a void keeps the match visible with its reason. There's no score editing: reject and re-record instead.
 11. **One-page score entry, tap-first.** It's the fastest flow on a phone: pick the set winner, tap a common score, and only type tiebreak points.
-12. **Design: a refined green sports brand** (Matt, 2026-11-17; after a lime "night court" and a navy/blue/gold pass).
-    - **Colors:** forest green #163D32 (brand panels, icon), sport green #22A06B (primary action, selection, wins), charcoal #171C1B, off-white #F7F8F4, slate text. No neon, no gold.
-    - **Contrast rule:** sport green carries near-black text (5.4:1); white on it fails (3.3:1). Green text on light surfaces is darkened to #1A7550.
-    - **Mark:** an off-white B standing on a sport-green line, on forest green. No ball, racket or court lines; tokens carry no sport in their names.
-    - **Type:** Archivo widths. Solid surfaces. Wins are a filled dot, losses a hollow ring (never color alone).
-    - **Positioning:** "Your friends. Your league. Your legacy." Tennis is the first and currently only sport; nothing else is advertised.
+12. **Design: a lively green sports brand** (Matt, 2026-11-17; after lime, navy/blue/gold and a quieter forest-green pass).
+    - **Colors:** rally green #19B779 (primary action, wins; ink text on it, since white fails contrast), deep evergreen #123F35 (hero panels, icon), fresh mint #B8F2D4 (soft highlights, "this is you"), warm ivory #FAFAF6, sport ink #151F1A, coral #F27A5E in small touches only.
+    - **Mark:** an ivory B on a rally-green line, on evergreen. No ball, racket or court lines; tokens carry no sport in their names.
+    - **Landing:** "The match ends. The rivalry doesn't." One CSS-only hero sequence, played once (result → winner → +10 → ranking change); everything is in place with motion off.
+    - **Type:** Archivo widths. Wins are a filled dot, losses a hollow ring (never color alone).
 13. **Tailwind and a few hand-made components, no component library.** A small app doesn't need shadcn or Radix; native `<dialog>`, links-as-tabs and buttons cover it accessibly. `motion` is used only where movement explains something.
 14. **No ESLint.** ESLint's TypeScript plugin doesn't support TypeScript 7 yet. Strict `tsc` plus tests is the check (same as Guap).
 15. **`.npmrc` `legacy-peer-deps=true`.** npm 10's resolver crashes on Vitest's optional peer chain. All packages are listed explicitly at exact versions.
@@ -33,3 +32,4 @@ decision · alternatives · why.
 18. **Profile photos are uploaded by the player** (Matt, 2026-11-17), never taken from the sign-in account. Resized to a 256px WebP in the browser, stored in a Supabase Storage bucket; initials until then.
 19. **No animation library.** `motion` was removed; CSS covers page entry, toasts, the head-to-head bar and scroll reveal (smaller bundle).
 20. **No Turnstile for now.** Google-only sign-in plus invite-only joining leaves no form for bots to abuse; revisit with email sign-up.
+21. **Speed: run next to the database, verify tokens locally, cache revisits for 30 s** (2026-11-17). See docs/PERFORMANCE.md for the measurements and trade-offs.

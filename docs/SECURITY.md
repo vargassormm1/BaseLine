@@ -2,7 +2,7 @@
 
 ## Model
 - **Identity:**
-  - Supabase Auth with Google only. Sessions live in httpOnly cookies (@supabase/ssr), refreshed in `src/proxy.ts`. The server checks every session with `auth.getUser()`.
+  - Supabase Auth with Google only. Sessions live in httpOnly cookies (@supabase/ssr), refreshed in `src/proxy.ts`. The server verifies every session token's signature and expiry (`auth.getClaims()`, local, with the project's public keys), and the database verifies it again on each query. A revoked session ends when its token expires (≤ 1 hour).
   - `me()` maps `auth.uid()` to a player; anonymous sessions never count.
   - V1 players link once, by a **Google-verified** email, and only if not already linked. Email/password sign-in is off, so nobody can register someone else's email.
 - **Authorization lives in the database:**

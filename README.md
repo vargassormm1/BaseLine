@@ -30,6 +30,7 @@ npm run test:e2e            # phone + desktop browser tests (production build, l
 | [PRODUCT_SPEC](docs/PRODUCT_SPEC.md) | what the app does, match and ranking rules |
 | [ARCHITECTURE](docs/ARCHITECTURE.md) | structure, data flow, design system |
 | [DATABASE](docs/DATABASE.md) | schema, RLS, write functions |
+| [PERFORMANCE](docs/PERFORMANCE.md) | navigation speed: what was slow, what changed, measurements |
 | [SECURITY](docs/SECURITY.md) | authorization model, protections, open risks |
 | [MIGRATION](docs/MIGRATION.md) | V1 → V2 data migration, cutover runbook, rollback |
 | [DECISIONS](docs/DECISIONS.md) | why things are the way they are |

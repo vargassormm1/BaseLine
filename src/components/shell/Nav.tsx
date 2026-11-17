@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { House, ListOrdered, Trophy, Plus, Swords, UserRound, Flag, Users, Settings } from "lucide-react";
 
@@ -10,9 +11,17 @@ const isOn = (path: string, href: string, meHref = "") =>
     : href.startsWith("/players/") ? path.toLowerCase() === href.toLowerCase()
     : path === href || path.startsWith(`${href}/`);
 
+/** The path to treat as current: the one just tapped (so the tab lights up at once), then the real one when it arrives. */
+function useOptimisticPath() {
+  const path = usePathname();
+  const [pending, setPending] = useState<string | null>(null);
+  useEffect(() => { setPending(null); }, [path]);
+  return { path: pending ?? path, go: (href: string) => { if (href !== path) setPending(href.split("?")[0]!); } };
+}
+
 /** Phones: five tabs with Record (the round button) in the thumb-reach center. */
 export function TabBar({ meHref, attention }: NavProps) {
-  const path = usePathname();
+  const { path, go } = useOptimisticPath();
   const tabs = [
     { href: "/home", label: "Home", icon: House, dot: attention > 0 },
     { href: "/matches", label: "Matches", icon: ListOrdered },
@@ -25,13 +34,13 @@ export function TabBar({ meHref, attention }: NavProps) {
       <ul className="mx-auto grid h-16 max-w-lg grid-cols-5 items-center">
         {tabs.map((t, i) => t === null ? (
           <li key="record" className="flex justify-center">
-            <Link href="/record" aria-label="Record a match" className="press -mt-7 grid size-14 place-items-center rounded-full bg-accent text-on-accent shadow-[0_8px_20px_-6px_rgb(25_183_121/0.5)] ring-4 ring-bg">
+            <Link href="/record" aria-label="Record a match" onClick={() => go("/record")} className="press -mt-7 grid size-14 place-items-center rounded-full bg-accent text-on-accent shadow-[0_8px_20px_-6px_rgb(25_183_121/0.5)] ring-4 ring-bg">
               <Plus size={26} strokeWidth={2.75} aria-hidden="true" />
             </Link>
           </li>
         ) : (
           <li key={t.href}>
-            <Link href={t.href} aria-current={isOn(path, t.href, meHref) ? "page" : undefined}
+            <Link href={t.href} onClick={() => go(t.href)} aria-current={isOn(path, t.href, meHref) ? "page" : undefined}
               className={`press relative flex h-14 flex-col items-center justify-center gap-0.5 text-micro font-semibold ${isOn(path, t.href, meHref) ? "text-text" : "text-text-3"}`}>
               <t.icon size={22} strokeWidth={isOn(path, t.href, meHref) ? 2.4 : 1.9} aria-hidden="true" />
               {t.label}
@@ -46,7 +55,7 @@ export function TabBar({ meHref, attention }: NavProps) {
 
 /** Desktop: a slim left rail. */
 export function Rail({ meHref, attention }: NavProps) {
-  const path = usePathname();
+  const { path, go } = useOptimisticPath();
   const items = [
     { href: "/home", label: "Home", icon: House, count: attention },
     { href: "/matches", label: "Matches", icon: ListOrdered },
@@ -58,17 +67,17 @@ export function Rail({ meHref, attention }: NavProps) {
   ];
   return (
     <nav aria-label="Main" className="flex h-full flex-col gap-1">
-      <Link href="/record" className="press mb-5 flex h-12 items-center justify-center gap-2 rounded-full bg-accent font-bold text-on-accent">
+      <Link href="/record" onClick={() => go("/record")} className="press mb-5 flex h-12 items-center justify-center gap-2 rounded-full bg-accent font-bold text-on-accent">
         <Plus size={20} strokeWidth={2.75} aria-hidden="true" />Record match
       </Link>
       {items.map((it) => (
-        <Link key={it.href} href={it.href} aria-current={isOn(path, it.href, meHref) ? "page" : undefined}
+        <Link key={it.href} href={it.href} onClick={() => go(it.href)} aria-current={isOn(path, it.href, meHref) ? "page" : undefined}
           className={`press flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold ${isOn(path, it.href, meHref) ? "bg-surface-3 text-text" : "text-text-2 hover:bg-surface-3 hover:text-text"}`}>
           <it.icon size={19} strokeWidth={isOn(path, it.href, meHref) ? 2.4 : 1.9} aria-hidden="true" />{it.label}
           {it.count ? <span className="ml-auto grid h-5 min-w-5 place-items-center rounded-full bg-coral px-1.5 text-micro font-bold text-[#151f1a]">{it.count}</span> : null}
         </Link>
       ))}
-      <Link href="/settings" aria-current={path === "/settings" ? "page" : undefined}
+      <Link href="/settings" onClick={() => go("/settings")} aria-current={path === "/settings" ? "page" : undefined}
         className={`press mt-auto flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold ${path === "/settings" ? "bg-surface-3 text-text" : "text-text-2 hover:bg-surface-3 hover:text-text"}`}>
         <Settings size={19} aria-hidden="true" />Settings
       </Link>

@@ -43,8 +43,10 @@ export default async function proxy(req: NextRequest) {
           },
         },
       });
-      const { data } = await sb.auth.getUser();
-      signedIn = !!data.user && !data.user.is_anonymous;
+      // getClaims() refreshes an expired session (rotating the cookies) and verifies the token's signature with the
+      // project's public signing keys, cached in memory: no round trip to the Auth server on a normal navigation.
+      const { data } = await sb.auth.getClaims();
+      signedIn = !!data?.claims?.sub && data.claims.is_anonymous !== true;
     }
   }
   const path = req.nextUrl.pathname;

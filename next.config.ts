@@ -13,6 +13,9 @@ const headers = [
 const config: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
+  // Going back to a screen you just saw is instant for 30 seconds. Anything you change clears it at once; other
+  // players' new results appear within 30 seconds (or on pull-to-refresh). In-memory per browser tab, never shared.
+  experimental: { staleTimes: { dynamic: 30 } },
   async headers() { return [{ source: "/:path*", headers }]; },
 };
 export default config;

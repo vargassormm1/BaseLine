@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/db/types";
 import { identity, type Identity } from "./identity";
+import { loadBoard } from "./data";
 
 export type DB = SupabaseClient<Database>;
 export const INVITE_COOKIE = "baseline_invite";
@@ -14,6 +15,8 @@ export interface Session { id: Identity; sb: DB; me: string | null }
 export const getSession = cache(async (): Promise<Session | null> => {
   const id = await identity();
   if (!id) return null;
+  // start loading the board now, in parallel with "who am I" (pages await the same cached promise right after)
+  void loadBoard(id.sb).catch(() => {});
   const { data: me, error } = await id.sb.rpc("me");
   if (error) throw new Error("Couldn't reach the database.");
   if (me) return { id, sb: id.sb, me };
@@ -23,7 +26,10 @@ export const getSession = cache(async (): Promise<Session | null> => {
   const { data: linked, error: e2 } = await id.sb.rpc("ensure_player", {
     p_username: "", p_first_name: p.firstName, p_last_name: p.lastName, ...(invite ? { p_invite: invite } : {}),
   });
-  return { id, sb: id.sb, me: e2 ? null : linked };
+  // Just linked or joined (a player's first visit only): start over with a clean request, because the board that
+  // began loading above was read before this account was a player.
+  if (!e2 && linked) redirect("/home");
+  return { id, sb: id.sb, me: null };
 });
 
 /** For pages and actions that need a player: signed out → sign-in; not joined yet → welcome. */

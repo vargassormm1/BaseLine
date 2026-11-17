@@ -31,20 +31,20 @@ export async function supabaseForRequest(): Promise<DB> {
 
 const split = (full: string) => { const [first = "", ...rest] = full.trim().split(/\s+/); return { first, last: rest.join(" ") }; };
 
-/** Who is signed in (Supabase Auth, Google). getUser() checks the session with the Auth server, not just the cookie. */
+/** Who is signed in (Supabase Auth, Google). The session token is verified cryptographically (signature and expiry)
+ *  with the project's public keys, so a normal navigation needs no round trip to the Auth server; the database
+ *  verifies the same token again on every query. A revoked session stops working when its token expires (≤ 1 hour). */
 export async function identity(): Promise<Identity | null> {
   if (e2eAuthEnabled()) return e2eIdentity();
   const sb = await supabaseForRequest();
-  const { data: { user } } = await sb.auth.getUser();
-  if (!user || user.is_anonymous) return null;
-  const m = user.user_metadata as Record<string, unknown>;
+  const { data, error } = await sb.auth.getClaims();
+  const c = data?.claims;
+  if (error || !c?.sub || c.is_anonymous === true) return null;
+  const m = (c.user_metadata ?? {}) as Record<string, unknown>;
   const name = split(String(m.full_name ?? m.name ?? ""));
   return {
-    userId: user.id, sb,
-    profile: {
-      firstName: String(m.given_name ?? name.first), lastName: String(m.family_name ?? name.last),
-      avatarUrl: typeof m.avatar_url === "string" ? m.avatar_url : typeof m.picture === "string" ? m.picture : null, email: user.email ?? null,
-    },
+    userId: c.sub, sb,
+    profile: { firstName: String(m.given_name ?? name.first), lastName: String(m.family_name ?? name.last), avatarUrl: null, email: typeof c.email === "string" ? c.email : null },
   };
 }
 

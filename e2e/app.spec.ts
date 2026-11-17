@@ -256,3 +256,26 @@ test("no sideways scrolling from 320px to 1440px, portrait and landscape, with a
     await db.end();
   }
 });
+
+test("navigation: a tapped tab responds at once, even on a slow connection; going back is instant", async ({ page }) => {
+  await signIn(page, "ana");
+  await page.waitForLoadState("networkidle");
+  // make every page request slow (1.2 s), so only immediate feedback can pass
+  await page.route("**/*", async (route) => {
+    const r = route.request();
+    if (r.headers()["rsc"] && !r.headers()["next-router-prefetch"]) await new Promise((f) => setTimeout(f, 1200));
+    await route.continue();
+  });
+  const nav = page.getByRole("navigation", { name: "Main" }).first();
+  const rankings = nav.getByRole("link", { name: "Rankings" });
+  const t0 = Date.now();
+  await rankings.click();
+  await expect(rankings).toHaveAttribute("aria-current", "page", { timeout: 300 }); // lit before the server answers
+  expect(Date.now() - t0).toBeLessThan(400);
+  await expect(page.getByRole("heading", { name: "Rankings", level: 1 })).toBeVisible();
+  // back to Home within 30 s: served from the browser's cache, no waiting on the slow network
+  const t1 = Date.now();
+  await nav.getByRole("link", { name: "Home" }).click();
+  await expect(page.getByRole("region", { name: "Your standing" })).toBeVisible({ timeout: 600 });
+  expect(Date.now() - t1).toBeLessThan(800);
+});
