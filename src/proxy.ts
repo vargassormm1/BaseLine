@@ -48,6 +48,13 @@ export default async function proxy(req: NextRequest) {
     }
   }
   const path = req.nextUrl.pathname;
+  // If Supabase's redirect allow-list doesn't include /auth/callback, Google sign-in returns to the site root with the
+  // one-time code. Hand it to the callback instead of dropping it.
+  if (path === "/" && req.nextUrl.searchParams.has("code")) {
+    const cb = new URL("/auth/callback", req.nextUrl.origin);
+    cb.searchParams.set("code", req.nextUrl.searchParams.get("code")!);
+    return NextResponse.redirect(cb);
+  }
   if (!signedIn && !PUBLIC.some((r) => r.test(path))) {
     const to = new URL("/sign-in", req.nextUrl.origin);
     if (path !== "/home") to.searchParams.set("next", path);
