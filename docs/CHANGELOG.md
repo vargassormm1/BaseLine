@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-17 — Email + password sign-in
+- Create account, sign in, confirm by email, forgot/reset password, alongside Google. Behind `BASELINE_EMAIL_AUTH` until production email sending is set up (`docs/EMAIL_AUTH.md`). Optional Turnstile bot check.
+- Redirects after sign-in use the host the request came in on.
+
 ## 2.0.0 — Baseline V2 (branch `v2`, not yet deployed)
 **Product**
 - **Home:** an athlete card (rank, points, record, season rank, form, streak), "Your move", rivals, recent matches and the top of the table.
