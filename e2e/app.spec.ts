@@ -279,3 +279,15 @@ test("navigation: a tapped tab responds at once, even on a slow connection; goin
   await expect(page.getByRole("region", { name: "Your standing" })).toBeVisible({ timeout: 600 });
   expect(Date.now() - t1).toBeLessThan(800);
 });
+
+test("phone: settings and the invite link are reachable without the desktop rail", async ({ page }) => {
+  test.skip(test.info().project.name !== "phone", "the rail covers desktop");
+  await signIn(page, "ana");
+  await page.getByRole("link", { name: "Settings", exact: true }).click();
+  await expect(page).toHaveURL(/\/settings$/);
+  await expect(page.getByRole("button", { name: "Create invite link" })).toBeVisible();
+  await page.getByRole("link", { name: "Me", exact: true }).click();
+  await page.getByRole("link", { name: "Invite a friend" }).click();
+  await expect(page).toHaveURL(/\/settings#invite$/);
+  await expect(page.getByRole("button", { name: "Create invite link" })).toBeInViewport();
+});

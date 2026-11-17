@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronDown, ChevronRight, Pencil, Swords } from "lucide-react";
+import { ChevronDown, ChevronRight, Pencil, Swords, UserPlus } from "lucide-react";
 import { requirePlayer } from "@/lib/server/session";
 import { loadBoard } from "@/lib/server/data";
 import { standings } from "@/lib/tennis/standings";
@@ -41,7 +41,12 @@ export default async function Profile({ params }: { params: Promise<{ username: 
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          {isMe ? <ButtonLink href="/settings" variant="secondary"><Pencil size={16} aria-hidden="true" />{p.avatarUrl ? "Edit profile" : "Add a photo"}</ButtonLink> : (
+          {isMe ? (
+            <>
+              <ButtonLink href="/settings" variant="secondary"><Pencil size={16} aria-hidden="true" />{p.avatarUrl ? "Edit profile" : "Add a photo"}</ButtonLink>
+              <ButtonLink href="/settings#invite" variant="secondary"><UserPlus size={16} aria-hidden="true" />Invite a friend</ButtonLink>
+            </>
+          ) : (
             <>
               <NewChallenge players={[p]} today={b.today} preset={p.id} label="Challenge" />
               <ButtonLink href={`/h2h?a=${b.byId.get(s.me)?.username ?? ""}&b=${p.username}`} variant="secondary"><Swords size={16} aria-hidden="true" />Head to head</ButtonLink>

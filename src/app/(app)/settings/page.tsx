@@ -26,7 +26,7 @@ export default async function Settings() {
       <section className={card} aria-labelledby="s-profile"><h2 id="s-profile" className="text-lg font-bold">Profile</h2>
         <ProfileForm mode="edit" initial={{ username: me.username, firstName: me.firstName, lastName: me.lastName }} />
       </section>
-      <section className={card} aria-labelledby="s-invite"><h2 id="s-invite" className="text-lg font-bold">Invite a friend</h2><InviteFriend /></section>
+      <section id="invite" className={`${card} scroll-mt-6`} aria-labelledby="s-invite"><h2 id="s-invite" className="text-lg font-bold">Invite a friend</h2><InviteFriend /></section>
       <section className={card} aria-labelledby="s-look"><h2 id="s-look" className="text-lg font-bold">Appearance</h2><ThemeControl initial={theme} /></section>
       <section className={card} aria-labelledby="s-rules"><h2 id="s-rules" className="text-lg font-bold">How it works</h2>
         <ul className="space-y-2 text-sm text-text-2">

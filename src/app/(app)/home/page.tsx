@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Flag, Plus } from "lucide-react";
+import { Flag, Plus, Settings } from "lucide-react";
 import { requirePlayer } from "@/lib/server/session";
 import { loadBoard } from "@/lib/server/data";
 import { standings } from "@/lib/tennis/standings";
@@ -42,6 +42,9 @@ export default async function Home() {
         <Link href="/challenges" aria-label={`Challenges${openChallenges ? `, ${openChallenges} open` : ""}`} className="press relative grid size-11 shrink-0 place-items-center rounded-full bg-surface-3 lg:hidden">
           <Flag size={19} aria-hidden="true" />
           {box.toAnswer.length ? <span className="absolute top-1.5 right-1.5 size-2.5 rounded-full bg-coral ring-2 ring-bg" aria-hidden="true" /> : null}
+        </Link>
+        <Link href="/settings" aria-label="Settings" className="press grid size-11 shrink-0 place-items-center rounded-full bg-surface-3 lg:hidden">
+          <Settings size={19} aria-hidden="true" />
         </Link>
       </header>
 
