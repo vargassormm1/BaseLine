@@ -9,7 +9,7 @@ test.beforeAll(async () => { await resetFixtures(); });
 test("signed out: the landing page is public, everything else is closed", async ({ page }) => {
   const problems = watch(page);
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Settle it on the court." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Your friends. Your league. Your legacy." })).toBeVisible();
   await expect(page.getByRole("link", { name: "Join with an invite" }).first()).toHaveAttribute("href", "/sign-in?next=/welcome");
   await expect(page.getByText("Baseline is invite-only.")).toBeVisible();
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
@@ -18,7 +18,7 @@ test("signed out: the landing page is public, everything else is closed", async 
   for (const path of ["/home", "/rankings", "/players/ana_e2e", "/h2h", "/record", "/matches/00000000-0000-4000-8000-0000000000f1"]) {
     await page.goto(path);
     await expect(page, path).toHaveURL(/\/sign-in(\?next=.*)?$/);
-    await expect(page.getByRole("heading", { name: "Step on court." })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Game on." })).toBeVisible();
     expect(await page.content(), path).not.toContain("Ana Reyes");
   }
   await axe(page);
@@ -211,4 +211,48 @@ test("matches: my scorecards by month, everyone's results, and the recorded conf
   await page.getByRole("link", { name: "Everyone" }).click();
   await expect(page).toHaveURL(/who=all/);
   await expect(page.getByRole("link", { name: "Show more" })).toBeVisible();
+});
+
+test("profile photo: initials until a player uploads their own; it can be removed again", async ({ page }) => {
+  const problems = watch(page);
+  await signIn(page, "dee");
+  await page.goto("/settings");
+  // a real 400×300 PNG, drawn in the browser (gets center-cropped to a 256px square WebP before upload)
+  const dataUrl = await page.evaluate(() => { const c = document.createElement("canvas"); c.width = 400; c.height = 300; const g = c.getContext("2d")!; g.fillStyle = "#4263eb"; g.fillRect(0, 0, 400, 300); g.fillStyle = "#fff"; g.fillRect(150, 100, 100, 100); return c.toDataURL("image/png"); });
+  const png = Buffer.from(dataUrl.split(",")[1]!, "base64");
+  await page.locator("#photo-file").setInputFiles({ name: "me.png", mimeType: "image/png", buffer: png });
+  await expect(page.getByText("Photo updated.")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Change photo" })).toBeVisible();
+  await page.goto("/players/dee_e2e");
+  await expect(page.locator("header img")).toHaveAttribute("src", /\/storage\/v1\/object\/public\/avatars\/[0-9a-f-]{36}\/[0-9a-f-]{36}\.webp$/);
+  expect(await page.locator("header img").evaluate((i: HTMLImageElement) => i.complete && i.naturalWidth)).toBe(256);
+  await page.goto("/settings");
+  await page.getByRole("button", { name: "Remove" }).click();
+  await expect(page.getByText("Photo removed.")).toBeVisible();
+  await page.goto("/players/dee_e2e");
+  await expect(page.locator("header img")).toHaveCount(0);
+  expect(problems).toEqual([]);
+});
+
+test("no sideways scrolling from 320px to 1440px, portrait and landscape, with a very long name", async ({ browser }) => {
+  test.skip(test.info().project.name !== "phone", "one sweep is enough");
+  test.setTimeout(180_000);
+  const db = postgres("postgresql://postgres:postgres@127.0.0.1:55322/postgres", { max: 1, onnotice: () => {} });
+  await db`update public.players set first_name = 'Maximiliano-Alexander', last_name = 'Featherstonehaugh-Wolfeschlegelstein' where username = 'cy_e2e'`;
+  try {
+    for (const [width, height] of [[320, 568], [360, 740], [390, 844], [430, 932], [568, 320], [844, 390], [768, 1024], [1024, 768], [1440, 900]] as const) {
+      const ctx = await browser.newContext({ viewport: { width, height }, baseURL: test.info().project.use.baseURL! });
+      const page = await ctx.newPage();
+      for (const path of ["/", "/sign-in"]) { await page.goto(path); await noSidewaysScroll(page); }
+      await page.goto("/e2e/sign-in?u=ana");
+      for (const path of ["/home", "/matches", "/rankings", "/record", "/challenges", "/players", "/players/cy_e2e", "/h2h?a=ana_e2e&b=cy_e2e", "/settings"]) {
+        await page.goto(path);
+        expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), `${width}px ${path}`).toBeLessThanOrEqual(0);
+      }
+      await ctx.close();
+    }
+  } finally {
+    await db`update public.players set first_name = 'Cy', last_name = 'Lindqvist' where username = 'cy_e2e'`;
+    await db.end();
+  }
 });

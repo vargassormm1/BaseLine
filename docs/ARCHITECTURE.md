@@ -37,12 +37,13 @@ The browser never talks to Supabase. Every query runs as the signed-in player, s
 per request (`react.cache`). At this group's scale (hundreds of matches) this is faster and simpler than many queries;
 if it ever reaches thousands, page match history and move standings into a SQL view.
 
-## Design system ("night court")
-- **Tokens:** `src/app/globals.css`. Charcoal and chalk surfaces; **optic yellow** (`--ball`) for wins and the one primary action; **clay** (`--clay`) for losses.
+## Design system (sport-neutral)
+- **Tokens:** `src/app/globals.css`. Midnight navy and off-white surfaces; **electric blue** (`--accent`) for the one primary action, selection and wins; **victory gold** (`--gold`) only for first place; a restrained red (`--loss`) for losses and errors. No sport in any token name.
 - **Type:** Archivo across widths. `.score` (condensed 75%, heavy, tabular) for scoreboard numerals; `.display` (112% wide, heavy) for names and headings.
 - **Surfaces:** solid only, no glass. The dark "athlete card" and the H2H matchup stay dark in both themes, as signature moments.
 - **Contrast:** every text pair is AA (axe runs in e2e, light and dark).
-- **Motion:** `motion` only where it explains something: set cards appearing, the H2H split bar, toasts. CSS `rise` on page entry. Reduced motion is honored.
+- **Motion:** CSS only: `rise` on page entry and toasts, the H2H bar growing, scroll reveal on the landing page where supported. Reduced motion is honored.
+- **Responsive rules:** layout children may always shrink (`min-width: 0`), headings wrap anywhere, hero numerals use `clamp()`, tap targets are at least 44px, the smallest text is 12px. A browser test sweeps 320–1440px in both orientations with a very long name.
 - **Navigation:** phones get Home · Matches · Record (the ball) · Rankings · Me; Challenges is the flag on Home; head to head opens from profiles, matches and rivals. Desktop gets a left rail with everything.
 - **Hierarchy rule:** one hero per screen, at most three supporting numbers, extra stats behind a disclosure. Lists use hairlines instead of a card per item where possible.
 

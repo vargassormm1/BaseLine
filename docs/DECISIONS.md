@@ -19,13 +19,16 @@ decision · alternatives · why.
 9. **Messaging dropped.** V1 had already removed it from the UI; its 2 empty threads stay in `legacy.*`.
 10. **Admin can void, not delete or edit.** Nothing is ever deleted; a void keeps the match visible with its reason. There's no score editing: reject and re-record instead.
 11. **One-page score entry, tap-first.** It's the fastest flow on a phone: pick the set winner, tap a common score, and only type tiebreak points.
-12. **Design: "night court".**
-    - **Colors:** charcoal and chalk with tennis-ball optic yellow, plus clay orange for losses.
-    - **Type:** Archivo widths (condensed scoreboard numerals, expanded athlete names).
-    - **Surfaces:** solid, no glass, per the brief.
-    - **Signature moments:** a dark athlete card and the H2H matchup.
+12. **Design: sport-neutral competition brand** (Matt's rebrand, 2026-11-17; replaces the tennis-ball lime "night court").
+    - **Colors:** midnight navy #111827, electric blue #4263EB for the primary action, selection and wins, off-white #F8FAFC, slate text, victory gold #F5B841 only for first place.
+    - **Mark:** a bold B standing on a blue line (the baseline); no ball, racket or court lines. Tokens carry no sport in their names.
+    - **Type:** Archivo widths (condensed scoreboard numerals, expanded names). Solid surfaces. Wins are a filled dot, losses a hollow ring (never color alone).
+    - **Positioning:** "Your friends. Your league. Your legacy." Tennis is the first and currently only sport; nothing else is advertised.
 13. **Tailwind and a few hand-made components, no component library.** A small app doesn't need shadcn or Radix; native `<dialog>`, links-as-tabs and buttons cover it accessibly. `motion` is used only where movement explains something.
 14. **No ESLint.** ESLint's TypeScript plugin doesn't support TypeScript 7 yet. Strict `tsc` plus tests is the check (same as Guap).
 15. **`.npmrc` `legacy-peer-deps=true`.** npm 10's resolver crashes on Vitest's optional peer chain. All packages are listed explicitly at exact versions.
 16. **Versions:** Next 16.4.6, React 19.3.1, supabase-js 2.118.0, @supabase/ssr 0.12.7, Tailwind 4.3.3, zod 4.6.7, motion 14.7.1, TypeScript 7.0.2. These are the latest stable releases, preferring ones a couple of weeks old or proven in Guap.
 17. **Local data is fictional.** `supabase/seed.sql` holds made-up players for development and tests. Real data only ever arrives through the migration script.
+18. **Profile photos are uploaded by the player** (Matt, 2026-11-17), never taken from the sign-in account. Resized to a 256px WebP in the browser, stored in a Supabase Storage bucket; initials until then.
+19. **No animation library.** `motion` was removed; CSS covers page entry, toasts, the head-to-head bar and scroll reveal (smaller bundle).
+20. **No Turnstile for now.** Google-only sign-in plus invite-only joining leaves no form for bots to abuse; revisit with email sign-up.

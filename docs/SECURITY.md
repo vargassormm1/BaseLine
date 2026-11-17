@@ -53,11 +53,48 @@ A separate reviewer audited the code with no access to my conclusions. Findings 
 | 8 | Low | Expired challenge status was rolled back | **Fixed** |
 | 9 | Low | Match idempotency keys and void-by readable | **Fixed:** column grants |
 
+## Second independent review (2026-11-17: Supabase Auth switch, photo uploads)
+| # | Severity | Finding | Status |
+|---|---|---|---|
+| 1 | High (conditional) | Linking a V1 player trusted JWT claims (`email` can be changed by the user, `user_metadata.email_verified` is user-editable) | **Fixed:** `ensure_player` reads the Google identity row in `auth.identities` (verified by Google); tests cover forged claims, a switched account email and an unverified identity |
+| 2 | Medium | Photo deletes did nothing (no SELECT policy), uploads effectively unlimited | **Fixed:** own-folder SELECT policy, upload ticket (20/hour) before uploading, 3-file cap; tested that deletes really delete |
+| 3 | Low/Med | Any object name allowed in the caller's folder | **Fixed:** name must be `<player id>/<uuid>.webp` |
+| 4 | Low | Session cookies set outside the proxy lacked `Secure` | **Fixed** |
+| 5 | Low | Unlimited invite attempts by a signed-in non-player | **Fixed:** 10/hour per account (`auth_rate_limits`), tested |
+| 6 | Low | Photo check was magic bytes only | **Fixed:** must be a still 256×256 WebP (header parsed) |
+| 7 | Low | Removed photos cached for a year | **Fixed:** 1 day |
+| 8 | Low | CSP `img-src` broader than needed | **Fixed:** only the avatars bucket path |
+| 9 | Info | `?q=a&q=b` on Matches returned a 500 | **Fixed** |
+| 10 | Info | Invite cookie never cleared | **Fixed:** cleared on joining and sign-out |
+
+## Rate limits (all in Postgres; no Redis, no paid service)
+| Action | Limit | Keyed by | Where |
+|---|---|---|---|
+| Record a match | 20 / hour | player | `record_match` |
+| Confirm / reject | 120 / hour | player | `respond_match` |
+| Create a challenge | 15 / day | player | `create_challenge` |
+| Create an invite | 10 / day | player | `create_invite` |
+| Edit profile | 10 / hour | player | `update_profile` |
+| Upload a photo | 20 / hour, 3 files max | player | `avatar_upload_ticket`, storage policy |
+| Join with an invite | 10 tries / hour | signed-in account | `ensure_player` |
+| Sign-in | Supabase Auth's built-in limits + Google | IP / account | Supabase dashboard → Auth → Rate Limits |
+| Anonymous traffic | recommended: Vercel Firewall rule, 60 requests / minute per IP on `/sign-in`, `/auth/*`, `/join/*` | IP | **needs the Vercel dashboard** (free on Hobby: 1 rule) |
+
+One row per player and bucket (fixed window), so the counters never grow without bound. Limits return a friendly message; the app never says whether an account exists.
+
+## Decisions on the security brief
+- **Bot challenge (Turnstile): not added.** Sign-in is Google-only, so there's no password or registration form for bots to hammer: Google does the bot screening, and nobody becomes a player without a one-time invite. Add Turnstile (Supabase Auth supports it natively) only if email + password sign-up is ever enabled.
+- **CSRF:** every state change is a Next.js server action (POST with an Origin check) and cookies are `SameSite=Lax`. No GET route changes data (invite links only set a cookie).
+- **PWA:** there is no service worker, so nothing is cached offline: no tokens, no private pages. Pages are sent `Cache-Control: private, no-store`. Signing out clears the session and invite cookies.
+- **Scanners:** unknown paths get the sign-in redirect or a 404; `.env*` files are never deployed (`.gitignore`, and Vercel builds from git). Errors show fixed messages only.
+- **Logging:** rejected actions raise Postgres errors with short codes (`rate_limited`, `not_allowed`, `invalid_score…`), visible in Supabase → Logs → Postgres; sign-in failures are in Supabase → Logs → Auth; request spikes in Vercel → Observability. No passwords, tokens, invite codes or emails are logged by the app.
+- **Dependencies:** `npm audit` = 0 known vulnerabilities; exact versions pinned; the animation library was removed.
+
 ## Open risks (prioritized)
-1. **Dashboard settings must be right at cutover:**
-   - Email provider off, anonymous sign-ins off, Google on.
-   - Redirect URLs limited to the app.
-   - With the email provider on, anyone could create an account, but still couldn't become a player without an invite, and couldn't link a V1 player, because linking requires a Google-verified email.
+1. **Dashboard settings matter:**
+   - Supabase: email provider off, anonymous sign-ins off, Google on, manual identity linking off, redirect URLs limited to `https://base-line.vercel.app/auth/callback**`.
+   - Vercel: add the Firewall rate-limit rule above.
+   - Even with a wrong setting, nobody becomes a player without an invite, and a V1 player can only be linked by a Google-verified identity.
 2. **Two colluding invited friends could still farm points** with each other. That's a social limit, not a technical one. An admin can void results.
 3. **A V1 player whose Google email differs from the one on file** can't self-link. An admin links them (SQL snippet); they must not take an invite and start over.
 4. **Pending results show a 200 status for "not found".** Streaming pages return 200 before the not-found UI renders. No data is exposed (tested).

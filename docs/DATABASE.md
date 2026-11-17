@@ -13,6 +13,8 @@ Migrations in `supabase/migrations/` (apply with `supabase db reset` locally, `s
 | `standing_adjustments` | Explicit, reasoned additions to all-time totals (`v1_carry_over`, `admin`). | |
 | `invites` | sha256 of one-time codes, creator, expiry, who used it. | Players see only their own (no codes). |
 | `rate_limits` | Fixed window per player and bucket. | No API access. |
+| `auth_rate_limits` | Same, for signed-in accounts that aren't players yet (invite attempts). | No API access. |
+| storage bucket `avatars` | Player-uploaded 256px WebP photos; `players.avatar_path` points at the current one. | Public read; write only in the player's own folder, 3 files max. |
 | `legacy.*` | Verbatim copies of V1's tables + `import_runs` (fingerprints and report of each migration). | Not exposed to the API. |
 
 Nothing is a counter: records, points and stats are derived from confirmed matches (+ adjustments).
@@ -20,7 +22,7 @@ Nothing is a counter: records, points and stats are derived from confirmed match
 ## Identity
 Supabase Auth (Google only). `public.me()` = the player whose `auth_user_id` is `auth.uid()` (anonymous sessions never
 count). `ensure_player()` on first visit: already linked → that player; else an **unlinked** player whose email on file
-equals the token's **Google-verified** email → link it (V1 players); else a valid invite → new player.
+equals the email on their **Google identity** (`auth.identities`, verified by Google; never a JWT claim) → link it (V1 players); else a valid invite → new player.
 Admin fallback for a different Google email: see the comment at the end of migration `…0600_supabase_auth.sql`.
 
 ## RLS (read side)
