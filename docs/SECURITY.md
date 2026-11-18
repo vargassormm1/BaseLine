@@ -77,14 +77,14 @@ A separate reviewer audited the code with no access to my conclusions. Findings 
 | Edit profile | 10 / hour | player | `update_profile` |
 | Upload a photo | 20 / hour, 3 files max | player | `avatar_upload_ticket`, storage policy |
 | Join with an invite | 10 tries / hour | signed-in account | `ensure_player` |
-| Sign-in | Supabase Auth's built-in limits + Google (+ Turnstile for email, when on) | IP / account | Supabase dashboard → Auth → Rate Limits |
+| Sign-in | Supabase Auth's built-in limits + Google (+ Turnstile for username accounts, when on) | IP / account | Supabase dashboard → Auth → Rate Limits |
 | Anonymous traffic | recommended: Vercel Firewall rule, 60 requests / minute per IP on `/sign-in`, `/auth/*`, `/join/*` | IP | **needs the Vercel dashboard** (free on Hobby: 1 rule) |
 
 One row per player and bucket (fixed window), so the counters never grow without bound. Limits return a friendly message; the app never says whether an account exists.
 
 ## Decisions on the security brief
-- **Bot challenge (Turnstile): ready, optional.** Email + password sign-up exists (behind `BASELINE_EMAIL_AUTH`, see `EMAIL_AUTH.md`). Turnstile turns on when `TURNSTILE_SITE_KEY` is set in Vercel and the secret is in Supabase Attack Protection; Supabase verifies the token on sign-up, sign-in, resend and reset. Accounts still need email confirmation and a one-time invite to become players.
-- **Email accounts can't claim V1 history** (linking reads only the Google identity Supabase stored), and the app refuses a sign-up that returns a session without confirmation.
+- **Bot challenge (Turnstile): ready, optional.** Username + password sign-up exists (behind `BASELINE_PASSWORD_AUTH`, see `PASSWORD_AUTH.md`). Turnstile turns on when `TURNSTILE_SITE_KEY` is set in Vercel and the secret is in Supabase Attack Protection. Accounts still need a one-time invite to become players.
+- **Password accounts use a reserved, undeliverable address** (`<username>@players.baseline.invalid`); the Before User Created hook (migration 0900) rejects any other email for password sign-ups, so nobody can pre-create an account under a friend's real email and have Supabase merge it with their Google sign-in. Password accounts can't claim V1 history (Google-only linking).
 - **CSRF:** every state change is a Next.js server action (POST with an Origin check) and cookies are `SameSite=Lax`. No GET route changes data (invite links only set a cookie).
 - **PWA:** there is no service worker, so nothing is cached offline: no tokens, no private pages. Pages are sent `Cache-Control: private, no-store`. Signing out clears the session and invite cookies.
 - **Scanners:** unknown paths get the sign-in redirect or a 404; `.env*` files are never deployed (`.gitignore`, and Vercel builds from git). Errors show fixed messages only.

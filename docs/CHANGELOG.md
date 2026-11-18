@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-11-18 — Username + password sign-in (replaces the email version)
+- Create account / sign in with a username and password next to Google; no email, no confirmation. Change password in Settings; the admin resets forgotten ones (SQL in `docs/PASSWORD_AUTH.md`).
+- Migration 0900: Before User Created hook that only allows password accounts on the reserved `players.baseline.invalid` domain.
+- Behind `BASELINE_PASSWORD_AUTH`. The email confirmation/reset flow and its templates are removed.
+
 ## 2026-11-17 — Email + password sign-in
 - Create account, sign in, confirm by email, forgot/reset password, alongside Google. Behind `BASELINE_EMAIL_AUTH` until production email sending is set up (`docs/EMAIL_AUTH.md`). Optional Turnstile bot check.
 - Redirects after sign-in use the host the request came in on.
