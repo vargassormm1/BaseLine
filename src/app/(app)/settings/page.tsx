@@ -8,6 +8,8 @@ import { ThemeControl } from "@/components/settings/ThemeControl";
 import { SignOut } from "@/components/settings/SignOut";
 import { InviteFriend } from "@/components/settings/InviteFriend";
 import { PhotoForm } from "@/components/settings/PhotoForm";
+import { ChangePassword } from "@/components/settings/ChangePassword";
+import { accountUsername } from "@/lib/server/accounts";
 
 export const metadata = { title: "Settings" };
 
@@ -17,6 +19,7 @@ export default async function Settings() {
   const me = b.byId.get(s.me)!;
   const theme = themeFrom((await cookies()).get(THEME_COOKIE)?.value);
   const card = "card space-y-4 p-5 sm:p-6";
+  const login = accountUsername(s.id.profile.email);
   return (
     <div className="animate-rise mx-auto max-w-[620px] space-y-6">
       <PageHeader title="Settings" />
@@ -38,7 +41,9 @@ export default async function Settings() {
         </ul>
       </section>
       <section className={card} aria-labelledby="s-account"><h2 id="s-account" className="text-lg font-bold">Account</h2>
-        <p className="text-sm text-text-2">Signed in with Google{s.id.profile.email ? <> as <span className="font-semibold text-text">{s.id.profile.email}</span></> : null}. Your email is only visible to you.</p>
+        {login ? <ChangePassword username={login} /> : (
+          <p className="text-sm text-text-2">Signed in with Google{s.id.profile.email ? <> as <span className="font-semibold text-text">{s.id.profile.email}</span></> : null}. Your email is only visible to you.</p>
+        )}
         <SignOut />
       </section>
     </div>

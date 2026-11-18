@@ -3,7 +3,7 @@ import { createServerClient } from "@supabase/ssr";
 
 // Every request: a per-request nonce CSP, a Supabase session refresh (rotated cookies), and a sign-in gate for the
 // app (pages check again with requirePlayer()). Public: landing, sign-in, the Google round trip, invite links.
-const PUBLIC = [/^\/$/, /^\/sign-in$/, /^\/auth\/(google|callback|confirm)$/, /^\/join\/[^/]+$/, /^\/e2e\/sign-in$/];
+const PUBLIC = [/^\/$/, /^\/sign-in$/, /^\/auth\/(google|callback)$/, /^\/join\/[^/]+$/, /^\/e2e\/sign-in$/];
 const COOKIE = { httpOnly: true, sameSite: "lax" as const, path: "/" };
 
 function csp(nonce: string) {
