@@ -196,6 +196,11 @@ password_requirements = "letters_digits"
 # rp_id = "localhost"
 # rp_origins = ["http://127.0.0.1:3000"]
 
+# Password accounts may only use the reserved <username>@players.baseline.invalid address (migration 0900).
+[auth.hook.before_user_created]
+enabled = true
+uri = "pg-functions://postgres/public/hook_before_user_created"
+
 [auth.rate_limit]
 # Number of emails that can be sent per hour. Requires auth.email.smtp to be enabled.
 email_sent = 200
@@ -226,7 +231,7 @@ enabled = true
 # addresses. If disabled, only the new email is required to confirm.
 double_confirm_changes = true
 # If enabled, users need to confirm their email address before signing in.
-enable_confirmations = true
+enable_confirmations = false
 # If enabled, users will need to reauthenticate or have logged in recently to change their password.
 secure_password_change = false
 # If enabled, users will need to provide their current password to change their password, unless
@@ -248,16 +253,6 @@ otp_expiry = 3600
 # pass = "env(SENDGRID_API_KEY)"
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
-
-# Same templates as production (copy into Supabase → Authentication → Emails). The links carry a token hash to
-# /auth/confirm, so they work in any browser or device, not only the one that asked.
-[auth.email.template.confirmation]
-subject = "Confirm your email for Baseline"
-content_path = "./supabase/templates/confirmation.html"
-
-[auth.email.template.recovery]
-subject = "Reset your Baseline password"
-content_path = "./supabase/templates/recovery.html"
 
 # Uncomment to customize email template
 # [auth.email.template.invite]

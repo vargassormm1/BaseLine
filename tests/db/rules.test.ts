@@ -270,3 +270,23 @@ describe("profile photos (storage)", () => {
     expect((await anon().storage.from("avatars").upload(`${a.id}/${randomUUID()}.webp`, webp, { contentType: "image/webp" })).error).not.toBeNull();
   });
 });
+
+describe("username accounts (Before User Created hook)", () => {
+  const hook = async (provider: string, email: string, phone = "") =>
+    (await db`select public.hook_before_user_created(${db.json({ user: { email, phone, app_metadata: { provider } } })}) r`)[0]!.r as { error?: { http_code: number } };
+  it("password accounts must use the reserved username address", async () => {
+    expect(await hook("email", "pat_99@players.baseline.invalid")).toEqual({});
+    expect((await hook("email", "friend@gmail.com")).error?.http_code).toBe(400);
+    expect((await hook("email", "x@players.baseline.invalid.evil.com")).error?.http_code).toBe(400);
+    expect((await hook("email", "a b@players.baseline.invalid")).error?.http_code).toBe(400);
+  });
+  it("Google sign-ups pass; nobody else can take the reserved domain; no phone accounts", async () => {
+    expect(await hook("google", "friend@gmail.com")).toEqual({});
+    expect((await hook("google", "pat@players.baseline.invalid")).error?.http_code).toBe(400);
+    expect((await hook("email", "pat_99@players.baseline.invalid", "+15555550100")).error?.http_code).toBe(400);
+  });
+  it("only Supabase Auth can run it", async () => {
+    expect((await anon().rpc("hook_before_user_created" as never, { event: {} } as never)).error).not.toBeNull();
+    expect((await a.sb.rpc("hook_before_user_created" as never, { event: {} } as never)).error).not.toBeNull();
+  });
+});
