@@ -3,7 +3,7 @@ import cases from "./fixtures/pickleball-scores.json";
 import { gameState, pbPointsFor, validateMatch, type PbFormat } from "@/lib/pickleball/rules";
 
 describe("pickleball match validation (shared cases with the database)", () => {
-  for (const c of cases as { name: string; format: string; games: [number, number][]; winner?: 1 | 2; error?: boolean }[]) {
+  for (const c of cases as unknown as { name: string; format: string; games: [number, number][]; winner?: 1 | 2; error?: boolean }[]) {
     it(c.name, () => {
       const r = validateMatch(c.format as PbFormat, c.games);
       if (c.error) expect(r.ok).toBe(false);
