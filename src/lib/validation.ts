@@ -30,3 +30,18 @@ export const passwordSignIn = z.object({ username: login, password: z.string().m
 export const passwordSignUp = z.object({ username: login, password });
 export const changePassword = z.object({ current: z.string().min(1, "Enter your current password.").max(72), password, confirm: z.string() })
   .refine((v) => v.password === v.confirm, { message: "The new passwords don't match.", path: ["confirm"] });
+
+// ---- pickleball ----
+const pbFormat = z.enum(["g11", "g15", "g21", "bo3", "bo5"]);
+const pbScoring = z.enum(["side_out", "rally"]);
+const pbSide = z.array(z.string().uuid()).min(1).max(2);
+export const pbRecord = z.object({
+  clientKey: z.string().uuid(), discipline: z.enum(["singles", "doubles"]), format: pbFormat, scoring: pbScoring,
+  side1: pbSide, side2: pbSide, playedOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  games: z.array(z.tuple([z.number().int().min(0).max(99), z.number().int().min(0).max(99)])).min(1).max(5),
+  challenge: z.string().uuid().nullable().optional(), note: z.string().trim().max(140).optional(),
+});
+export const pbChallenge = z.object({
+  discipline: z.enum(["singles", "doubles"]), format: pbFormat, scoring: pbScoring, side1: pbSide, side2: pbSide,
+  message: z.string().trim().max(140).optional(), proposedFor: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
+});

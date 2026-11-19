@@ -22,6 +22,8 @@ const MESSAGES: Record<string, string> = {
   invite_required: "Baseline is invite-only. Ask a player for an invite link.",
   invalid_invite: "That invite code isn't valid (or was already used, or expired).",
   possible_duplicate: "Looks like this match is already recorded (same opponent, day and score).",
+  invalid_players: "Check the players: 1 vs 1 for singles, 2 vs 2 for doubles, everyone different, and you're playing.",
+  challenge_open: "There's already an open challenge between these players.",
   too_old_to_confirm: "This result is more than a year old, so it can't be confirmed anymore. It can still be withdrawn.",
 };
 export function friendlyError(raw: string | undefined | null): string {

@@ -16,19 +16,25 @@ export interface Board { players: PlayerRow[]; byId: Map<string, PlayerRow>; mat
 
 const MATCH_COLUMNS = "id, format, deciding_set, player_one, player_two, winner_id, status, played_on, created_at, confirmed_at, points_awarded, challenge_id, legacy_match_id, note, void_reason, match_sets(set_number, p1_games, p2_games, p1_tiebreak, p2_tiebreak, is_match_tiebreak)";
 
+/** Players (shared by every sport), once per request. */
+export const loadPlayers = cache(async (sb: DB): Promise<{ players: PlayerRow[]; byId: Map<string, PlayerRow> }> => {
+  const { data, error } = await sb.from("players").select("id, username, first_name, last_name, avatar_path, is_admin").order("username");
+  if (error) throw new Error("Couldn't load data.");
+  const ps: PlayerRow[] = (data ?? []).map((p) => ({ id: p.id, username: p.username, firstName: p.first_name, lastName: p.last_name, avatarUrl: avatarUrl(p.avatar_path), isAdmin: p.is_admin }));
+  return { players: ps, byId: new Map(ps.map((p) => [p.id, p])) };
+});
+
 /** Everything the screens need, loaded once per request. At this group's scale (hundreds of matches) one read is
  *  faster and simpler than many small queries; RLS decides what the player can see. */
 export const loadBoard = cache(async (sb: DB): Promise<Board> => {
-  const [players, matches, adjustments, challenges] = await Promise.all([
-    sb.from("players").select("id, username, first_name, last_name, avatar_path, is_admin").order("username"),
+  const [pl, matches, adjustments, challenges] = await Promise.all([
+    loadPlayers(sb),
     sb.from("matches").select(MATCH_COLUMNS).order("played_on", { ascending: false }).order("created_at", { ascending: false }),
     sb.from("standing_adjustments").select("player_id, points, wins, losses, reason"),
     sb.from("challenges").select("id, challenger, opponent, format, message, proposed_for, status, created_at, expires_at").order("created_at", { ascending: false }),
   ]);
-  for (const r of [players, matches, adjustments, challenges]) if (r.error) throw new Error("Couldn't load data.");
-  const ps: PlayerRow[] = (players.data ?? []).map((p) => ({
-    id: p.id, username: p.username, firstName: p.first_name, lastName: p.last_name, avatarUrl: avatarUrl(p.avatar_path), isAdmin: p.is_admin,
-  }));
+  for (const r of [matches, adjustments, challenges]) if (r.error) throw new Error("Couldn't load data.");
+  const ps = pl.players;
   const ms: Match[] = (matches.data ?? []).map((m) => ({
     id: m.id, format: m.format as Format, deciding: m.deciding_set as Match["deciding"], p1: m.player_one, p2: m.player_two,
     winner: m.winner_id, status: m.status, playedOn: m.played_on, createdAt: m.created_at, confirmedAt: m.confirmed_at,
@@ -40,7 +46,7 @@ export const loadBoard = cache(async (sb: DB): Promise<Board> => {
   }));
   const today = todayET();
   return {
-    players: ps, byId: new Map(ps.map((p) => [p.id, p])), matches: ms,
+    players: ps, byId: pl.byId, matches: ms,
     adjustments: (adjustments.data ?? []).map((a) => ({ playerId: a.player_id, points: a.points, wins: a.wins, losses: a.losses, reason: a.reason })),
     challenges: (challenges.data ?? []).map((c) => ({
       id: c.id, challenger: c.challenger, opponent: c.opponent, format: c.format as Format, message: c.message, proposedFor: c.proposed_for,

@@ -3,7 +3,25 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 
 export type Database = {
   
-  "public": {
+  "graphql_public": {
+          Tables: {
+            [_ in never]: never
+          }
+          Views: {
+            [_ in never]: never
+          }
+          Functions: {
+            "graphql":
+{ Args: { "extensions"?: Json,"operationName"?: string,"query"?: string,"variables"?: Json }; Returns: Json
+                           }
+          }
+          Enums: {
+            [_ in never]: never
+          }
+          CompositeTypes: {
+            [_ in never]: never
+          }
+        },"public": {
           Tables: {
             "auth_rate_limits": {
                   Row: {
@@ -135,6 +153,142 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"pickleball_challenge_players": {
+                  Row: {
+                    "challenge_id": string,"player_id": string,"side": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "challenge_id": string,"player_id": string,"side": number
+                  }
+                  Update: {
+                    "challenge_id"?: string,"player_id"?: string,"side"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "pickleball_challenge_players_challenge_id_fkey"
+      columns: ["challenge_id"]
+isOneToOne: false
+      referencedRelation: "pickleball_challenges"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "pickleball_challenge_players_player_id_fkey"
+      columns: ["player_id"]
+isOneToOne: false
+      referencedRelation: "players"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"pickleball_challenges": {
+                  Row: {
+                    "challenger": string,"closed_at": string | null,"created_at": string,"discipline": string,"expires_at": string,"format": string,"id": string,"message": string | null,"proposed_for": string | null,"responded_at": string | null,"responded_by": string | null,"scoring": string,"sides_key": string,"status": Database["public"]['Enums']["challenge_status"]
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "challenger": string,"closed_at"?: string | null,"created_at"?: string,"discipline": string,"expires_at"?: string,"format": string,"id"?: string,"message"?: string | null,"proposed_for"?: string | null,"responded_at"?: string | null,"responded_by"?: string | null,"scoring"?: string,"sides_key": string,"status"?: Database["public"]['Enums']["challenge_status"]
+                  }
+                  Update: {
+                    "challenger"?: string,"closed_at"?: string | null,"created_at"?: string,"discipline"?: string,"expires_at"?: string,"format"?: string,"id"?: string,"message"?: string | null,"proposed_for"?: string | null,"responded_at"?: string | null,"responded_by"?: string | null,"scoring"?: string,"sides_key"?: string,"status"?: Database["public"]['Enums']["challenge_status"]
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "pickleball_challenges_challenger_fkey"
+      columns: ["challenger"]
+isOneToOne: false
+      referencedRelation: "players"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "pickleball_challenges_responded_by_fkey"
+      columns: ["responded_by"]
+isOneToOne: false
+      referencedRelation: "players"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"pickleball_games": {
+                  Row: {
+                    "game_number": number,"match_id": string,"side1_points": number,"side2_points": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "game_number": number,"match_id": string,"side1_points": number,"side2_points": number
+                  }
+                  Update: {
+                    "game_number"?: number,"match_id"?: string,"side1_points"?: number,"side2_points"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "pickleball_games_match_id_fkey"
+      columns: ["match_id"]
+isOneToOne: false
+      referencedRelation: "pickleball_matches"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"pickleball_match_players": {
+                  Row: {
+                    "match_id": string,"player_id": string,"side": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "match_id": string,"player_id": string,"side": number
+                  }
+                  Update: {
+                    "match_id"?: string,"player_id"?: string,"side"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "pickleball_match_players_match_id_fkey"
+      columns: ["match_id"]
+isOneToOne: false
+      referencedRelation: "pickleball_matches"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "pickleball_match_players_player_id_fkey"
+      columns: ["player_id"]
+isOneToOne: false
+      referencedRelation: "players"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"pickleball_matches": {
+                  Row: {
+                    "challenge_id": string | null,"client_key": string | null,"confirmed_at": string | null,"created_at": string,"discipline": string,"format": string,"id": string,"note": string | null,"played_on": string,"points_awarded": number | null,"recorded_by": string,"recorder_side": number,"responded_at": string | null,"responded_by": string | null,"scoring": string,"sides_key": string,"status": Database["public"]['Enums']["match_status"],"void_reason": string | null,"voided_at": string | null,"voided_by": string | null,"winner_side": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "challenge_id"?: string | null,"client_key"?: string | null,"confirmed_at"?: string | null,"created_at"?: string,"discipline": string,"format": string,"id"?: string,"note"?: string | null,"played_on": string,"points_awarded"?: number | null,"recorded_by": string,"recorder_side": number,"responded_at"?: string | null,"responded_by"?: string | null,"scoring"?: string,"sides_key": string,"status"?: Database["public"]['Enums']["match_status"],"void_reason"?: string | null,"voided_at"?: string | null,"voided_by"?: string | null,"winner_side": number
+                  }
+                  Update: {
+                    "challenge_id"?: string | null,"client_key"?: string | null,"confirmed_at"?: string | null,"created_at"?: string,"discipline"?: string,"format"?: string,"id"?: string,"note"?: string | null,"played_on"?: string,"points_awarded"?: number | null,"recorded_by"?: string,"recorder_side"?: number,"responded_at"?: string | null,"responded_by"?: string | null,"scoring"?: string,"sides_key"?: string,"status"?: Database["public"]['Enums']["match_status"],"void_reason"?: string | null,"voided_at"?: string | null,"voided_by"?: string | null,"winner_side"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "pickleball_matches_challenge_id_fkey"
+      columns: ["challenge_id"]
+isOneToOne: false
+      referencedRelation: "pickleball_challenges"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "pickleball_matches_recorded_by_fkey"
+      columns: ["recorded_by"]
+isOneToOne: false
+      referencedRelation: "players"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "pickleball_matches_responded_by_fkey"
+      columns: ["responded_by"]
+isOneToOne: false
+      referencedRelation: "players"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "pickleball_matches_voided_by_fkey"
+      columns: ["voided_by"]
+isOneToOne: false
+      referencedRelation: "players"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"player_private": {
                   Row: {
                     "email": string | null,"player_id": string
@@ -227,17 +381,26 @@ isOneToOne: false
 "cancel_match":
 { Args: { "p_match": string }; Returns: undefined
                            },
+"cancel_pickleball_match":
+{ Args: { "p_match": string }; Returns: undefined
+                           },
 "create_challenge":
 { Args: { "p_format": number,"p_message"?: string,"p_opponent": string,"p_proposed_for"?: string }; Returns: string
                            },
 "create_invite":
 { Args: Record<PropertyKey, never>; Returns: string
                            },
+"create_pickleball_challenge":
+{ Args: { "p_discipline": string,"p_format": string,"p_message"?: string,"p_proposed_for"?: string,"p_scoring": string,"p_side1": (string)[],"p_side2": (string)[] }; Returns: string
+                           },
 "ensure_player":
 { Args: { "p_first_name": string,"p_invite"?: string,"p_last_name": string,"p_username": string }; Returns: string
                            },
 "expire_challenges":
 { Args: { "p_a": string,"p_b": string }; Returns: undefined
+                           },
+"hook_before_user_created":
+{ Args: { "event": Json }; Returns: Json
                            },
 "is_admin":
 { Args: Record<PropertyKey, never>; Returns: boolean
@@ -248,11 +411,32 @@ isOneToOne: false
 "my_avatar_count":
 { Args: Record<PropertyKey, never>; Returns: number
                            },
+"pickleball_check_sides":
+{ Args: { "p_discipline": string,"p_me": string,"p_side1": (string)[],"p_side2": (string)[] }; Returns: undefined
+                           },
+"pickleball_format_info":
+{ Args: { "p_format": string }; Returns: Record<string, unknown>
+                           },
+"pickleball_in_challenge":
+{ Args: { "p_challenge": string }; Returns: boolean
+                           },
+"pickleball_in_match":
+{ Args: { "p_match": string }; Returns: boolean
+                           },
+"pickleball_sides_key":
+{ Args: { "p_side1": (string)[],"p_side2": (string)[] }; Returns: string
+                           },
+"pickleball_validate":
+{ Args: { "p_format": string,"p_games": Json }; Returns: number
+                           },
 "points_for":
 { Args: { "p_format": number }; Returns: number
                            },
 "record_match":
 { Args: { "p_allow_duplicate"?: boolean,"p_challenge"?: string,"p_client_key": string,"p_deciding": string,"p_format": number,"p_note"?: string,"p_opponent": string,"p_played_on": string,"p_sets": Json }; Returns: string
+                           },
+"record_pickleball_match":
+{ Args: { "p_challenge"?: string,"p_client_key": string,"p_discipline": string,"p_format": string,"p_games": Json,"p_note"?: string,"p_played_on": string,"p_scoring": string,"p_side1": (string)[],"p_side2": (string)[] }; Returns: string
                            },
 "require_me":
 { Args: Record<PropertyKey, never>; Returns: string
@@ -261,6 +445,12 @@ isOneToOne: false
 { Args: { "p_accept": boolean,"p_challenge": string }; Returns: string
                            },
 "respond_match":
+{ Args: { "p_accept": boolean,"p_match": string }; Returns: undefined
+                           },
+"respond_pickleball_challenge":
+{ Args: { "p_action": string,"p_challenge": string }; Returns: string
+                           },
+"respond_pickleball_match":
 { Args: { "p_accept": boolean,"p_match": string }; Returns: undefined
                            },
 "set_avatar":
@@ -276,6 +466,9 @@ isOneToOne: false
 { Args: { "p_deciding": string,"p_format": number,"p_sets": Json }; Returns: number
                            },
 "void_match":
+{ Args: { "p_match": string,"p_reason": string }; Returns: undefined
+                           },
+"void_pickleball_match":
 { Args: { "p_match": string,"p_reason": string }; Returns: undefined
                            }
           }
@@ -394,7 +587,11 @@ export type CompositeTypes<
   : never
 
 export const Constants = {
-  "public": {
+  "graphql_public": {
+          Enums: {
+            
+          }
+        },"public": {
           Enums: {
             "challenge_status": ["pending", "accepted", "declined", "canceled", "expired", "completed"],"match_status": ["pending", "confirmed", "rejected", "canceled", "voided"]
           }
