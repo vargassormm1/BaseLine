@@ -23,8 +23,9 @@ export default async function PbH2H({ searchParams }: { searchParams: Promise<Re
   const ready = A.length === need && B.length === need && new Set([...A, ...B]).size === 2 * need;
   const result = !ready ? null : mode === "singles" ? pbSinglesH2H(b.matches, A[0]!, B[0]!) : mode === "teams" ? pbTeamH2H(b.matches, [A[0]!, A[1]!], [B[0]!, B[1]!]) : pbDoublesOpponents(b.matches, A[0]!, B[0]!);
   const page = Math.max(1, Number(q.page) || 1);
+  const LABEL: Record<string, string> = { a: "First player", b: "Second player", a1: "Team 1, player 1", a2: "Team 1, player 2", b1: "Team 2, player 1", b2: "Team 2, player 2" };
   const select = (name: string, value: string | undefined) => (
-    <select name={name} defaultValue={value ?? ""} className="h-12 min-w-0 flex-1 rounded-2xl border border-line-strong bg-surface-2 px-3 text-base outline-none focus:border-accent-ink">
+    <select name={name} aria-label={LABEL[name]} defaultValue={value ?? ""} className="h-12 min-w-0 flex-1 rounded-2xl border border-line-strong bg-surface-2 px-3 text-base outline-none focus:border-accent-ink">
       <option value="">Choose…</option>
       {b.players.map((p) => <option key={p.id} value={p.username}>{displayName(p)}</option>)}
     </select>
