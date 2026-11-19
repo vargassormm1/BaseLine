@@ -1,6 +1,6 @@
 # Baseline (V2)
 
-Tennis match tracker for a group of friends. Next.js 16 + TypeScript + Tailwind 4 + Supabase (Postgres + Auth with Google). Docs in `docs/`
+Tennis and pickleball tracker for a group of friends (one account, separate rankings per sport; see docs/PICKLEBALL.md). Next.js 16 + TypeScript + Tailwind 4 + Supabase (Postgres + Auth with Google). Docs in `docs/`
 (start with PRODUCT_SPEC, ARCHITECTURE, SECURITY, MIGRATION). Project status/log also in
 `~/Coding/SideProjects/documentation/baseline/`.
 
@@ -15,6 +15,7 @@ Tennis match tracker for a group of friends. Next.js 16 + TypeScript + Tailwind 
 - **No production deploys, env changes or cutover steps without explicit approval** (runbook: docs/MIGRATION.md).
 - **Writes go through SQL functions** (`supabase/migrations`), never direct table writes. A new write means: a function with `require_me()`, ownership checks, validation and a rate limit; `revoke … from public, anon`, `grant … to authenticated`; plus a DB test.
 - **Tennis rules live in `src/lib/tennis`** (pure, unit-tested). `score.ts` and `validate_sets()` must stay in sync (`tests/fixtures/scores.json` runs against both).
+- **Pickleball rules live in `src/lib/pickleball`** (2026 USA Pickleball rulebook). `rules.ts` and `pickleball_validate()` must stay in sync (`tests/fixtures/pickleball-scores.json`). Pickleball has its own tables; never mix sports in standings, points or head-to-head. Sport routes/labels: `src/lib/sports.ts`.
 - **Records and points are derived from confirmed matches.** Never add counters. Never rewrite `points_awarded` or legacy rows.
 - **Server-only code stays on the server:** `src/lib/server`, never imported by `"use client"` files (guard test). No service key in the app.
 - **The local test sign-in** (`BASELINE_E2E`) must stay local-only (guard test).

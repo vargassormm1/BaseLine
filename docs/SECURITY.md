@@ -70,7 +70,7 @@ A separate reviewer audited the code with no access to my conclusions. Findings 
 ## Rate limits (all in Postgres; no Redis, no paid service)
 | Action | Limit | Keyed by | Where |
 |---|---|---|---|
-| Record a match | 20 / hour | player | `record_match` |
+| Record a match | 20 / hour | player | `record_match`, `record_pickleball_match` (shared bucket) |
 | Confirm / reject | 120 / hour | player | `respond_match` |
 | Create a challenge | 15 / day | player | `create_challenge` |
 | Create an invite | 10 / day | player | `create_invite` |
@@ -102,3 +102,13 @@ One row per player and bucket (fixed window), so the counters never grow without
 5. **The CSP allows `style-src 'unsafe-inline'`.** It's used for computed sizes (avatars, bars). Scripts stay nonce-locked.
 
 Passing `npm audit` or these tests doesn't prove the app is secure. Re-run the review after major changes.
+
+## Pickleball (2026-11-19)
+- Writes only through SECURITY DEFINER functions (`search_path=''`, `require_me()`, rate limits, input checks); no table
+  grants for insert/update/delete. The winner and points are computed in the database; the client never sends them.
+- Doubles: 4 distinct existing players, 2 per side, the recorder on side 1; only a player on the other side may confirm
+  or reject; the recorder's partner can't. Only admins void. Challenges: only the challenged side accepts/declines,
+  only the challenger cancels; a result against a challenge must match its sides, discipline and format.
+- Points awarded once at confirmation (status + points checks), concurrency-safe daily cap (advisory lock per sides/day),
+  idempotent recording (`client_key`). RLS: pending/rejected results and challenges visible only to participants.
+- The `baseline_sport` cookie only chooses which screens to show (httpOnly, lax); `/start` redirects to fixed routes only.

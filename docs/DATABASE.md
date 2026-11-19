@@ -48,3 +48,15 @@ All are `SECURITY DEFINER` with `search_path = ''`. EXECUTE is granted to `authe
 
 ## Types
 `npm run db:types` regenerates `src/lib/db/types.ts` from the local database.
+
+## Pickleball (migration 20261119001000, additive)
+| Table | Purpose |
+|---|---|
+| pickleball_matches | discipline (singles/doubles), format (g11/g15/g21/bo3/bo5), scoring (side_out/rally), recorded_by + recorder_side, winner_side (computed), sides_key, status, played_on, points_awarded (fixed at confirmation), challenge_id, client_key, void fields |
+| pickleball_match_players | match × player × side (1/2): 1 v 1 or 2 v 2, all distinct |
+| pickleball_games | game_number, side1_points, side2_points |
+| pickleball_challenges (+ _players) | discipline, format, scoring, challenger, sides, status; one open per sides_key |
+Functions: `pickleball_validate`, `record_pickleball_match`, `respond_pickleball_match` (any player on the other side;
+daily cap under an advisory lock), `cancel_pickleball_match`, `void_pickleball_match` (admin), `create_pickleball_challenge`,
+`respond_pickleball_challenge`. RLS: confirmed/voided results readable by players, others only by participants
+(`pickleball_in_match`/`pickleball_in_challenge` helpers avoid policy recursion); no direct writes. Tennis untouched.

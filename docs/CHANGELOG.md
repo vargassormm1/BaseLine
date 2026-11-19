@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-11-19 — Pickleball (branch `pickleball`, not deployed)
+- Second sport: singles and doubles, formats one game to 11/15/21, best of 3/5 to 11, side-out or rally scoring (tag).
+  Official 2026 USA Pickleball rules (win by 2; game ends when decided). Separate Singles and Doubles boards; 5/10/10/20
+  points to each winner; first 3 point-earning matches per day between the same sides; any opponent confirms.
+- Sport switcher on every page (remembers the last sport), pickleball dashboard, record flow, rankings, matches,
+  head to head (singles, team vs team, doubles opponents), challenges, profile tab. Landing page mentions both sports.
+- Additive migration only; tennis tables, functions and data untouched.
+
 ## 2026-11-18 — Username + password sign-in (replaces the email version)
 - Create account / sign in with a username and password next to Google; no email, no confirmation. Change password in Settings; the admin resets forgotten ones (SQL in `docs/PASSWORD_AUTH.md`).
 - Migration 0900: Before User Created hook that only allows password accounts on the reserved `players.baseline.invalid` domain.

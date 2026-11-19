@@ -51,3 +51,22 @@ Scoring method: side-out (default) or rally (a label on the match; the final-sco
 - Shared: players, accounts, invites, sign-in, rate limits, design system.
 - Code: `src/lib/pickleball/*` (score, points, standings, h2h; pure, tested), `src/lib/sports.ts` (registry: label,
   icon, routes, formats). Pickleball pages under `/pickleball/...`; the sport switcher remembers the last sport.
+
+## Tests
+- Unit: `tests/pickleball-score.test.ts` (shared cases), `tests/pickleball-standings.test.ts`, `tests/sports.test.ts`.
+- Database: `tests/db/pickleball.test.ts` (same score cases in SQL, singles/doubles flows, who may confirm, idempotency,
+  daily cap incl. concurrent confirmations, no direct writes, admin void, tennis isolation, challenges).
+- Browser: `e2e/pickleball.spec.ts` (every screen + axe + no overflow, switcher, singles and doubles journeys, tennis
+  rankings unchanged).
+
+## Deferred (documented, not invented)
+Retirements, forfeits, walkovers and unfinished matches (only completed matches are recorded); win-by-one (team play);
+DUPR or any external rating (Baseline points are not a rating).
+
+## Release plan (needs Matt's approval)
+1. Backup: `pg_dump` of production (schema + data) to `~/Backups/baseline/`, verify it restores into a local database
+   and that tennis counts match.
+2. `supabase db push --remote` (only migration 20261119001000; additive, no tennis changes).
+3. Reconcile: tennis match/set/points totals and standings identical before and after.
+4. Deploy the app. Rollback: redeploy the previous build (the new tables are unused by it); drop the pickleball tables
+   only if ever needed (no tennis data depends on them).

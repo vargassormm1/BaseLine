@@ -6,7 +6,7 @@ import { getSession } from "@/lib/server/session";
 import { Wordmark } from "@/components/shell/Nav";
 import { buttonClass } from "@/components/ui/Button";
 
-// The public landing page. Tennis is the first (and today the only) supported sport. Everything shown is an
+// The public landing page. Tennis and pickleball (the two supported sports; nothing else is claimed). Everything shown is an
 // illustration with made-up players (Alex, Jordan, Chris, Sam) telling one consistent story: Alex beats Jordan
 // 6–4 6–3, earns 10 points and takes the top spot; their rivalry now stands at 7–5 after 12 matches.
 // No real player data, no invented claims (user counts, testimonials).
@@ -38,9 +38,9 @@ export default async function Landing() {
       {/* ---- 1. hero: bright and airy; the product shows why it's fun ---- */}
       <section className="mx-auto grid max-w-[1080px] gap-10 px-5 pt-4 pb-16 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-14 lg:pt-12 lg:pb-24">
         <div className="animate-rise">
-          <p className="inline-flex h-8 items-center gap-2 rounded-full bg-mint px-3 text-sm font-semibold text-on-mint"><span className="size-2 rounded-full bg-coral" aria-hidden="true" />Tennis with your friends</p>
+          <p className="inline-flex h-8 items-center gap-2 rounded-full bg-mint px-3 text-sm font-semibold text-on-mint"><span className="size-2 rounded-full bg-coral" aria-hidden="true" />Tennis and pickleball with your friends</p>
           <h1 className="display mt-4 text-[clamp(38px,12vw,52px)] sm:text-[68px] lg:text-[76px]">The match ends. The rivalry doesn&apos;t.</h1>
-          <p className="mt-5 max-w-[42ch] text-lg text-text-2">Turn friendly matches into real competition. Track every win, settle the debate, and climb your own rankings with your friends.</p>
+          <p className="mt-5 max-w-[42ch] text-lg text-text-2">Turn friendly matches into real competition. Track your records, settle rivalries, and climb the rankings in tennis and pickleball.</p>
           <div className="mt-7 flex flex-wrap items-center gap-3">
             <Link href={SIGN_IN} prefetch={false} className={buttonClass("primary", "lg")}>Join with an invite</Link>
             <a href="#how" className={buttonClass("ghost", "lg")}>See how it works</a>
@@ -116,7 +116,7 @@ export default async function Landing() {
         <h2 id="how-title" className="display text-[32px] sm:text-[40px]">Play. Record. Climb.</h2>
         <ol className="reveal mt-9 grid gap-8 sm:grid-cols-3 sm:gap-6">
           {[
-            ["Play", "Challenge a friend, or just go play. One set, best of three or best of five."],
+            ["Play", "Challenge a friend, or just go play: tennis sets or pickleball games, singles or doubles."],
             ["Record", "Tap in the score. Your opponent confirms it, so every result is agreed."],
             ["Climb", "Wins earn points. Your record, the rankings and every rivalry update at once."],
           ].map(([t, d], i) => (
@@ -128,11 +128,33 @@ export default async function Landing() {
         </ol>
         <dl className="reveal mt-10 flex flex-wrap items-center gap-x-8 gap-y-3 rounded-[20px] bg-surface-2 px-5 py-4">
           <dt className="text-sm font-semibold text-text-2">A win is worth</dt>
-          {[["One set", 5], ["Best of three", 10], ["Best of five", 20]].map(([k, v]) => (
+          {[["One set or one game to 11", 5], ["Best of three", 10], ["Best of five", 20]].map(([k, v]) => (
             <dd key={k} className="flex items-baseline gap-2"><span className="score num text-[28px] text-accent-ink">+{v}</span><span className="text-sm text-text-2">{k}</span></dd>
           ))}
           <dd className="text-sm text-text-2 sm:ml-auto">Losing costs nothing. One more match, one more chance.</dd>
         </dl>
+      </section>
+
+      {/* ---- 3b. two sports, separate standings (a static example; same made-up players) ---- */}
+      <section className="mx-auto max-w-[1080px] px-5 pb-16 lg:pb-24" aria-labelledby="sports-title">
+        <div className="grid gap-8 rounded-[28px] border border-line bg-surface p-6 sm:p-8 lg:grid-cols-2 lg:items-center">
+          <div>
+            <h2 id="sports-title" className="display text-[30px] sm:text-[40px]">One account. Two sports. Separate rankings.</h2>
+            <p className="mt-3 max-w-[40ch] text-text-2">Your tennis record and your pickleball record never mix. Pickleball has its own singles and doubles tables, scored in games to 11, win by two.</p>
+          </div>
+          <div className="reveal" role="img" aria-label="Example pickleball doubles result: Alex and Chris beat Jordan and Sam 11–9, 8–11, 11–7, plus 10 points each.">
+            <div aria-hidden="true" className="rounded-[20px] bg-surface-2 p-4">
+              <p className="flex items-center gap-2 text-caption font-semibold text-text-3"><span>Pickleball</span><span>·</span><span>Doubles</span><span>·</span><span>Best of 3</span><span className="ml-auto num text-accent-ink">+10 pts each</span></p>
+              {[{ n: "Alex & Chris", s: [11, 8, 11], won: true }, { n: "Jordan & Sam", s: [9, 11, 7], won: false }].map((r, i) => (
+                <div key={r.n} className={`flex items-center gap-3 py-2 ${i ? "border-t border-line" : ""}`}>
+                  <span className="flex -space-x-2"><Disc name={r.n.split(" & ")[0]!} tone={r.won ? "mint" : "light"} /><Disc name={r.n.split(" & ")[1]!} tone={r.won ? "mint" : "light"} /></span>
+                  <span className={`flex-1 font-bold ${r.won ? "" : "text-text-2"}`}>{r.n}</span>
+                  {r.s.map((g, j) => <span key={j} className={`score num w-8 text-center text-[22px] ${g === 11 ? "" : "text-text-3"}`}>{g}</span>)}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* ---- 4. your own rankings ---- */}

@@ -50,3 +50,15 @@ if it ever reaches thousands, page match history and move standings into a SQL v
 ## Rendering & caching
 All signed-in pages are dynamic (per-player data, RLS); Supabase fetches use `cache: "no-store"`; nothing personal is
 cached across users. Writes call `revalidatePath("/", "layout")`. `loading.tsx` gives an instant skeleton.
+
+## Multiple sports (2026-11-19)
+- One identity (`players`, auth, invites, rate limits) shared by every sport; each sport keeps its own tables, rules
+  module, standings and pages. Tennis: `matches`/`match_sets`/`challenges`, `src/lib/tennis`, routes `/home`, `/rankings`…
+  Pickleball: `pickleball_*` tables, `src/lib/pickleball`, routes under `/pickleball`.
+- `src/lib/sports.ts` is the registry (label, routes, scoring unit) and maps a screen to the same screen in another sport.
+  The `SportSwitcher` sits at the top of every signed-in page; the proxy stores the last sport in the `baseline_sport`
+  cookie; shared screens (profiles) follow it or `?sport=`; `/start` (PWA start URL, post-sign-in) opens that sport.
+- Data: `loadPlayers` (shared) + `loadBoard` (tennis) / `loadPickleball` (pickleball), each cached per request. A
+  pickleball page never loads tennis matches; the app layout (rendered once, kept across navigation) loads both only to
+  count what's waiting for me in either sport.
+- Adding a sport = a registry entry, a rules module + SQL validator with shared fixtures, its tables/functions, pages.
