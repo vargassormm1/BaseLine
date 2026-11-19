@@ -1,6 +1,6 @@
 # Pickleball (second sport)
 
-Status: in progress (branch `pickleball`). Not deployed.
+Status: live since 2026-11-19 (main b4f5231). Backup before release: `~/Backups/baseline/pre-pickleball-*`; tennis tables verified identical after the migration.
 
 ## Rules used (official sources, checked 2026-11-19)
 - 2026 USA Pickleball Official Rulebook: https://usapickleball.org/docs/rules/USAP-Official-Rulebook.pdf
