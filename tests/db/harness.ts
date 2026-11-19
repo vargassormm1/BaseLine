@@ -59,6 +59,8 @@ export async function cleanup() {
   const ids = (await db`select id from public.players where username like ${`t${run}%`} or auth_user_id in ${db(createdAuth.length ? createdAuth : ["00000000-0000-0000-0000-000000000000"])}`).map((r) => r.id as string);
   if (ids.length) {
     await db`delete from public.matches where player_one in ${db(ids)} or player_two in ${db(ids)}`;
+    await db`delete from public.pickleball_matches where id in (select match_id from public.pickleball_match_players where player_id in ${db(ids)})`;
+    await db`delete from public.pickleball_challenges where id in (select challenge_id from public.pickleball_challenge_players where player_id in ${db(ids)})`;
     await db`delete from public.challenges where challenger in ${db(ids)} or opponent in ${db(ids)}`;
     await db`delete from public.standing_adjustments where player_id in ${db(ids)}`;
     await db`delete from public.invites where used_by in ${db(ids)} or created_by in ${db(ids)}`;
