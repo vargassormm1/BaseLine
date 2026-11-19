@@ -28,7 +28,7 @@ export const getSession = cache(async (): Promise<Session | null> => {
   });
   // Just linked or joined (a player's first visit only): start over with a clean request, because the board that
   // began loading above was read before this account was a player.
-  if (!e2 && linked) redirect("/home");
+  if (!e2 && linked) redirect("/start");
   return { id, sb: id.sb, me: null };
 });
 

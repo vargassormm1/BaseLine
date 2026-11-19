@@ -154,7 +154,7 @@ begin
   v_key := public.pickleball_sides_key(p_side1, p_side2);
   if p_challenge is not null then
     select * into c from public.pickleball_challenges where id = p_challenge for update;
-    if not found or c.status <> 'accepted' or c.sides_key <> v_key or c.discipline <> p_discipline or c.format <> p_format then
+    if not found or c.status <> 'accepted' or c.sides_key <> v_key or c.discipline <> p_discipline or c.format <> p_format or c.scoring <> p_scoring then
       raise exception 'invalid_challenge';
     end if;
   end if;
@@ -189,14 +189,17 @@ begin
   if m.status = v_to then return; end if;
   if m.status <> 'pending' then raise exception 'already_answered'; end if;
   perform public.take_rate_limit(v_me, 'respond', 120, interval '1 hour');
+  if p_accept and m.played_on < public.app_today() - 365 then raise exception 'too_old_to_confirm'; end if;
   if not p_accept then
     update public.pickleball_matches set status = v_to, responded_at = now(), responded_by = v_me where id = p_match;
     return;
   end if;
-  -- serialize confirmations for the same sides and day, so two at once can't both take the third slot
-  perform pg_advisory_xact_lock(hashtext('pickleball_points:' || m.sides_key || ':' || m.played_on));
+  -- the cap counts results confirmed today (New York) between these sides, whatever date they were played, so
+  -- backdating can't get around it; serialized so two confirmations at once can't both take the third slot
+  perform pg_advisory_xact_lock(hashtext('pickleball_points:' || m.sides_key || ':' || public.app_today()));
   select count(*) into v_earlier from public.pickleball_matches
-    where sides_key = m.sides_key and discipline = m.discipline and played_on = m.played_on and status = 'confirmed' and points_awarded > 0 and id <> m.id;
+    where sides_key = m.sides_key and discipline = m.discipline and status = 'confirmed' and points_awarded > 0 and id <> m.id
+      and (confirmed_at at time zone 'America/New_York')::date = public.app_today();
   select case when v_earlier >= 3 then 0 else points end into v_points from public.pickleball_format_info(m.format);
   update public.pickleball_matches set status = v_to, responded_at = now(), responded_by = v_me, confirmed_at = now(), points_awarded = v_points where id = p_match;
   if m.challenge_id is not null then
@@ -241,7 +244,8 @@ begin
   if p_message is not null and length(p_message) > 140 then raise exception 'invalid_note'; end if;
   if p_proposed_for is not null and (p_proposed_for < public.app_today() or p_proposed_for > public.app_today() + 90) then raise exception 'invalid_date'; end if;
   v_key := public.pickleball_sides_key(p_side1, p_side2);
-  update public.pickleball_challenges set status = 'expired', closed_at = now() where sides_key = v_key and status = 'pending' and expires_at < now();
+  update public.pickleball_challenges set status = 'expired', closed_at = now()
+    where sides_key = v_key and ((status = 'pending' and expires_at < now()) or (status = 'accepted' and responded_at < now() - interval '30 days'));
   begin
     insert into public.pickleball_challenges (discipline, format, scoring, challenger, sides_key, message, proposed_for)
     values (p_discipline, p_format, p_scoring, v_me, v_key, nullif(trim(p_message), ''), p_proposed_for) returning id into v_id;
@@ -262,12 +266,13 @@ begin
   select side into v_side from public.pickleball_challenge_players where challenge_id = p_challenge and player_id = v_me;
   if v_side is null then raise exception 'not_allowed' using errcode = '42501'; end if;
   perform public.take_rate_limit(v_me, 'respond', 120, interval '1 hour');
-  if c.status = 'pending' and c.expires_at < now() then
+  if (c.status = 'pending' and c.expires_at < now()) or (c.status = 'accepted' and c.responded_at < now() - interval '30 days') then
     update public.pickleball_challenges set status = 'expired', closed_at = now() where id = p_challenge;
     return 'expired';
   end if;
   if p_action = 'cancel' then
-    if c.challenger <> v_me then raise exception 'not_allowed' using errcode = '42501'; end if;
+    -- a pending challenge: only the challenger withdraws it; an accepted one: anyone in it can call it off
+    if (c.status = 'pending' and c.challenger <> v_me) then raise exception 'not_allowed' using errcode = '42501'; end if;
     if c.status not in ('pending', 'accepted') then raise exception 'already_answered'; end if;
     update public.pickleball_challenges set status = 'canceled', closed_at = now() where id = p_challenge;
   elsif p_action in ('accept', 'decline') then
@@ -312,7 +317,9 @@ revoke all on function public.pickleball_in_match(uuid), public.pickleball_in_ch
 grant execute on function public.pickleball_in_match(uuid), public.pickleball_in_challenge(uuid) to authenticated;
 
 -- players see confirmed/voided results and the ones they're in; writes only through the functions above
-grant select on public.pickleball_matches, public.pickleball_match_players, public.pickleball_games to authenticated;
+grant select (id, discipline, format, scoring, recorded_by, recorder_side, winner_side, sides_key, status, played_on, points_awarded,
+  challenge_id, note, created_at, responded_at, confirmed_at, voided_at, void_reason) on public.pickleball_matches to authenticated;
+grant select on public.pickleball_match_players, public.pickleball_games to authenticated;
 create policy pickleball_matches_read on public.pickleball_matches for select to authenticated using (
   public.me() is not null and (status in ('confirmed', 'voided')
     or public.pickleball_in_match(id)));

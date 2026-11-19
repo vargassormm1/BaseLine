@@ -39,8 +39,15 @@ Scoring method: side-out (default) or rally (a label on the match; the final-sco
 - **Confirmation:** any one player on the other side confirms or rejects (the recorder's side can't confirm).
 - **Leaderboards (Matt, 2026-11-19): separate Singles and Doubles boards**, each with its own points.
   Each winner of a doubles match gets the full reward on the Doubles board.
-- **Daily cap (Matt, 2026-11-19):** only the first 3 confirmed matches per day between the same sides (same players,
-  same discipline) earn points; later ones count in records and head-to-head with 0 points.
+- **Daily cap (Matt, 2026-11-19):** only the first 3 results **confirmed per day** (New York time) between the same sides
+  (same players, same discipline) earn points; later ones count in records and head-to-head with 0 points. Counted by
+  the day of confirmation, not the date played, so backdating can't get around it. Voiding a result doesn't re-award
+  a later 0-point one (points are fixed at confirmation).
+- Results more than a year old can't be confirmed (same as tennis).
+- Challenges: the challenged side accepts or declines; a pending challenge is withdrawn only by the challenger; an
+  accepted one can be called off by anyone in it and lapses 30 days after acceptance. A result recorded against a
+  challenge must match its sides, discipline, format and scoring. No "possible duplicate" check yet (a double entry is
+  rejected by the other side); idempotent re-submits are handled by `client_key`.
 - Points are fixed when the result is confirmed (rule changes never rewrite history), awarded once, removed if an
   admin voids the match. Clients never send points.
 - Tennis and pickleball never share standings, points, head-to-head or history.

@@ -33,7 +33,7 @@ export default async function PbChallenges() {
           <ul className="space-y-3">{box.toPlay.map((c) => {
             const mine = c.side1.includes(me.id) ? c.side1 : c.side2, theirs = c.side1.includes(me.id) ? c.side2 : c.side1, partner = mine.find((x) => x !== me.id);
             const q = new URLSearchParams({ challenge: c.id, opponents: theirs.join(","), ...(partner ? { partner } : {}) });
-            return <li key={c.id} className="card flex flex-wrap items-center gap-3 px-4 py-3.5"><p className="min-w-0 flex-1 text-sm">vs <span className="font-bold">{sideName(theirs, b.byId)}</span><span className="block text-caption text-text-3">{what(c)}</span></p><ButtonLink href={`/pickleball/record?${q}`} size="sm">Record result</ButtonLink>{c.challenger === me.id ? <CancelPbChallenge id={c.id} /> : null}</li>;
+            return <li key={c.id} className="card flex flex-wrap items-center gap-3 px-4 py-3.5"><p className="min-w-0 flex-1 text-sm">vs <span className="font-bold">{sideName(theirs, b.byId)}</span><span className="block text-caption text-text-3">{what(c)}</span></p><ButtonLink href={`/pickleball/record?${q}`} size="sm">Record result</ButtonLink><CancelPbChallenge id={c.id} /></li>;
           })}</ul>
         </section>) : null}
       {box.sent.length ? (

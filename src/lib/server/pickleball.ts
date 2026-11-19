@@ -12,7 +12,8 @@ export interface PbChallengeRow {
 }
 export interface PbBoard { players: PlayerRow[]; byId: Map<string, PlayerRow>; matches: PbMatch[]; challenges: PbChallengeRow[]; today: string }
 
-/** Pickleball only (tennis is never loaded on pickleball screens). One read per request; RLS decides visibility. */
+/** Pickleball matches and challenges (pickleball pages never read tennis matches; the app layout loads both once, only
+ *  for the "waiting for you" badge). One read per request; RLS decides visibility. */
 export const loadPickleball = cache(async (sb: DB): Promise<PbBoard> => {
   const [players, matches, challenges] = await Promise.all([
     loadPlayers(sb),

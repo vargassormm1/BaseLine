@@ -27,7 +27,7 @@ function Disc({ name, tone = "light", size = 40 }: { name: string; tone?: "light
 }
 
 export default async function Landing() {
-  if (await getSession()) redirect("/home");
+  if (await getSession()) redirect("/start");
   return (
     <main className="pt-safe min-h-dvh overflow-x-clip">
       <header className="mx-auto flex max-w-[1080px] items-center justify-between px-5 py-4">

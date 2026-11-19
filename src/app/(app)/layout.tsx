@@ -13,16 +13,16 @@ import { SportSwitcher } from "@/components/shell/SportSwitcher";
 /** Signed-in frame: rail on desktop, tab bar on phones. Every page inside also calls requirePlayer(). */
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const s = await requirePlayer();
-  const [board, pb, jar] = await Promise.all([loadBoard(s.sb), loadPickleball(s.sb), cookies()]);
+  const [board, pb, jar] = await Promise.all([loadBoard(s.sb), loadPickleball(s.sb).catch(() => null), cookies()]);
   const me = board.byId.get(s.me);
   const c = jar.get(SPORT_COOKIE)?.value;
   const sport = isSport(c) ? c : "tennis";
   // the badge counts what's waiting for me in every sport (the layout loads once, not on each tab switch)
-  const nav = { meHref: me ? `/players/${me.username}` : "/settings", attention: attentionCount(board, s.me) + pbAttention(pb, s.me), sport };
+  const nav = { meHref: me ? `/players/${me.username}` : "/settings", attention: attentionCount(board, s.me) + (pb ? pbAttention(pb, s.me) : 0), sport };
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[232px_minmax(0,1fr)]">
       <aside className="sticky top-0 hidden h-dvh flex-col border-r border-line px-4 pt-6 pb-5 lg:flex" aria-label="Sidebar">
-        <Link href="/home" className="mb-7 px-2" aria-label="Baseline home"><Wordmark /></Link>
+        <Link href="/start" className="mb-7 px-2" aria-label="Baseline home"><Wordmark /></Link>
         <Rail {...nav} />
       </aside>
       <main id="main" className="pt-safe pb-tabbar mx-auto w-full max-w-[1040px] px-4 sm:px-6 lg:pb-16 lg:pt-8">

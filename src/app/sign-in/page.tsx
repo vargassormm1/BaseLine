@@ -9,7 +9,7 @@ import { PasswordAuth } from "@/components/auth/PasswordAuth";
 export const metadata = { title: "Sign in" };
 
 export default async function SignIn({ searchParams }: { searchParams: Promise<{ next?: string; error?: string; mode?: string }> }) {
-  if (await getSession()) redirect("/home");
+  if (await getSession()) redirect("/start");
   const q = await searchParams;
   const next = safeNext(q.next);
   const passwords = passwordAuthEnabled();

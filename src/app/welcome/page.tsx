@@ -10,7 +10,7 @@ export const metadata = { title: "Welcome" };
 export default async function Welcome() {
   const s = await getSession();
   if (!s) redirect("/sign-in");
-  if (s.me) redirect("/home");
+  if (s.me) redirect("/start");
   const p = s.id.profile;
   return (
     <main className="pt-safe mx-auto flex min-h-dvh max-w-md flex-col justify-center px-5 py-10">
