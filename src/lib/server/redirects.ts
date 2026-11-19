@@ -1,7 +1,7 @@
 /** Only same-site paths are allowed as a post-sign-in destination (no open redirects). */
 export function safeNext(raw: string | null | undefined): string {
-  if (!raw || !raw.startsWith("/") || raw.startsWith("//") || raw.startsWith("/\\") || raw.includes("://") || raw.length > 200) return "/home";
-  return /^\/[A-Za-z0-9/_.?=&%-]*$/.test(raw) ? raw : "/home";
+  if (!raw || !raw.startsWith("/") || raw.startsWith("//") || raw.startsWith("/\\") || raw.includes("://") || raw.length > 200) return "/start";
+  return /^\/[A-Za-z0-9/_.?=&%-]*$/.test(raw) ? raw : "/start";
 }
 
 /** An absolute URL on the host the request actually came in on (Next's nextUrl.origin can say "localhost" when the

@@ -3,12 +3,14 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { House, ListOrdered, Trophy, Plus, Swords, UserRound, Flag, Users, Settings } from "lucide-react";
+import { SPORTS, sportOfPath, type SportKey } from "@/lib/sports";
 
-export interface NavProps { meHref: string; attention: number }
+export interface NavProps { meHref: string; attention: number; /** the last sport used, for shared screens */ sport: SportKey }
 /** Exactly one nav item is active: your own profile lights "Me", other players light "Players". */
 const isOn = (path: string, href: string, meHref = "") =>
   href === "/players" ? path === "/players" || (path.startsWith("/players/") && path.toLowerCase() !== meHref.toLowerCase())
     : href.startsWith("/players/") ? path.toLowerCase() === href.toLowerCase()
+    : href === "/pickleball" ? path === href // the pickleball dashboard isn't "on" for every /pickleball/... screen
     : path === href || path.startsWith(`${href}/`);
 
 /** The path to treat as current: the one just tapped (so the tab lights up at once), then the real one when it arrives. */
@@ -20,13 +22,14 @@ function useOptimisticPath() {
 }
 
 /** Phones: five tabs with Record (the round button) in the thumb-reach center. */
-export function TabBar({ meHref, attention }: NavProps) {
+export function TabBar({ meHref, attention, sport }: NavProps) {
   const { path, go } = useOptimisticPath();
+  const sp = SPORTS[sportOfPath(path) ?? sport];
   const tabs = [
-    { href: "/home", label: "Home", icon: House, dot: attention > 0 },
-    { href: "/matches", label: "Matches", icon: ListOrdered },
+    { href: sp.home, label: "Home", icon: House, dot: attention > 0 },
+    { href: sp.matches, label: "Matches", icon: ListOrdered },
     null,
-    { href: "/rankings", label: "Rankings", icon: Trophy },
+    { href: sp.rankings, label: "Rankings", icon: Trophy },
     { href: meHref, label: "Me", icon: UserRound },
   ];
   return (
@@ -34,7 +37,7 @@ export function TabBar({ meHref, attention }: NavProps) {
       <ul className="mx-auto grid h-16 max-w-lg grid-cols-5 items-center">
         {tabs.map((t, i) => t === null ? (
           <li key="record" className="flex justify-center">
-            <Link href="/record" aria-label="Record a match" onClick={() => go("/record")} className="press -mt-7 grid size-14 place-items-center rounded-full bg-accent text-on-accent shadow-[0_8px_20px_-6px_rgb(25_183_121/0.5)] ring-4 ring-bg">
+            <Link href={sp.record} aria-label={`Record a ${sp.label.toLowerCase()} match`} onClick={() => go(sp.record)} className="press -mt-7 grid size-14 place-items-center rounded-full bg-accent text-on-accent shadow-[0_8px_20px_-6px_rgb(25_183_121/0.5)] ring-4 ring-bg">
               <Plus size={26} strokeWidth={2.75} aria-hidden="true" />
             </Link>
           </li>
@@ -54,21 +57,22 @@ export function TabBar({ meHref, attention }: NavProps) {
 }
 
 /** Desktop: a slim left rail. */
-export function Rail({ meHref, attention }: NavProps) {
+export function Rail({ meHref, attention, sport }: NavProps) {
   const { path, go } = useOptimisticPath();
+  const sp = SPORTS[sportOfPath(path) ?? sport];
   const items = [
-    { href: "/home", label: "Home", icon: House, count: attention },
-    { href: "/matches", label: "Matches", icon: ListOrdered },
-    { href: "/rankings", label: "Rankings", icon: Trophy },
-    { href: "/h2h", label: "Head to head", icon: Swords },
-    { href: "/challenges", label: "Challenges", icon: Flag },
+    { href: sp.home, label: "Home", icon: House, count: attention },
+    { href: sp.matches, label: "Matches", icon: ListOrdered },
+    { href: sp.rankings, label: "Rankings", icon: Trophy },
+    { href: sp.h2h, label: "Head to head", icon: Swords },
+    { href: sp.challenges, label: "Challenges", icon: Flag },
     { href: "/players", label: "Players", icon: Users },
     { href: meHref, label: "My profile", icon: UserRound },
   ];
   return (
     <nav aria-label="Main" className="flex h-full flex-col gap-1">
-      <Link href="/record" onClick={() => go("/record")} className="press mb-5 flex h-12 items-center justify-center gap-2 rounded-full bg-accent font-bold text-on-accent">
-        <Plus size={20} strokeWidth={2.75} aria-hidden="true" />Record match
+      <Link href={sp.record} onClick={() => go(sp.record)} className="press mb-5 flex h-12 items-center justify-center gap-2 rounded-full bg-accent font-bold text-on-accent">
+        <Plus size={20} strokeWidth={2.75} aria-hidden="true" />Record {sp.label.toLowerCase()}
       </Link>
       {items.map((it) => (
         <Link key={it.href} href={it.href} onClick={() => go(it.href)} aria-current={isOn(path, it.href, meHref) ? "page" : undefined}

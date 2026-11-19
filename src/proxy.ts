@@ -1,3 +1,4 @@
+import { isSport, SPORT_COOKIE, sportOfPath } from "@/lib/sports";
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
@@ -69,6 +70,11 @@ export default async function proxy(req: NextRequest) {
   }
   res.headers.set("Content-Security-Policy", policy);
   res.headers.set("Cache-Control", "private, no-store"); // per-player pages are never cached
+  // remember the sport last viewed (shared screens and the app's entry follow it)
+  const sport = sportOfPath(path) ?? (isSport(req.nextUrl.searchParams.get("sport")) ? req.nextUrl.searchParams.get("sport") : null);
+  if (sport && req.cookies.get(SPORT_COOKIE)?.value !== sport) {
+    res.cookies.set(SPORT_COOKIE, sport, { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax", httpOnly: true, secure: req.nextUrl.protocol === "https:" });
+  }
   return res;
 }
 

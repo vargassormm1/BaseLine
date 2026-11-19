@@ -4,11 +4,11 @@ import { FormDots, Movement } from "@/components/ui/bits";
 import type { StandingRow } from "@/lib/tennis/standings";
 
 /** One leaderboard row: position, movement, player, form, record, points. Top three get the optic rank. */
-export function LeaderboardRow({ r, me, compact = false }: { r: StandingRow; me: string; compact?: boolean }) {
+export function LeaderboardRow({ r, me, compact = false, href }: { r: StandingRow; me: string; compact?: boolean; /** defaults to the player's profile */ href?: string }) {
   const isMe = r.player.id === me;
   return (
     <li>
-      <Link href={`/players/${r.player.username}`} aria-current={isMe ? "true" : undefined}
+      <Link href={href ?? `/players/${r.player.username}`} aria-current={isMe ? "true" : undefined}
         className={`press flex items-center gap-3 px-4 ${compact ? "py-2.5" : "py-3.5"} ${isMe ? "bg-mint text-on-mint" : "hover:bg-surface-2"}`}>
         <span className="flex w-9 shrink-0 flex-col items-center">
           <span className={`score text-[26px] ${r.rank === null ? "text-text-3" : r.rank === 1 ? "text-accent-ink" : "text-text"}`}>{r.rank ?? "–"}</span>

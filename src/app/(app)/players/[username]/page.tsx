@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
+import { isSport, SPORT_COOKIE } from "@/lib/sports";
+import { PbProfile } from "@/components/pickleball/PbProfile";
 import { ChevronDown, ChevronRight, Pencil, Swords, UserPlus } from "lucide-react";
 import { requirePlayer } from "@/lib/server/session";
-import { loadBoard } from "@/lib/server/data";
+import { loadBoard, loadPlayers } from "@/lib/server/data";
 import { standings } from "@/lib/tennis/standings";
 import { playerStats } from "@/lib/tennis/stats";
 import { FORMAT_LABEL, type Format } from "@/lib/tennis/types";
@@ -16,10 +19,30 @@ export async function generateMetadata({ params }: { params: Promise<{ username:
   return { title: `@${(await params).username}` };
 }
 
-export default async function Profile({ params }: { params: Promise<{ username: string }> }) {
+export default async function Profile({ params, searchParams }: { params: Promise<{ username: string }>; searchParams: Promise<{ sport?: string }> }) {
   const { username } = await params;
   if (!/^[A-Za-z0-9_.-]{3,24}$/.test(username)) notFound();
   const s = await requirePlayer();
+  // one identity, a page per sport: ?sport= (from the switcher), else the last sport used
+  const q = (await searchParams).sport, c = (await cookies()).get(SPORT_COOKIE)?.value;
+  const sport = isSport(q) ? q : isSport(c) ? c : "tennis";
+  if (sport === "pickleball") {
+    const { players } = await loadPlayers(s.sb);
+    const pp = players.find((x) => x.username.toLowerCase() === username.toLowerCase());
+    if (!pp) notFound();
+    return (
+      <div className="animate-rise space-y-8">
+        <header className="flex flex-col items-start gap-5 pt-2 sm:flex-row sm:items-end">
+          <Avatar player={pp} size="hero" />
+          <div className="w-full min-w-0 flex-1">
+            <p className="truncate text-sm font-semibold text-text-2">@{pp.username} · pickleball</p>
+            <h1 className="display mt-1 text-[clamp(30px,10vw,44px)] sm:text-[56px]">{displayName(pp)}</h1>
+          </div>
+        </header>
+        <PbProfile sb={s.sb} p={pp} me={s.me} />
+      </div>
+    );
+  }
   const b = await loadBoard(s.sb);
   const p = b.players.find((x) => x.username.toLowerCase() === username.toLowerCase());
   if (!p) notFound();
