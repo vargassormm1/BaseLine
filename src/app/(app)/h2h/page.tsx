@@ -10,14 +10,31 @@ import { Empty } from "@/components/ui/bits";
 import { MatchCard } from "@/components/tennis/Scoreboard";
 import { NewChallenge } from "@/components/actions/NewChallenge";
 import { SplitBar } from "@/components/tennis/SplitBar";
+import { Segmented } from "@/components/ui/Segmented";
+import { DoublesH2H, type DMode } from "@/components/doubles/DoublesH2H";
+import { loadTennisDoubles } from "@/lib/server/doubles";
 
 export const metadata = { title: "Head to head" };
 
-export default async function H2H({ searchParams }: { searchParams: Promise<{ a?: string; b?: string }> }) {
+export default async function H2H({ searchParams }: { searchParams: Promise<{ a?: string; b?: string; mode?: string; a1?: string; a2?: string; b1?: string; b2?: string }> }) {
   const s = await requirePlayer();
   const b = await loadBoard(s.sb);
   const q = await searchParams;
   const find = (u?: string) => (u ? b.players.find((p) => p.username.toLowerCase() === u.toLowerCase()) : undefined);
+  const mode = q.mode === "teams" || q.mode === "opponents" || q.mode === "partner" ? (q.mode as DMode) : "singles";
+  const modes = <Segmented label="Head-to-head type" items={[{ href: "/h2h", label: "Singles", on: mode === "singles" }, { href: "/h2h?mode=teams", label: "Teams", on: mode === "teams" }, { href: "/h2h?mode=opponents", label: "Doubles opponents", on: mode === "opponents" }, { href: "/h2h?mode=partner", label: "Partners", on: mode === "partner" }]} />;
+  if (mode !== "singles") {
+    const d = await loadTennisDoubles(s.sb);
+    const ids = (...us: (string | undefined)[]) => us.flatMap((x) => (typeof x === "string" ? x.split(",") : [])).map((x) => find(x)?.id).filter((x): x is string => !!x);
+    const A = mode === "teams" ? ids(q.a1, q.a2).length ? ids(q.a1, q.a2) : ids(q.a) : ids(q.a).slice(0, 1);
+    const B = mode === "teams" ? ids(q.b1, q.b2).length ? ids(q.b1, q.b2) : ids(q.b) : ids(q.b).slice(0, 1);
+    return (
+      <div className="animate-rise space-y-6">
+        <div className="space-y-4 pt-2"><h1 className="display text-[34px] sm:text-[40px]">Head to head</h1><div className="no-scrollbar -mx-4 overflow-x-auto px-4">{modes}</div></div>
+        <DoublesH2H mode={mode} players={b.players} byId={b.byId} matches={d.matches} today={b.today} a={A} b={B} />
+      </div>
+    );
+  }
   const me = b.byId.get(s.me)!;
   const pa = find(q.a) ?? me;
   const topRival = playerStats(pa.id, b.matches).rivals[0]?.opponentId;
@@ -43,7 +60,7 @@ export default async function H2H({ searchParams }: { searchParams: Promise<{ a?
   );
 
   if (!pb || pb.id === pa.id) {
-    return <div className="animate-rise space-y-6"><h1 className="display pt-2 text-[34px]">Head to head</h1>{picker}<Empty title="Pick two different players" /></div>;
+    return <div className="animate-rise space-y-6"><h1 className="display pt-2 text-[34px]">Head to head</h1>{modes}{picker}<Empty title="Pick two different players" /></div>;
   }
   const h = headToHead(pa.id, pb.id, b.matches);
   const rows: [string, string | number, string | number][] = [
@@ -63,7 +80,7 @@ export default async function H2H({ searchParams }: { searchParams: Promise<{ a?
 
   return (
     <div className="animate-rise space-y-8">
-      <div className="space-y-4 pt-2"><h1 className="display text-[34px] sm:text-[40px]">Head to head</h1>{picker}</div>
+      <div className="space-y-4 pt-2"><h1 className="display text-[34px] sm:text-[40px]">Head to head</h1><div className="no-scrollbar -mx-4 overflow-x-auto px-4">{modes}</div>{picker}</div>
 
       {/* the matchup */}
       <section aria-label={`${displayName(pa)} versus ${displayName(pb)}: ${h.a.wins} to ${h.b.wins}`} className="overflow-hidden rounded-[28px] border border-white/10 bg-[#123f35] px-3 pt-6 pb-7 text-[#fafaf6] sm:px-8">

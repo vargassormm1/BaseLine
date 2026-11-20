@@ -9,13 +9,28 @@ import { ButtonLink } from "@/components/ui/Button";
 import { Empty, PageHeader, Pill } from "@/components/ui/bits";
 import { AnswerChallenge, CancelChallenge } from "@/components/actions/ActionButtons";
 import { NewChallenge } from "@/components/actions/NewChallenge";
+import { Segmented } from "@/components/ui/Segmented";
+import { DoublesChallenges } from "@/components/doubles/DoublesChallenges";
+import { loadTennisDoubles } from "@/lib/server/doubles";
 
 export const metadata = { title: "Challenges" };
 const STATUS: Record<ChallengeRow["status"], string> = { pending: "Waiting", accepted: "On", declined: "Declined", canceled: "Canceled", expired: "Expired", completed: "Played" };
 
-export default async function Challenges() {
+export default async function Challenges({ searchParams }: { searchParams: Promise<{ type?: string }> }) {
   const s = await requirePlayer();
   const b = await loadBoard(s.sb);
+  const doublesView = (await searchParams).type === "doubles";
+  const tabs = <div className="mb-6"><Segmented label="Challenge type" items={[{ href: "/challenges", label: "Singles", on: !doublesView }, { href: "/challenges?type=doubles", label: "Doubles", on: doublesView }]} /></div>;
+  if (doublesView) {
+    const d = await loadTennisDoubles(s.sb);
+    return (
+      <div className="animate-rise">
+        <PageHeader title="Challenges" subtitle="Doubles: you and a partner against two others. Either of them can accept." />
+        {tabs}
+        <DoublesChallenges me={b.byId.get(s.me)!} players={b.players} byId={b.byId} matches={d.matches} challenges={d.challenges} today={b.today} />
+      </div>
+    );
+  }
   const box = inbox(b, s.me);
   const others = b.players.filter((p) => p.id !== s.me);
   const done = b.challenges.filter((c) => !["pending", "accepted"].includes(c.status)).slice(0, 15);
@@ -37,6 +52,7 @@ export default async function Challenges() {
   return (
     <div className="animate-rise">
       <PageHeader title="Challenges" subtitle="Call someone out. When they accept, play it and record the result." action={<NewChallenge players={others} today={b.today} />} />
+      {tabs}
       <div className="space-y-8">
         {box.toAnswer.length ? <section aria-labelledby="c-in"><h2 id="c-in" className="mb-3 text-lg font-bold">For you</h2><ul className="space-y-3">{box.toAnswer.map((c) => card(c, <AnswerChallenge id={c.id} />, false))}</ul></section> : null}
         {box.toPlay.length ? (

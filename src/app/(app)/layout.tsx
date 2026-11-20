@@ -7,18 +7,19 @@ import { Toaster } from "@/components/ui/Toast";
 import { cookies } from "next/headers";
 import { loadPickleball } from "@/lib/server/pickleball";
 import { pbAttention } from "@/lib/pickleball/inbox";
+import { loadTennisDoubles } from "@/lib/server/doubles";
 import { isSport, SPORT_COOKIE } from "@/lib/sports";
 import { SportSwitcher } from "@/components/shell/SportSwitcher";
 
 /** Signed-in frame: rail on desktop, tab bar on phones. Every page inside also calls requirePlayer(). */
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const s = await requirePlayer();
-  const [board, pb, jar] = await Promise.all([loadBoard(s.sb), loadPickleball(s.sb).catch(() => null), cookies()]);
+  const [board, pb, td, jar] = await Promise.all([loadBoard(s.sb), loadPickleball(s.sb).catch(() => null), loadTennisDoubles(s.sb).catch(() => null), cookies()]);
   const me = board.byId.get(s.me);
   const c = jar.get(SPORT_COOKIE)?.value;
   const sport = isSport(c) ? c : "tennis";
   // the badge counts what's waiting for me in every sport (the layout loads once, not on each tab switch)
-  const nav = { meHref: me ? `/players/${me.username}` : "/settings", attention: attentionCount(board, s.me) + (pb ? pbAttention(pb, s.me) : 0), sport };
+  const nav = { meHref: me ? `/players/${me.username}` : "/settings", attention: attentionCount(board, s.me) + (td ? pbAttention(td, s.me) : 0) + (pb ? pbAttention(pb, s.me) : 0), sport };
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[232px_minmax(0,1fr)]">
       <aside className="sticky top-0 hidden h-dvh flex-col border-r border-line px-4 pt-6 pb-5 lg:flex" aria-label="Sidebar">

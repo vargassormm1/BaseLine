@@ -14,17 +14,22 @@ import { ButtonLink } from "@/components/ui/Button";
 import { Empty, FormDots, SectionHeader, Stat } from "@/components/ui/bits";
 import { MatchCard } from "@/components/tennis/Scoreboard";
 import { NewChallenge } from "@/components/actions/NewChallenge";
+import { Segmented } from "@/components/ui/Segmented";
+import { DoublesProfile } from "@/components/doubles/DoublesProfile";
+import { loadTennisDoubles } from "@/lib/server/doubles";
+import { sideStandings } from "@/lib/sides/standings";
 
 export async function generateMetadata({ params }: { params: Promise<{ username: string }> }) {
   return { title: `@${(await params).username}` };
 }
 
-export default async function Profile({ params, searchParams }: { params: Promise<{ username: string }>; searchParams: Promise<{ sport?: string }> }) {
+export default async function Profile({ params, searchParams }: { params: Promise<{ username: string }>; searchParams: Promise<{ sport?: string; view?: string }> }) {
   const { username } = await params;
   if (!/^[A-Za-z0-9_.-]{3,24}$/.test(username)) notFound();
   const s = await requirePlayer();
   // one identity, a page per sport: ?sport= (from the switcher), else the last sport used
-  const q = (await searchParams).sport, c = (await cookies()).get(SPORT_COOKIE)?.value;
+  const sp = await searchParams;
+  const q = sp.sport, c = (await cookies()).get(SPORT_COOKIE)?.value;
   const sport = isSport(q) ? q : isSport(c) ? c : "tennis";
   if (sport === "pickleball") {
     const { players } = await loadPlayers(s.sb);
@@ -43,13 +48,17 @@ export default async function Profile({ params, searchParams }: { params: Promis
       </div>
     );
   }
-  const b = await loadBoard(s.sb);
+  const [b, d] = await Promise.all([loadBoard(s.sb), loadTennisDoubles(s.sb)]);
+  const view = sp.view === "singles" || sp.view === "doubles" ? sp.view : "overview";
   const p = b.players.find((x) => x.username.toLowerCase() === username.toLowerCase());
   if (!p) notFound();
   const isMe = p.id === s.me;
   const all = standings(b.players, b.matches, b.adjustments, { today: b.today }).find((r) => r.player.id === p.id)!;
   const st = playerStats(p.id, b.matches);
   const visible = b.matches.filter((m) => (m.p1 === p.id || m.p2 === p.id) && m.status !== "canceled");
+  const drow = sideStandings(b.players, d.matches, { today: b.today }).find((r) => r.player.id === p.id);
+  const base = `/players/${p.username}?sport=tennis`;
+  const tabs = <Segmented label="Profile section" items={[{ href: base, label: "Overview", on: view === "overview" }, { href: `${base}&view=singles`, label: "Singles", on: view === "singles" }, { href: `${base}&view=doubles`, label: "Doubles", on: view === "doubles" }]} />;
 
   return (
     <div className="animate-rise space-y-9">
@@ -59,8 +68,8 @@ export default async function Profile({ params, searchParams }: { params: Promis
           <p className="truncate text-sm font-semibold text-text-2">@{p.username}{p.isAdmin ? " · admin" : ""}</p>
           <h1 className="display mt-1 text-[clamp(30px,10vw,44px)] sm:text-[56px]">{displayName(p)}</h1>
           <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-text-2">
-            <span><span className="score num text-[22px] text-text">{all.rank ? `#${all.rank}` : "–"}</span> rank</span>
-            <span><span className="score num text-[22px] text-text">{all.points}</span> pts</span>
+            <span><span className="score num text-[22px] text-text">{all.rank ? `#${all.rank}` : "–"}</span> singles · {all.points} pts</span>
+            <span><span className="score num text-[22px] text-text">{drow?.rank ? `#${drow.rank}` : "–"}</span> doubles · {drow?.points ?? 0} pts</span>
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -78,6 +87,23 @@ export default async function Profile({ params, searchParams }: { params: Promis
         </div>
       </header>
 
+      {tabs}
+      {view === "overview" ? (
+        <section aria-label="Overview" className="grid gap-4 sm:grid-cols-2">
+          <Link href={`${base}&view=singles`} className="press card block p-5 hover:border-line-strong">
+            <p className="eyebrow">Singles</p>
+            <p className="mt-2 score num text-[30px]">{all.rank ? `#${all.rank}` : "–"} <span className="text-base font-semibold text-text-2">{all.points} pts</span></p>
+            <p className="num text-sm text-text-2">{all.wins}–{all.losses}{all.winPct !== null ? ` · ${Math.round(all.winPct)}%` : ""}</p>
+          </Link>
+          <Link href={`${base}&view=doubles`} className="press card block p-5 hover:border-line-strong">
+            <p className="eyebrow">Doubles</p>
+            <p className="mt-2 score num text-[30px]">{drow?.rank ? `#${drow.rank}` : "–"} <span className="text-base font-semibold text-text-2">{drow?.points ?? 0} pts</span></p>
+            <p className="num text-sm text-text-2">{drow ? `${drow.wins}–${drow.losses}${drow.winPct !== null ? ` · ${Math.round(drow.winPct)}%` : ""}` : "0–0"}</p>
+          </Link>
+        </section>
+      ) : null}
+      {view === "doubles" ? <DoublesProfile p={p} players={b.players} byId={b.byId} matches={d.matches} today={b.today} isMe={isMe} /> : null}
+      {view !== "doubles" ? (<>
       {st.played === 0 && all.wins + all.losses === 0 ? (
         <Empty title={isMe ? "No matches yet" : `${shortName(p)} hasn't played yet`}>Stats show up after the first confirmed match.</Empty>
       ) : (
@@ -129,6 +155,7 @@ export default async function Profile({ params, searchParams }: { params: Promis
           {visible.length > 6 ? <p className="mt-3 text-caption text-text-3">Latest 6 of {visible.length}.{isMe ? " See them all under Matches." : ""}</p> : null}
         </section>
       ) : null}
+      </>) : null}
     </div>
   );
 }

@@ -12,13 +12,22 @@ import { MatchCard, ScoreRows } from "@/components/tennis/Scoreboard";
 import { LeaderboardRow } from "@/components/tennis/LeaderboardRow";
 import { AnswerChallenge, ConfirmMatch } from "@/components/actions/ActionButtons";
 import { FORMAT_LABEL } from "@/lib/tennis/types";
+import { loadTennisDoubles } from "@/lib/server/doubles";
+import { sidesInbox } from "@/lib/pickleball/inbox";
+import { sideStandings } from "@/lib/sides/standings";
+import { DScoreRows } from "@/components/doubles/DoublesScoreboard";
+import { ConfirmDoubles, AnswerDoublesChallenge } from "@/components/doubles/DoublesActions";
+import { sideName } from "@/components/pickleball/PbScoreboard";
+import { D_FORMATS } from "@/lib/tennis/doubles";
 
 export const metadata = { title: "Home" };
 
 export default async function Home() {
   const s = await requirePlayer();
-  const b = await loadBoard(s.sb);
+  const [b, d] = await Promise.all([loadBoard(s.sb), loadTennisDoubles(s.sb)]);
   const me = b.byId.get(s.me)!;
+  const dbox = sidesInbox(d, s.me);
+  const drow = sideStandings(b.players, d.matches, { today: b.today }).find((r) => r.player.id === s.me);
   const all = standings(b.players, b.matches, b.adjustments, { today: b.today });
   const mine = all.find((r) => r.player.id === me.id)!;
   const st = playerStats(me.id, b.matches);
@@ -62,11 +71,15 @@ export default async function Home() {
           {st.form.length ? <><span>Last {Math.min(5, st.form.length)}</span><FormDots form={st.form.slice(0, 5)} onDark /></> : <span>No matches yet</span>}
           {mine.rank && mine.movement ? <span className="ml-auto inline-flex items-center gap-1"><Movement by={mine.movement} /> this week</span> : null}
         </div>
+        <Link href="/rankings?board=doubles" className="mt-4 flex items-center justify-between rounded-2xl bg-white/5 px-4 py-2.5 text-sm text-[#a9c4b9] hover:bg-white/10">
+          <span>Doubles</span>
+          <span className="num font-semibold text-[#fafaf6]">{drow?.rank ? `#${drow.rank}` : "Unranked"} · {drow?.wins ?? 0}–{drow?.losses ?? 0} · {drow?.points ?? 0} pts</span>
+        </Link>
         <ButtonLink href="/record" size="lg" full className="mt-6"><Plus size={20} strokeWidth={3} aria-hidden="true" />Record match</ButtonLink>
       </section>
 
       {/* only when something is waiting for me */}
-      {box.toConfirm.length + box.toAnswer.length + box.toPlay.length > 0 ? (
+      {box.toConfirm.length + box.toAnswer.length + box.toPlay.length + dbox.toConfirm.length + dbox.toAnswer.length + dbox.toPlay.length > 0 ? (
         <section aria-labelledby="your-move">
           <SectionHeader id="your-move" title="Your move" />
           <ul className="space-y-3">
@@ -75,6 +88,25 @@ export default async function Home() {
                 <p className="mb-1 text-sm"><span className="font-bold">{shortName(b.byId.get(m.p1))}</span> recorded a result. Is it right?</p>
                 <Link href={`/matches/${m.id}`} className="block"><ScoreRows m={m} byId={b.byId} /></Link>
                 <div className="mt-3"><ConfirmMatch id={m.id} size="sm" /></div>
+              </li>
+            ))}
+            {dbox.toConfirm.map((m) => (
+              <li key={m.id} className="card px-4 pt-3 pb-4">
+                <p className="mb-1 text-sm"><span className="font-bold">{shortName(b.byId.get(m.recordedBy))}</span> recorded a doubles result. Is it right?</p>
+                <Link href={`/matches/doubles/${m.id}`} className="block"><DScoreRows m={m} byId={b.byId} /></Link>
+                <div className="mt-3"><ConfirmDoubles id={m.id} size="sm" /></div>
+              </li>
+            ))}
+            {dbox.toAnswer.map((c) => (
+              <li key={c.id} className="card space-y-3 px-4 py-3.5">
+                <p className="text-sm"><span className="font-bold">{sideName(c.side1, b.byId)}</span> challenged you and {shortName(b.byId.get(c.side2.find((x) => x !== me.id) ?? ""))} to doubles ({D_FORMATS[c.format].label.toLowerCase()}){c.message ? <span className="block text-text-2">“{c.message}”</span> : null}</p>
+                <AnswerDoublesChallenge id={c.id} />
+              </li>
+            ))}
+            {dbox.toPlay.map((c) => (
+              <li key={c.id} className="card flex items-center gap-3 px-4 py-3.5">
+                <p className="min-w-0 flex-1 text-sm">Doubles challenge on vs <span className="font-bold">{sideName(c.side1.includes(me.id) ? c.side2 : c.side1, b.byId)}</span>. Played it?</p>
+                <ButtonLink href={`/record?type=doubles&challenge=${c.id}`} size="sm" variant="secondary">Record result</ButtonLink>
               </li>
             ))}
             {box.toAnswer.map((c) => (
