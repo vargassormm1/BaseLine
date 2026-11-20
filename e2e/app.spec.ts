@@ -29,7 +29,8 @@ test("landing: both sports in the preview, keyboard tabs, no sideways scroll at 
   await page.goto("/");
   const tabs = page.getByRole("tablist", { name: "Example sport" });
   await expect(tabs.getByRole("tab", { name: "Tennis" })).toHaveAttribute("aria-selected", "true");
-  await expect(page.getByRole("tabpanel")).toContainText("Alex and Chris beat Jordan and Sam");
+  await expect(page.getByRole("tabpanel")).toContainText("Alex beats Jordan 6–4, 7–5");
+  await expect(page.getByText("Doubles count too.")).toBeVisible();
   await tabs.getByRole("tab", { name: "Pickleball" }).focus();
   await page.keyboard.press("Enter");
   await expect(tabs.getByRole("tab", { name: "Pickleball" })).toHaveAttribute("aria-selected", "true");

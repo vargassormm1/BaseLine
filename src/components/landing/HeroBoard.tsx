@@ -13,10 +13,10 @@ type Demo = {
 };
 const DEMOS: Record<"tennis" | "pickleball", Demo> = {
   tennis: {
-    tab: "Tennis", label: "Tennis doubles", boardLabel: "Tennis doubles rankings", points: 10,
-    sides: [{ names: ["Alex", "Chris"], games: [6, 6], won: true }, { names: ["Jordan", "Sam"], games: [4, 3], won: false }],
-    board: [{ name: "Jordan", before: 120 }, { name: "Alex", before: 115 }, { name: "Sam", before: 100 }, { name: "Chris", before: 95 }],
-    summary: "Tennis doubles example: Alex and Chris beat Jordan and Sam 6–4, 6–3. Alex and Chris earn 10 points each; Alex moves up to first and Chris to third in the tennis doubles rankings.",
+    tab: "Tennis", label: "Tennis singles", boardLabel: "Tennis singles rankings", points: 10,
+    sides: [{ names: ["Alex"], games: [6, 7], won: true }, { names: ["Jordan"], games: [4, 5], won: false }],
+    board: [{ name: "Jordan", before: 140 }, { name: "Alex", before: 135 }, { name: "Chris", before: 115 }, { name: "Sam", before: 95 }],
+    summary: "Tennis singles example: Alex beats Jordan 6–4, 7–5, earns 10 points and moves past Jordan into first in the tennis singles rankings.",
   },
   pickleball: {
     tab: "Pickleball", label: "Pickleball singles", boardLabel: "Pickleball singles rankings", points: 10,
@@ -92,6 +92,7 @@ export function HeroBoard() {
           </div>
         </div>
       </div>
+      <p className="mt-3 px-1 text-sm text-text-2"><span className="font-semibold text-text">Doubles count too.</span> Tennis and pickleball doubles have their own rankings, and both partners earn the points.</p>
     </div>
   );
 }
