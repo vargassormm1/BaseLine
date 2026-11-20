@@ -26,7 +26,8 @@ export function DoublesChallenges({ me, players, byId, matches, challenges, toda
         <section aria-labelledby="dc-on"><SectionHeader id="dc-on" title="Doubles: on" />
           <ul className="space-y-3">{box.toPlay.map((c) => {
             const theirs = c.side1.includes(me.id) ? c.side2 : c.side1;
-            return <li key={c.id} className="card flex flex-wrap items-center gap-3 px-4 py-3.5"><p className="min-w-0 flex-1 text-sm">vs <span className="font-bold">{sideName(theirs, byId)}</span><span className="block text-caption text-text-3">{what(c)}</span></p><ButtonLink href={`/record?type=doubles&challenge=${c.id}`} size="sm">Record result</ButtonLink><CancelDoublesChallenge id={c.id} /></li>;
+            const pending = matches.find((m) => m.challengeId === c.id && m.status === "pending");
+            return <li key={c.id} className="card flex flex-wrap items-center gap-3 px-4 py-3.5"><p className="min-w-0 flex-1 text-sm">vs <span className="font-bold">{sideName(theirs, byId)}</span><span className="block text-caption text-text-3">{what(c)}</span></p>{pending ? <ButtonLink href={`/matches/doubles/${pending.id}`} size="sm" variant="secondary">Result waiting</ButtonLink> : <ButtonLink href={`/record?type=doubles&challenge=${c.id}`} size="sm">Record result</ButtonLink>}<CancelDoublesChallenge id={c.id} /></li>;
           })}</ul>
         </section>) : null}
       {box.sent.length ? (

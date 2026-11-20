@@ -85,6 +85,13 @@ export function checkSet(s: DSet, kind: SetKind): SetCheck {
   return { kind: "done", winner };
 }
 
+/** Games that can only come from a tiebreak (7–6, 5–4 / 4–3 short, 9–8 pro): only these may carry tiebreak points. */
+export function isTiebreakScore(a: number, b: number, kind: SetKind): boolean {
+  if ("matchTiebreak" in kind || kind.tieAt === null) return false;
+  const hi = Math.max(a, b), lo = Math.min(a, b), g = kind.games;
+  return kind.tieAt === g ? hi === g + 1 && lo === g : hi === g && lo === g - 1;
+}
+
 /** Which kind each set slot is, for a format. */
 export function setKind(format: DFormat, index: number, shortTieAt: 3 | 4 = 4): SetKind {
   const f = D_FORMATS[format];

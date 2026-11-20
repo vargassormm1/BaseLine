@@ -31,3 +31,15 @@ describe("points and score lines", () => {
     expect(doublesScoreLine("one_set", [[7, 6, 7, 5]])).toBe("7–6(5)");
   });
 });
+
+describe("which scores carry tiebreak points", () => {
+  it("only 7–6, short 5–4 (or 4–3 at 3–3) and pro 9–8", async () => {
+    const { isTiebreakScore } = await import("@/lib/tennis/doubles");
+    expect(isTiebreakScore(7, 6, { games: 6, tieAt: 6 })).toBe(true);
+    expect(isTiebreakScore(6, 4, { games: 6, tieAt: 6 })).toBe(false);
+    expect(isTiebreakScore(5, 4, { games: 4, tieAt: 4 })).toBe(true);
+    expect(isTiebreakScore(4, 3, { games: 4, tieAt: 3 })).toBe(true);
+    expect(isTiebreakScore(9, 8, { games: 8, tieAt: 8 })).toBe(true);
+    expect(isTiebreakScore(8, 6, { games: 6, tieAt: null })).toBe(false);
+  });
+});

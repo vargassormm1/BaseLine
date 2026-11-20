@@ -3,7 +3,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeftRight } from "lucide-react";
 import { recordDoubles } from "@/app/doubles-actions";
-import { checkSet, D_FORMATS, doublesScoreLine, isShort, setKind, validateDoubles, type DFormat, type DSet } from "@/lib/tennis/doubles";
+import { checkSet, D_FORMATS, isTiebreakScore, doublesScoreLine, isShort, setKind, validateDoubles, type DFormat, type DSet } from "@/lib/tennis/doubles";
 import { addDays } from "@/lib/tennis/dates";
 import type { Player } from "@/lib/tennis/types";
 import { Avatar, displayName, shortName } from "@/components/ui/Avatar";
@@ -47,18 +47,20 @@ export function DoublesRecordForm({ me, others, recent, today, initial }: Double
   // swap my partner with an opponent (I always record from my own team)
   const swap = () => { setPartner(o1); setO1(partner); };
 
-  const toSet = (r: Row): DSet | null => {
+  // hidden tiebreak boxes never count: they only apply while the games read as a tiebreak set
+  const toSet = (r: Row, i: number): DSet | null => {
     const a = toNum(r.a), b = toNum(r.b);
     if (a === null && b === null) return null;
     const ta = toNum(r.ta), tb = toNum(r.tb);
-    return ta !== null || tb !== null ? [a ?? NaN, b ?? NaN, ta, tb] : [a ?? NaN, b ?? NaN];
+    const tbShown = a !== null && b !== null && isTiebreakScore(a, b, setKind(format, i, shortTieAt));
+    return tbShown && (ta !== null || tb !== null) ? [a ?? NaN, b ?? NaN, ta, tb] : [a ?? NaN, b ?? NaN];
   };
   // show sets as needed: the minimum to finish, plus the next one while the match is still undecided
   let shown = f.setsToWin;
   {
     let w1 = 0, w2 = 0;
     for (let i = 0; i < f.maxSets; i++) {
-      const st = toSet(rows[i]!);
+      const st = toSet(rows[i]!, i);
       const c = st ? checkSet(st, setKind(format, i, shortTieAt)) : null;
       if (c?.kind !== "done") { shown = Math.max(shown, i + 1); break; }
       if (c.winner === 1) w1++; else w2++;
@@ -67,7 +69,7 @@ export function DoublesRecordForm({ me, others, recent, today, initial }: Double
     }
     shown = Math.min(Math.max(shown, 1), f.maxSets);
   }
-  const sets = rows.slice(0, shown).map(toSet).filter((s): s is DSet => s !== null);
+  const sets = rows.slice(0, shown).map((r, i) => toSet(r, i)).filter((s): s is DSet => s !== null);
   const check = validateDoubles(format, sets, shortTieAt);
   const ready = playersReady && check.ok;
   const setRow = (i: number, k: keyof Row, v: string) => { setError(null); setRows((rs) => rs.map((r, j) => (j === i ? { ...r, [k]: v.replace(/\D/g, "").slice(0, 2) } : r))); };
@@ -144,10 +146,10 @@ export function DoublesRecordForm({ me, others, recent, today, initial }: Double
             {Array.from({ length: shown }, (_, i) => {
               const kind = setKind(format, i, shortTieAt);
               const mtb = "matchTiebreak" in kind;
-              const s = toSet(rows[i]!);
+              const s = toSet(rows[i]!, i);
               const c = s ? checkSet([s[0], s[1]], kind) : null;
               const full = s ? checkSet(s, kind) : null;
-              const isTbSet = !mtb && c?.kind === "done" && (() => { const hi = Math.max(s![0], s![1]), lo = Math.min(s![0], s![1]); return "games" in kind && kind.tieAt !== null && ((kind.tieAt === kind.games && hi === kind.games + 1 && lo === kind.games) || (kind.tieAt !== kind.games && hi === kind.games && lo === kind.games - 1)); })();
+              const isTbSet = !mtb && c?.kind === "done" && isTiebreakScore(s![0], s![1], kind);
               const label = mtb ? "Match tiebreak" : `Set ${i + 1}`;
               return (
                 <div key={i} className="rounded-2xl border border-line bg-surface px-3 py-3">

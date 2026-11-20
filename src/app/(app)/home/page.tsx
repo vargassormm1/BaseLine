@@ -103,7 +103,7 @@ export default async function Home() {
                 <AnswerDoublesChallenge id={c.id} />
               </li>
             ))}
-            {dbox.toPlay.map((c) => (
+            {dbox.toPlay.filter((c) => !d.matches.some((m) => m.challengeId === c.id && m.status === "pending")).map((c) => (
               <li key={c.id} className="card flex items-center gap-3 px-4 py-3.5">
                 <p className="min-w-0 flex-1 text-sm">Doubles challenge on vs <span className="font-bold">{sideName(c.side1.includes(me.id) ? c.side2 : c.side1, b.byId)}</span>. Played it?</p>
                 <ButtonLink href={`/record?type=doubles&challenge=${c.id}`} size="sm" variant="secondary">Record result</ButtonLink>

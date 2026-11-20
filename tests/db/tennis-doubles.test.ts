@@ -102,7 +102,8 @@ describe("challenges", () => {
     expect((await c.sb.rpc("respond_tennis_doubles_challenge", { p_challenge: ch.data as string, p_action: "accept" })).error?.code).toBe("42501");
     expect((await b.sb.rpc("respond_tennis_doubles_challenge", { p_challenge: ch.data as string, p_action: "accept" })).data).toBe("accepted");
     expect((await rec(a, [a.id, c.id], [b.id, d.id], [[6, 2]], { p_format: "one_set", p_challenge: ch.data })).error?.message).toMatch(/invalid_challenge/);
-    const id = (await rec(a, [a.id, c.id], [b.id, d.id], [[6, 2], [6, 3]], { p_challenge: ch.data })).data as string;
+    expect((await rec(a, [a.id, c.id], [b.id, d.id], [[6, 2], [6, 3]], { p_challenge: ch.data })).error?.message).toMatch(/invalid_challenge/); // agreed no-ad
+    const id = (await rec(a, [a.id, c.id], [b.id, d.id], [[6, 2], [6, 3]], { p_challenge: ch.data, p_no_ad: true })).data as string;
     await respond(d, id);
     expect((await db`select status from public.tennis_doubles_challenges where id = ${ch.data as string}`)[0]!.status).toBe("completed");
   });

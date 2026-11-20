@@ -114,7 +114,8 @@ begin
     if w1 = f.sets_to_win or w2 = f.sets_to_win then raise exception 'invalid_score'; end if;
     if jsonb_typeof(s) <> 'array' or jsonb_array_length(s) not in (2, 4) then raise exception 'invalid_score'; end if;
     for k in 0 .. jsonb_array_length(s) - 1 loop
-      if not (jsonb_typeof(s -> k) = 'null' and k >= 2) and ((s ->> k) is null or (s ->> k) !~ '^\d{1,2}$') then raise exception 'invalid_score'; end if;
+      -- JSON numbers only (no strings), whole 0–99; tiebreak slots may be null
+      if not (jsonb_typeof(s -> k) = 'null' and k >= 2) and (jsonb_typeof(s -> k) <> 'number' or (s ->> k) !~ '^[0-9]{1,2}$') then raise exception 'invalid_score'; end if;
     end loop;
     a := (s ->> 0)::int; b := (s ->> 1)::int; ta := (s ->> 2)::int; tb := (s ->> 3)::int;
     hi := greatest(a, b); lo := least(a, b);
@@ -162,7 +163,9 @@ begin
   v_key := public.pickleball_sides_key(p_side1, p_side2);
   if p_challenge is not null then
     select * into c from public.tennis_doubles_challenges where id = p_challenge for update;
-    if not found or c.status <> 'accepted' or c.sides_key <> v_key or c.format <> p_format then raise exception 'invalid_challenge'; end if;
+    if not found or c.status <> 'accepted' or c.sides_key <> v_key or c.format <> p_format
+       or c.short_tie_at is distinct from p_short_tie_at or c.no_ad <> coalesce(p_no_ad, false)
+       or c.responded_at < now() - interval '30 days' then raise exception 'invalid_challenge'; end if;
   end if;
   begin
     insert into public.tennis_doubles_matches (format, short_tie_at, no_ad, recorded_by, recorder_side, winner_side, sides_key, played_on, challenge_id, client_key, note)
