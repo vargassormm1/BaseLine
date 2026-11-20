@@ -133,3 +133,22 @@ dialog.sheet::backdrop { background: var(--scrim); animation: fade 200ms ease-ou
   .press:active { transform: none; }
   .skeleton::after { display: none; }
 }
+
+/* ---- landing page (src/app/page.tsx, components/landing) ---- */
+.lp-headline { font-stretch: 118%; font-weight: 850; letter-spacing: -0.045em; line-height: 0.92; font-size: clamp(31px, 9.6vw, 56px); }
+@media (min-width: 640px) { .lp-headline { font-size: 64px; } }
+@media (min-width: 1024px) { .lp-headline { font-size: clamp(50px, 4.5vw, 66px); } }
+.lp-h2 { font-stretch: 115%; font-weight: 850; letter-spacing: -0.04em; line-height: 0.95; font-size: clamp(34px, 9vw, 60px); text-wrap: balance; }
+.lp-h3 { font-stretch: 112%; font-weight: 800; letter-spacing: -0.035em; line-height: 1; font-size: clamp(26px, 6vw, 36px); text-wrap: balance; }
+.lp-name { font-stretch: 112%; font-weight: 800; letter-spacing: -0.03em; font-size: clamp(22px, 6vw, 36px); line-height: 1; }
+.lp-h2h { font-stretch: 70%; font-weight: 850; font-variant-numeric: tabular-nums; line-height: 0.8; font-size: clamp(84px, 26vw, 168px); letter-spacing: -0.02em; }
+/* the hero sequence: scores land, "Won" and "+10" stamp in, the standings reorder. Finished state without motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .lp-in { animation: rise 380ms var(--ease-out) both; animation-delay: var(--d, 0ms); }
+  .lp-pop { animation: pop 420ms var(--ease-out) both; animation-delay: var(--d, 0ms); }
+  .lp-row { animation: lp-slide 650ms var(--ease-out) both; animation-delay: var(--d, 0ms); }
+  .lp-gain { animation-name: lp-slide, lp-flash; animation-duration: 650ms, 1400ms; }
+}
+.lp-gain { background: color-mix(in oklab, var(--mint) 45%, var(--surface)); }
+@keyframes lp-slide { from { transform: translateY(var(--from, 0)); } to { transform: none; } }
+@keyframes lp-flash { 0%, 40% { background: var(--surface); } 60% { background: var(--mint); } 100% { background: color-mix(in oklab, var(--mint) 45%, var(--surface)); } }
