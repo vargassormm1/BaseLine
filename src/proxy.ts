@@ -61,6 +61,12 @@ export default async function proxy(req: NextRequest) {
     cb.searchParams.set("code", req.nextUrl.searchParams.get("code")!);
     return NextResponse.redirect(cb);
   }
+  // signed in: the landing page is for visitors; go straight to the app (the page never has to look the account up)
+  if (signedIn && path === "/") {
+    const redirect = NextResponse.redirect(new URL("/start", req.nextUrl.origin));
+    redirect.headers.set("Content-Security-Policy", policy);
+    return redirect;
+  }
   if (!signedIn && !PUBLIC.some((r) => r.test(path))) {
     const to = new URL("/sign-in", req.nextUrl.origin);
     if (path !== "/home") to.searchParams.set("next", path);
