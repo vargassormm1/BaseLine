@@ -363,6 +363,142 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"tennis_doubles_challenge_players": {
+                  Row: {
+                    "challenge_id": string,"player_id": string,"side": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "challenge_id": string,"player_id": string,"side": number
+                  }
+                  Update: {
+                    "challenge_id"?: string,"player_id"?: string,"side"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "tennis_doubles_challenge_players_challenge_id_fkey"
+      columns: ["challenge_id"]
+isOneToOne: false
+      referencedRelation: "tennis_doubles_challenges"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "tennis_doubles_challenge_players_player_id_fkey"
+      columns: ["player_id"]
+isOneToOne: false
+      referencedRelation: "players"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"tennis_doubles_challenges": {
+                  Row: {
+                    "challenger": string,"closed_at": string | null,"created_at": string,"expires_at": string,"format": string,"id": string,"message": string | null,"no_ad": boolean,"proposed_for": string | null,"responded_at": string | null,"responded_by": string | null,"short_tie_at": number | null,"sides_key": string,"status": Database["public"]['Enums']["challenge_status"]
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "challenger": string,"closed_at"?: string | null,"created_at"?: string,"expires_at"?: string,"format": string,"id"?: string,"message"?: string | null,"no_ad"?: boolean,"proposed_for"?: string | null,"responded_at"?: string | null,"responded_by"?: string | null,"short_tie_at"?: number | null,"sides_key": string,"status"?: Database["public"]['Enums']["challenge_status"]
+                  }
+                  Update: {
+                    "challenger"?: string,"closed_at"?: string | null,"created_at"?: string,"expires_at"?: string,"format"?: string,"id"?: string,"message"?: string | null,"no_ad"?: boolean,"proposed_for"?: string | null,"responded_at"?: string | null,"responded_by"?: string | null,"short_tie_at"?: number | null,"sides_key"?: string,"status"?: Database["public"]['Enums']["challenge_status"]
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "tennis_doubles_challenges_challenger_fkey"
+      columns: ["challenger"]
+isOneToOne: false
+      referencedRelation: "players"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "tennis_doubles_challenges_responded_by_fkey"
+      columns: ["responded_by"]
+isOneToOne: false
+      referencedRelation: "players"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"tennis_doubles_matches": {
+                  Row: {
+                    "challenge_id": string | null,"client_key": string | null,"confirmed_at": string | null,"created_at": string,"format": string,"id": string,"no_ad": boolean,"note": string | null,"played_on": string,"points_awarded": number | null,"recorded_by": string,"recorder_side": number,"responded_at": string | null,"responded_by": string | null,"short_tie_at": number | null,"sides_key": string,"status": Database["public"]['Enums']["match_status"],"void_reason": string | null,"voided_at": string | null,"voided_by": string | null,"winner_side": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "challenge_id"?: string | null,"client_key"?: string | null,"confirmed_at"?: string | null,"created_at"?: string,"format": string,"id"?: string,"no_ad"?: boolean,"note"?: string | null,"played_on": string,"points_awarded"?: number | null,"recorded_by": string,"recorder_side": number,"responded_at"?: string | null,"responded_by"?: string | null,"short_tie_at"?: number | null,"sides_key": string,"status"?: Database["public"]['Enums']["match_status"],"void_reason"?: string | null,"voided_at"?: string | null,"voided_by"?: string | null,"winner_side": number
+                  }
+                  Update: {
+                    "challenge_id"?: string | null,"client_key"?: string | null,"confirmed_at"?: string | null,"created_at"?: string,"format"?: string,"id"?: string,"no_ad"?: boolean,"note"?: string | null,"played_on"?: string,"points_awarded"?: number | null,"recorded_by"?: string,"recorder_side"?: number,"responded_at"?: string | null,"responded_by"?: string | null,"short_tie_at"?: number | null,"sides_key"?: string,"status"?: Database["public"]['Enums']["match_status"],"void_reason"?: string | null,"voided_at"?: string | null,"voided_by"?: string | null,"winner_side"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "tennis_doubles_matches_challenge_id_fkey"
+      columns: ["challenge_id"]
+isOneToOne: false
+      referencedRelation: "tennis_doubles_challenges"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "tennis_doubles_matches_recorded_by_fkey"
+      columns: ["recorded_by"]
+isOneToOne: false
+      referencedRelation: "players"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "tennis_doubles_matches_responded_by_fkey"
+      columns: ["responded_by"]
+isOneToOne: false
+      referencedRelation: "players"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "tennis_doubles_matches_voided_by_fkey"
+      columns: ["voided_by"]
+isOneToOne: false
+      referencedRelation: "players"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"tennis_doubles_players": {
+                  Row: {
+                    "match_id": string,"player_id": string,"side": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "match_id": string,"player_id": string,"side": number
+                  }
+                  Update: {
+                    "match_id"?: string,"player_id"?: string,"side"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "tennis_doubles_players_match_id_fkey"
+      columns: ["match_id"]
+isOneToOne: false
+      referencedRelation: "tennis_doubles_matches"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "tennis_doubles_players_player_id_fkey"
+      columns: ["player_id"]
+isOneToOne: false
+      referencedRelation: "players"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"tennis_doubles_sets": {
+                  Row: {
+                    "is_match_tiebreak": boolean,"match_id": string,"set_number": number,"side1_games": number,"side1_tiebreak": number | null,"side2_games": number,"side2_tiebreak": number | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "is_match_tiebreak"?: boolean,"match_id": string,"set_number": number,"side1_games": number,"side1_tiebreak"?: number | null,"side2_games": number,"side2_tiebreak"?: number | null
+                  }
+                  Update: {
+                    "is_match_tiebreak"?: boolean,"match_id"?: string,"set_number"?: number,"side1_games"?: number,"side1_tiebreak"?: number | null,"side2_games"?: number,"side2_tiebreak"?: number | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "tennis_doubles_sets_match_id_fkey"
+      columns: ["match_id"]
+isOneToOne: false
+      referencedRelation: "tennis_doubles_matches"
+      referencedColumns: ["id"]
+    }
+                  ]
                 }
           }
           Views: {
@@ -384,6 +520,9 @@ isOneToOne: false
 "cancel_pickleball_match":
 { Args: { "p_match": string }; Returns: undefined
                            },
+"cancel_tennis_doubles":
+{ Args: { "p_match": string }; Returns: undefined
+                           },
 "create_challenge":
 { Args: { "p_format": number,"p_message"?: string,"p_opponent": string,"p_proposed_for"?: string }; Returns: string
                            },
@@ -392,6 +531,9 @@ isOneToOne: false
                            },
 "create_pickleball_challenge":
 { Args: { "p_discipline": string,"p_format": string,"p_message"?: string,"p_proposed_for"?: string,"p_scoring": string,"p_side1": (string)[],"p_side2": (string)[] }; Returns: string
+                           },
+"create_tennis_doubles_challenge":
+{ Args: { "p_format": string,"p_message"?: string,"p_no_ad": boolean,"p_proposed_for"?: string,"p_short_tie_at": number,"p_side1": (string)[],"p_side2": (string)[] }; Returns: string
                            },
 "ensure_player":
 { Args: { "p_first_name": string,"p_invite"?: string,"p_last_name": string,"p_username": string }; Returns: string
@@ -438,6 +580,9 @@ isOneToOne: false
 "record_pickleball_match":
 { Args: { "p_challenge"?: string,"p_client_key": string,"p_discipline": string,"p_format": string,"p_games": Json,"p_note"?: string,"p_played_on": string,"p_scoring": string,"p_side1": (string)[],"p_side2": (string)[] }; Returns: string
                            },
+"record_tennis_doubles":
+{ Args: { "p_challenge"?: string,"p_client_key": string,"p_format": string,"p_no_ad": boolean,"p_note"?: string,"p_played_on": string,"p_sets": Json,"p_short_tie_at": number,"p_side1": (string)[],"p_side2": (string)[] }; Returns: string
+                           },
 "require_me":
 { Args: Record<PropertyKey, never>; Returns: string
                            },
@@ -453,11 +598,32 @@ isOneToOne: false
 "respond_pickleball_match":
 { Args: { "p_accept": boolean,"p_match": string }; Returns: undefined
                            },
+"respond_tennis_doubles":
+{ Args: { "p_accept": boolean,"p_match": string }; Returns: undefined
+                           },
+"respond_tennis_doubles_challenge":
+{ Args: { "p_action": string,"p_challenge": string }; Returns: string
+                           },
 "set_avatar":
 { Args: { "p_path"?: string }; Returns: string
                            },
 "take_rate_limit":
 { Args: { "p_bucket": string,"p_max": number,"p_player": string,"p_window": string }; Returns: undefined
+                           },
+"tennis_doubles_format_info":
+{ Args: { "p_format": string }; Returns: Record<string, unknown>
+                           },
+"tennis_doubles_in_challenge":
+{ Args: { "p_challenge": string }; Returns: boolean
+                           },
+"tennis_doubles_in_match":
+{ Args: { "p_match": string }; Returns: boolean
+                           },
+"tennis_doubles_validate":
+{ Args: { "p_format": string,"p_sets": Json,"p_short_tie_at": number }; Returns: number
+                           },
+"tennis_race":
+{ Args: { "a": number,"b": number,"p_to": number }; Returns: string
                            },
 "update_profile":
 { Args: { "p_first_name": string,"p_last_name": string,"p_username": string }; Returns: undefined
@@ -469,6 +635,9 @@ isOneToOne: false
 { Args: { "p_match": string,"p_reason": string }; Returns: undefined
                            },
 "void_pickleball_match":
+{ Args: { "p_match": string,"p_reason": string }; Returns: undefined
+                           },
+"void_tennis_doubles":
 { Args: { "p_match": string,"p_reason": string }; Returns: undefined
                            }
           }

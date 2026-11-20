@@ -61,6 +61,8 @@ export async function cleanup() {
     await db`delete from public.matches where player_one in ${db(ids)} or player_two in ${db(ids)}`;
     await db`delete from public.pickleball_matches where id in (select match_id from public.pickleball_match_players where player_id in ${db(ids)})`;
     await db`delete from public.pickleball_challenges where id in (select challenge_id from public.pickleball_challenge_players where player_id in ${db(ids)})`;
+    await db`delete from public.tennis_doubles_matches where id in (select match_id from public.tennis_doubles_players where player_id in ${db(ids)})`;
+    await db`delete from public.tennis_doubles_challenges where id in (select challenge_id from public.tennis_doubles_challenge_players where player_id in ${db(ids)})`;
     await db`delete from public.challenges where challenger in ${db(ids)} or opponent in ${db(ids)}`;
     await db`delete from public.standing_adjustments where player_id in ${db(ids)}`;
     await db`delete from public.invites where used_by in ${db(ids)} or created_by in ${db(ids)}`;
