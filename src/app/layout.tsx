@@ -8,7 +8,7 @@ const archivo = Archivo({ subsets: ["latin"], axes: ["wdth"], variable: "--font-
 
 export const metadata: Metadata = {
   title: { default: "Baseline", template: "%s · Baseline" },
-  description: "The match ends. The rivalry doesn't. Track every match, settle the debate and climb your own rankings with your friends. Starting with tennis.",
+  description: "Your friends. Your rivals. Your rankings. Record your tennis and pickleball matches, climb your group's leaderboard and keep every rivalry on the record.",
   applicationName: "Baseline",
   appleWebApp: { capable: true, title: "Baseline", statusBarStyle: "black-translucent" },
 };
