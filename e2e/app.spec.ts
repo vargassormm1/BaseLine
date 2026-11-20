@@ -9,9 +9,9 @@ test.beforeAll(async () => { await resetFixtures(); });
 test("signed out: the landing page is public, everything else is closed", async ({ page }) => {
   const problems = watch(page);
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "The match ends. The rivalry doesn't." })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Your friends. Your rivals. Your rankings." })).toBeVisible();
   await expect(page.getByRole("link", { name: "Join with an invite" }).first()).toHaveAttribute("href", "/sign-in?next=/welcome");
-  await expect(page.getByText(/^Invite-only:/)).toBeVisible();
+  await expect(page.getByText(/^Baseline is invite-only\./)).toBeVisible();
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
   await axe(page);
   await noSidewaysScroll(page);
@@ -23,6 +23,27 @@ test("signed out: the landing page is public, everything else is closed", async 
   }
   await axe(page);
   expect(problems).toEqual([]);
+});
+
+test("landing: both sports in the preview, keyboard tabs, no sideways scroll at any width, signed-in visitors skip it", async ({ page }) => {
+  await page.goto("/");
+  const tabs = page.getByRole("tablist", { name: "Example sport" });
+  await expect(tabs.getByRole("tab", { name: "Tennis" })).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByRole("tabpanel")).toContainText("Alex and Chris beat Jordan and Sam");
+  await tabs.getByRole("tab", { name: "Pickleball" }).focus();
+  await page.keyboard.press("Enter");
+  await expect(tabs.getByRole("tab", { name: "Pickleball" })).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByRole("tabpanel")).toContainText("Jordan beats Chris 11–8, 11–6");
+  for (const width of [320, 360, 375, 390, 430, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await noSidewaysScroll(page);
+  }
+  await page.emulateMedia({ colorScheme: "dark", reducedMotion: "reduce" });
+  await page.reload();
+  await axe(page);
+  await signIn(page, "ana");
+  await page.goto("/");
+  await expect(page).toHaveURL(/\/(home|pickleball)$/);
 });
 
 test("security headers and a nonce-based CSP are on every page", async ({ request }) => {
