@@ -27,7 +27,7 @@ export default async function Rankings({ searchParams }: { searchParams: Promise
     const pairs = topPartnerships(seasonD ? d.matches.filter((m) => yearOf(m.playedOn) === seasonD) : d.matches, 3).slice(0, 8);
     return (
       <div className="animate-rise">
-        <PageHeader title="Rankings" subtitle="Doubles: individual points that follow you whoever you partner. A win is worth 5 (one set), 10 (standard doubles or best of 3) or 20 (best of 5) to each winner." />
+        <PageHeader title="Rankings" subtitle="Doubles: individual points that follow you whoever you partner. Each winner earns the same as singles: 10 for standard doubles or best of 3, 20 for best of 5, 5 for one set, a pro set or short sets, 3 for one short set." />
         {boardTabs("doubles")}
         <div className="no-scrollbar -mx-4 mb-5 overflow-x-auto px-4">
           <Segmented label="Season" items={[{ href: "/rankings?board=doubles", label: "All-time", on: seasonD === undefined }, ...yearsD.map((y) => ({ href: `/rankings?board=doubles&season=${y}`, label: String(y), on: seasonD === y }))]} />
