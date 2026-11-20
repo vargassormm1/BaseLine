@@ -95,6 +95,8 @@
   .card { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; }
   .pb-tabbar { padding-bottom: calc(env(safe-area-inset-bottom) + 96px); }
   .pt-safe { padding-top: env(safe-area-inset-top); }
+  /* installed app (home screen): iOS blurs the strip under the status bar; give the first row a little room below it */
+  @media (display-mode: standalone) { .pt-safe { padding-top: calc(env(safe-area-inset-top) + 10px); } }
   .no-scrollbar { scrollbar-width: none; }
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .skeleton { position: relative; overflow: hidden; background: var(--surface-3); border-radius: 10px; }
