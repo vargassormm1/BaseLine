@@ -8,6 +8,8 @@ export async function resetFixtures() {
     await db`delete from public.matches where note like 'e2e%'`;
     await db`delete from public.pickleball_matches`; // local fixtures only: pickleball starts empty each run
     await db`delete from public.pickleball_challenges`;
+    await db`delete from public.tennis_doubles_matches`; // local fixtures only: tennis doubles starts empty each run
+    await db`delete from public.tennis_doubles_challenges`;
     await db`update public.matches set status = 'pending', responded_at = null, confirmed_at = null where id = '00000000-0000-4000-8000-0000000000f1'`;
     await db`delete from public.challenges where challenger in (${ANA}, ${BEN}, ${CY}) and opponent in (${ANA}, ${BEN}, ${CY})`;
     await db`insert into public.challenges (challenger, opponent, format, message) values (${CY}, ${ANA}, 3, 'Rematch. Saturday morning?')`;
