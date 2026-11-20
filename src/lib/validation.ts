@@ -46,3 +46,18 @@ export const pbChallenge = z.object({
   discipline: z.enum(["singles", "doubles"]), format: pbFormat, scoring: pbScoring, side1: pbSide, side2: pbSide,
   message: z.string().trim().max(140).optional(), proposedFor: isoDay.nullable().optional(),
 });
+
+// ---- tennis doubles ----
+const dFormat = z.enum(["one_set", "std", "bo3", "bo3_adv", "bo5", "short1", "short3", "pro8"]);
+const dPair = z.array(z.string().uuid()).length(2);
+const g = z.number().int().min(0).max(99);
+export const dRecord = z.object({
+  clientKey: z.string().uuid(), format: dFormat, shortTieAt: z.union([z.literal(3), z.literal(4)]).nullable(), noAd: z.boolean(),
+  side1: dPair, side2: dPair, playedOn: isoDay,
+  sets: z.array(z.union([z.tuple([g, g]), z.tuple([g, g, g.nullable(), g.nullable()])])).min(1).max(5),
+  challenge: z.string().uuid().nullable().optional(), note: z.string().trim().max(140).optional(),
+});
+export const dChallenge = z.object({
+  format: dFormat, shortTieAt: z.union([z.literal(3), z.literal(4)]).nullable(), noAd: z.boolean(), side1: dPair, side2: dPair,
+  message: z.string().trim().max(140).optional(), proposedFor: isoDay.nullable().optional(),
+});
